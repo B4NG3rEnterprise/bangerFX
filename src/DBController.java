@@ -1,8 +1,5 @@
-/**
- * Created by Merlin on 04.03.2016.
- */
+
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -93,7 +90,7 @@ public class DBController {
             while (rs.next()) {
                 System.out.println("Title = " + rs.getString("title"));
                 System.out.println("Artist = " + rs.getString("artist"));
-                System.out.println("Album = " + rs.getInt("album"));
+                System.out.println("Album = " + rs.getString("album"));
             }
             rs.close();
             connection.close();
