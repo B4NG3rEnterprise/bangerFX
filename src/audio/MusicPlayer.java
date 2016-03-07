@@ -1,3 +1,5 @@
+package audio;
+
 import static jouvieje.bass.Bass.*;
 
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
@@ -78,10 +80,7 @@ public class MusicPlayer {
     public boolean isPlaying() {
         int r = Bass.BASS_ChannelIsActive(stream.asInt());
 
-        if(!(r == BASS_ACTIVE.BASS_ACTIVE_PLAYING))
-            return false;
-        else
-            return true;
+        return r == BASS_ACTIVE.BASS_ACTIVE_PLAYING;
     }
 
 
