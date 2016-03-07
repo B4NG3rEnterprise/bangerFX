@@ -64,8 +64,7 @@ public class DBController {
             stmt.executeUpdate("DROP TABLE IF EXISTS music;");
             stmt.executeUpdate("CREATE TABLE music (title, artist, album);");
 
-            PreparedStatement ps = connection
-                    .prepareStatement("INSERT INTO music VALUES (?, ?, ?);");
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO music VALUES (?, ?, ?);");
 
             ps.setString(1, "Light Tunnels");
             ps.setString(2, "Macklemore");
