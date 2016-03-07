@@ -16,18 +16,20 @@ import javax.swing.JOptionPane;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 public class LyricsGetter {
+
     public static void main(String[] args) throws IOException {
         String artist = JOptionPane.showInputDialog("Please provide an artist name");
         String title = JOptionPane.showInputDialog("Please provide a song name");
         getLyricsBySearch(artist, title);
     }
 
-    public static void getLyricsBySearch(String artist, String title) throws IOException{
+    public static void getLyricsBySearch(String artist, String title) throws MalformedURLException, IOException{
 
         // prepare url for searchQuery on genius.com
-        String url = artist.replace(" ", "+").toLowerCase() + "+" + title.replace(" ", "-").toLowerCase();
+        String url = artist.replace(" ", "+").toLowerCase() + "+" + title.replace(" ", "+").toLowerCase();
 
         // connect to genius.com with the search link
         URLConnection connection = new URL("http://genius.com/search?q=" + url).openConnection();
@@ -44,7 +46,14 @@ public class LyricsGetter {
 
         // get the first result and save its url to a string
         Document document = Jsoup.parse(sb.toString());
-        url = document.getElementsByClass("song_link").first().attr("href");
+        Elements results = document.getElementsByClass("song_link");
+        for (int i = 0; i < results.size(); i++){
+            if (results.get(i).attr("href").contains("Spotify")) continue;
+            else {
+                url = results.get(i).attr("href");
+                break;
+            }
+        }
 
         // connect to genius.com with the url from the results
         connection = new URL(url).openConnection();
@@ -58,12 +67,12 @@ public class LyricsGetter {
             sb.append(line);
         }
 
-        // extract the lyrics
+        // get the lyrics
         document = Jsoup.parse(sb.toString());
         Element lyrics = document.getElementsByClass("lyrics").first();
         lyrics.getElementsByClass("referent").unwrap(); // remove <a/>-Tags
 
-        // display lyrics in JOptionPane
+        // display lyrics
         JLabel label = new JLabel("<html>" + lyrics.toString() + "</html>");
         label.setFont(new Font("Century Gothic", Font.PLAIN, 12));
         JOptionPane.showMessageDialog(null, label, "Lyrics for " + title + " by " + artist,
