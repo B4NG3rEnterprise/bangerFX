@@ -1,15 +1,20 @@
 import javafx.application.Application;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import jouvieje.bass.Bass;
+import util.DeviceItem;
 
 public class PlayerInterface extends Application {
 
     Stage stage;
     Scene scene;
     MusicPlayer p;
+    MenuBar menuBar = new MenuBar();
     int clicked = 0;
 
     public PlayerInterface() {}
@@ -22,7 +27,7 @@ public class PlayerInterface extends Application {
 
         Slider s = new Slider(0, 100, p.getVolume()*100);
         s.setMaxWidth(100);
-        s.setShowTickMarks(true);
+        s.setShowTickMarks(false);
 
         s.setOnMouseClicked(e -> {
             p.setVolume((float)s.getValue()/100);
@@ -85,7 +90,8 @@ public class PlayerInterface extends Application {
             }
         });
 
-        scene = new Scene(new HBox(20, play, s, t));
+        menuBar.getMenus().add(initDeviceMenu());
+        scene = new Scene(new HBox(20, play, s, t, menuBar));
 
         stage.setScene(scene);
         stage.setTitle("MusicPlayer");
@@ -95,5 +101,17 @@ public class PlayerInterface extends Application {
             System.exit(0);
         });
         stage.show();
+    }
+
+    private Menu initDeviceMenu(){
+        Menu deviceMenu = new Menu("Devices");
+        ObservableList<DeviceItem> deviceList = p.getDevices();
+        for (int i = 0; i < deviceList.size(); i++) {
+            int deviceNum = deviceList.get(i).getDeviceInt();
+            MenuItem m = new MenuItem(deviceList.get(i).toString());
+            m.setOnAction(e -> p.setOutputDevice(deviceNum));
+            deviceMenu.getItems().add(m);
+        }
+        return deviceMenu;
     }
 }
