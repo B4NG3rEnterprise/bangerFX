@@ -1,46 +1,34 @@
 package audio;
 
-import static jouvieje.bass.Bass.*;
-import static util.Device.forceFrequency;
-import static util.Device.forceNoSoundDevice;
-
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import jouvieje.bass.Bass;
 import jouvieje.bass.BassInit;
 import jouvieje.bass.defines.BASS_ACTIVE;
 import jouvieje.bass.defines.BASS_ATTRIB;
-import jouvieje.bass.defines.BASS_DATA;
 import jouvieje.bass.defines.BASS_POS;
 import jouvieje.bass.structures.BASS_DEVICEINFO;
 import jouvieje.bass.structures.HSTREAM;
 import jouvieje.bass.utils.BufferUtils;
-import jouvieje.bass.utils.ObjectPointer;
-import jouvieje.bass.utils.Pointer;
 import util.DeviceItem;
 
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.swing.*;
-import java.io.*;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import static jouvieje.bass.Bass.*;
+
 public class MusicPlayer {
 
     HSTREAM stream;
-    ObjectPointer p;
+    float volume;
+    boolean muted;
 
     public MusicPlayer() {
         BassInit.loadLibraries();
         Bass.BASS_Init(-1, 44100, 0, null, null);
 
-        String path = "U:/PS Sport Q11/Newsroom.mp3";
+        String path = "C:/Users/david/Desktop/fun.mp3";
 
         stream = BASS_StreamCreateFile(false, path, 0, 0, 0);
 
@@ -71,6 +59,23 @@ public class MusicPlayer {
         Bass.BASS_ChannelSetAttribute(stream.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, x);
     }
 
+    public void mute() {
+        volume = getVolume();
+        muted = true;
+        setVolume(0);
+    }
+
+    public void unmute() {
+        if (getVolume() <= 0) {
+            muted = false;
+            setVolume(volume);
+        }
+    }
+
+    public boolean isMuted() {
+        return muted;
+    }
+
     public synchronized double getPosition() {
         long pos = Bass.BASS_ChannelGetPosition(stream.asInt(), BASS_POS.BASS_POS_BYTE);
         return Bass.BASS_ChannelBytes2Seconds(stream.asInt(), pos);
@@ -86,8 +91,12 @@ public class MusicPlayer {
     }
 
     public boolean isPlaying() {
-        int r = Bass.BASS_ChannelIsActive(stream.asInt());
-
+        int r = 0;
+        try {
+            r = Bass.BASS_ChannelIsActive(stream.asInt());
+        } catch (NullPointerException e) {
+            //e.printStackTrace();
+        }
         return r == BASS_ACTIVE.BASS_ACTIVE_PLAYING;
     }
 

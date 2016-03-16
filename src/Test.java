@@ -1,16 +1,19 @@
-import audio.PlayerInterface;
+import audio.MusicPlayer;
 import gui.MainView;
-import gui.SearchBar;
-import javafx.application.Application;
-import javafx.stage.Stage;
 
 public class Test {
 
-    public static void main(String... args) {
+    private static MusicPlayer p;
 
+    public static void main(String... args) {
+        p = new MusicPlayer();
     	MainView.launch(MainView.class, args);
 		
 		
         //PlayerInterface.launch(PlayerInterface.class, args);
+    }
+
+    public static MusicPlayer getMusicPlayer() {
+        return p;
     }
 }
