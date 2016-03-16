@@ -1,5 +1,9 @@
-package gui;
+package gui.statusbar;
 
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+
+import gui.MainView;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -9,6 +13,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
+
 
 public class StatusBar extends HBox implements EventHandler<Event> {
 	
@@ -36,18 +41,37 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 	}
 	
 	public void init() {
-		prev = new Button("<<");
+		
+		prev = new Button();
+		GlyphsDude.setIcon(prev, MaterialDesignIcon.SKIP_PREVIOUS, "3em");
+		prev.getStyleClass().add("statusbar_icon");
 		prev.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
-		next = new Button(">>");
+		
+		next = new Button();
+		GlyphsDude.setIcon(next, MaterialDesignIcon.SKIP_NEXT, "3em");
+		next.getStyleClass().add("statusbar_icon");
 		next.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
-		play = new Button(">");
+		
+		play = new Button();
+		GlyphsDude.setIcon(play, MaterialDesignIcon.PLAY, "3em");
+		play.getStyleClass().add("statusbar_icon");
 		play.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
-		mute = new Button("M");
+		
+		mute = new Button();
+		GlyphsDude.setIcon(mute, MaterialDesignIcon.VOLUME_HIGH, "3em");
+		mute.getStyleClass().add("statusbar_icon");
 		mute.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
-		repeat = new Button("R");
+		
+		repeat = new Button();
+		GlyphsDude.setIcon(repeat, MaterialDesignIcon.REPEAT, "3em");
+		repeat.getStyleClass().add("statusbar_icon");
 		repeat.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
-		shuffle = new Button("S");
+		
+		shuffle = new Button();
+		GlyphsDude.setIcon(shuffle, MaterialDesignIcon.SHUFFLE, "3em");
+		shuffle.getStyleClass().add("statusbar_icon");
 		shuffle.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
+		
 		
 		volume = new Slider(0, 1, 0);
 		volume.addEventHandler(MouseEvent.ANY, this);
