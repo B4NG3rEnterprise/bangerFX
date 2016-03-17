@@ -6,13 +6,18 @@ import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.paint.Paint;
 
 
 public class StatusBar extends HBox implements EventHandler<Event> {
@@ -35,13 +40,17 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 	
 	public StatusBar(MainView m) {
 		super(15);
-		mainview = m;
-		
+        mainview = m;
+		this.getStyleClass().add("statusbar");
+        this.setAlignment(Pos.CENTER);
 		init();
 	}
+
+    public void setCustomBackground(Paint p) {
+        setBackground(new Background(new BackgroundFill(p, null, null)));
+    }
 	
 	public void init() {
-		
 		prev = new Button();
 		GlyphsDude.setIcon(prev, MaterialDesignIcon.SKIP_PREVIOUS, size);
 		prev.getStyleClass().add("statusbar_icon");
@@ -70,6 +79,8 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		volume = new Slider(0, 100, mainview.getMusicPlayer().getVolume()*100);
 		volume.addEventHandler(MouseEvent.ANY, this);
 		volume.addEventHandler(ScrollEvent.ANY, this);
+		volume.getStyleClass().add("statusbar_slider");
+        volume.setMaxWidth(90);
 
         mute = new ToggleButton();
         GlyphsDude.setIcon(mute, getVolumeIcon(volume.getValue()), size);
@@ -77,8 +88,9 @@ public class StatusBar extends HBox implements EventHandler<Event> {
         mute.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
 
         songPosition = new Slider();
-        volume.addEventHandler(MouseEvent.ANY, this);
-
+        HBox.setHgrow(songPosition, Priority.ALWAYS);
+        songPosition.addEventHandler(MouseEvent.ANY, this);
+        songPosition.getStyleClass().add("statusbar_slider");
 
 		currentPos = new Label("00:00");
 		songLength = new Label("99:99");
