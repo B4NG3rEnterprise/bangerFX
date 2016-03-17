@@ -89,7 +89,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
         songPosition.addEventHandler(MouseEvent.ANY, this);
         songPosition.getStyleClass().add("statusbar_slider");
         songPosition.getStyleClass().add("progress_slider");
-        songPosition.setMinWidth(300);
+        songPosition.setMinWidth(400);
 
         songIndicator = new ProgressBar();
         songPosition.valueProperty().addListener((ov, old_val, new_val) -> {
@@ -99,7 +99,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
         songIndicator.setProgress(0);
 
         progress = new StackPane(songIndicator, songPosition);
-        HBox.setHgrow(progress, Priority.ALWAYS);
+        HBox.setHgrow(progress, Priority.NEVER);
 
         songIndicator.minWidthProperty().bind(progress.widthProperty());
         songIndicator.maxWidthProperty().bind(progress.widthProperty());
@@ -145,7 +145,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
     }
 
     public void handleScroll(ScrollEvent event) {
-        System.out.println("HIZ");
+
     }
 
 	@Override
