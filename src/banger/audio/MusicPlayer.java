@@ -28,18 +28,19 @@ public class MusicPlayer {
         BassInit.loadLibraries();
         Bass.BASS_Init(-1, 44100, 0, null, null);
 
-        String path = "C:/Users/merlin/Desktop/fun.mp3";
+    }
 
+    public void play() { Bass.BASS_ChannelPlay(stream.asInt(), false); }
+
+    public void play(String path){
+        if (isPlaying()) stopChannel();
         stream = BASS_StreamCreateFile(false, path, 0, 0, 0);
-
         System.out.println(Bass.BASS_ErrorGetCode());
 
-        setVolume(0.05f);
+        play();
     }
 
-    public void play() {
-        Bass.BASS_ChannelPlay(stream.asInt(), false);
-    }
+    public void stopChannel(){ Bass.BASS_ChannelStop(stream.asInt());}
 
     public void pause() {
         Bass.BASS_ChannelPause(stream.asInt());

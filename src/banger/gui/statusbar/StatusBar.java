@@ -84,7 +84,8 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		shuffle.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
 
 		//region Volume Slider
-		volumePosition = new Slider(0, 100, mainview.getMusicPlayer().getVolume()*100);
+		// volumePosition = new Slider(0, 100, mainview.getMusicPlayer().getVolume()*100);
+		volumePosition = new Slider(0, 100, 10);
 		volumePosition.addEventHandler(MouseEvent.ANY, this);
 		volumePosition.addEventHandler(ScrollEvent.ANY, this);
 		volumePosition.getStyleClass().add("statusbar_slider");

@@ -1,5 +1,6 @@
 package banger.gui;
 
+import banger.audio.MusicPlayer;
 import banger.audio.Song;
 import banger.database.DBController;
 import javafx.collections.ObservableList;
@@ -12,17 +13,21 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 
-public class Library extends TableView implements EventHandler<Event> {
+public class Library extends TableView<Song> implements EventHandler<Event> {
 
-    public Library() {
+    private MainView mw;
+
+    public Library(MainView mw) {
         super();
+
+        this.mw = mw;
         init();
     }
 
     public void init(){
         ObservableList<Song> show = DBController.shuffleAll();
 
-        this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         TableColumn song_id = new TableColumn("ID");
         song_id.setCellValueFactory(
@@ -37,8 +42,17 @@ public class Library extends TableView implements EventHandler<Event> {
         album_name.setCellValueFactory(
                 new PropertyValueFactory<Song, String>("album"));
 
-        this.setItems(show);
-        this.getColumns().addAll(song_id, song_name, artist_name, album_name);
+        setItems(show);
+        getColumns().addAll(song_id, song_name, artist_name, album_name);
+
+        setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
+                    mw.getMusicPlayer().play((getSelectionModel().getSelectedItem().getFileLocation()));
+                }
+            }
+        });
     }
 
     public void handle(Event event){

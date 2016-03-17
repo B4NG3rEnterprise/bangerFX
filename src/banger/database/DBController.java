@@ -142,11 +142,11 @@ public class DBController {
             stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('The Train', 1, 1, 'Rap', 2, '/music/macklemore', 330)");
             stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('White Privilege II', 1, 1, 'Rap', 2, '/music/macklemore', 330)");
 
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('A Heartbeat Away', 2, 2, 'Elektro', 5, '/music/hellberg', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('The Girl', 2, 2, 'Elektro', 5, '/music/hellberg', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Back2You', 2, 2, 'Elektro', 5, '/music/hellberg', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Wasted Summer', 2, 2, 'Elektro', 5, '/music/hellberg', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Love You Now', 2, 2, 'Elektro', 5, '/music/hellberg', 330)");
+            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('A Heartbeat Away', 2, 2, 'Elektro', 5, 'res/music/hellberg/this is me ep/a heartbeat away.mp3', 330)");
+            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('The Girl', 2, 2, 'Elektro', 5, 'res/music/hellberg/this is me ep/the girl (feat. Cozi Zuehlsdorff).mp3', 330)");
+            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Back2You', 2, 2, 'Elektro', 5, 'res/music/hellberg/this is me ep/back2you.mp3', 330)");
+            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Wasted Summer', 2, 2, 'Elektro', 5, 'res/music/hellberg/this is me ep/wasted summer (feat. jessarae).mp3', 330)");
+            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Love You Now', 2, 2, 'Elektro', 5, 'res/music/hellberg/this is me ep/love you now.mp3', 330)");
 
             System.out.println("Tables filled successfully.");
             connection.close();

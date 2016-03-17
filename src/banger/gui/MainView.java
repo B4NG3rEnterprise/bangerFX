@@ -23,7 +23,7 @@ public class MainView extends Application {
         statusbar.setCustomBackground(Paint.valueOf("#FA7D38"));
 
         BorderPane bl = new BorderPane();
-        bl.setTop(new Library());
+        bl.setTop(new Library(this));
         bl.setBottom(statusbar);
         Scene scene = new Scene(bl);
 		scene.getStylesheets().add("banger/gui/statusbar/statusbar.css");
