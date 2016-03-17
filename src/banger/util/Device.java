@@ -1,5 +1,5 @@
 /* $LICENSE$ */
-package util;
+package banger.util;
 
 public class Device {
     private final static boolean forceNoSoundDevice = false;

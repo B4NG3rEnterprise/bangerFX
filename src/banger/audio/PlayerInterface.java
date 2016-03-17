@@ -1,15 +1,12 @@
-package audio;
+package banger.audio;
 
+import banger.util.DeviceItem;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import jouvieje.bass.Bass;
-import util.DeviceItem;
 
 public class PlayerInterface extends Application {
 

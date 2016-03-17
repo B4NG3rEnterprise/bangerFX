@@ -1,0 +1,47 @@
+.statusbar, .statusbar * {
+    -fx-fill: white;
+    -fx-text-fill: white;
+}
+
+.statusbar .statusbar_slider .track { // Slider Bahn
+    -fx-padding: 0 0 1px 0;
+    -fx-background-color: white;
+}
+
+.statusbar .statusbar_slider .thumb { // Slider-Knopf
+    -fx-border-radius: 100%;
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+    -fx-padding: 4px;
+    -fx-effect: none;
+}
+
+.statusbar .statusbar_slider:focused .thumb {
+    -fx-background-color: white;
+    -fx-border-radius: 100%;
+    -fx-background-insets: 0;
+}
+
+.statusbar .progress_slider .track {
+    -fx-background-color: rgba(255,255,255, 0.4);
+}
+
+.statusbar .progress_indicator {
+    -fx-padding: 0;
+}
+
+.statusbar .progress_indicator .track {
+    -fx-background-color: transparent;
+    -fx-padding: 0px;
+}
+
+.statusbar .progress_indicator .bar {
+    -fx-background-color: white;
+    -fx-border-width: 1px;
+    -fx-border-color: white;
+    -fx-padding: 0px;
+}
+
+.statusbar .statusbar_icon {
+    -fx-background-color: transparent;
+}
