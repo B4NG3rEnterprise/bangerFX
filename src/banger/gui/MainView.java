@@ -2,9 +2,11 @@ package banger.gui;
 
 import banger.Test;
 import banger.audio.MusicPlayer;
+import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.MenuBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
@@ -23,7 +25,8 @@ public class MainView extends Application {
         statusbar.setCustomBackground(Paint.valueOf("#FA7D38"));
 
         BorderPane bl = new BorderPane();
-        bl.setTop(new Library(this));
+        bl.setTop(new BangerBar(this));
+        bl.setCenter(new Library(this));
         bl.setBottom(statusbar);
         Scene scene = new Scene(bl);
 		scene.getStylesheets().add("banger/gui/statusbar/statusbar.css");

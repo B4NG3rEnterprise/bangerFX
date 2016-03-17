@@ -15,12 +15,12 @@ import javafx.scene.input.MouseEvent;
 
 public class Library extends TableView<Song> implements EventHandler<Event> {
 
-    private MainView mw;
+    private MainView mainview;
 
-    public Library(MainView mw) {
+    public Library(MainView mainview) {
         super();
 
-        this.mw = mw;
+        this.mainview = mainview;
         init();
     }
 
@@ -49,7 +49,7 @@ public class Library extends TableView<Song> implements EventHandler<Event> {
             @Override
             public void handle(MouseEvent event) {
                 if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
-                    mw.getMusicPlayer().play((getSelectionModel().getSelectedItem().getFileLocation()));
+                    mainview.getMusicPlayer().play((getSelectionModel().getSelectedItem().getFileLocation()));
                 }
             }
         });
