@@ -27,7 +27,12 @@ public class MainView extends Application {
 		stage.setScene(scene);
         stage.setTitle("MusicPlayer");
         stage.setMinWidth(1000);
+        stage.setMaxWidth(1400);
         stage.setMinHeight(75);
+        stage.setOnCloseRequest(e -> {
+            player.stop();
+            System.exit(0);
+        });
         stage.show();
 	}
 

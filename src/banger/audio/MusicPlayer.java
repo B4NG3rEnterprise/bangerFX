@@ -85,7 +85,7 @@ public class MusicPlayer {
         Bass.BASS_ChannelSetPosition(stream.asInt(), Bass.BASS_ChannelSeconds2Bytes(stream.asInt(), x), BASS_POS.BASS_POS_BYTE);
     }
 
-    public double getLength() {
+    public synchronized double getLength() {
         long pos = Bass.BASS_ChannelGetLength(stream.asInt(), BASS_POS.BASS_POS_BYTE);
         return Bass.BASS_ChannelBytes2Seconds(stream.asInt(), pos);
     }
@@ -95,7 +95,7 @@ public class MusicPlayer {
         try {
             r = Bass.BASS_ChannelIsActive(stream.asInt());
         } catch (NullPointerException e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
         return r == BASS_ACTIVE.BASS_ACTIVE_PLAYING;
     }
