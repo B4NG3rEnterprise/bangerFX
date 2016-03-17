@@ -1,4 +1,4 @@
-package util;
+package banger.util;
 
 import org.ini4j.Ini;
 
