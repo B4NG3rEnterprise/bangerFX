@@ -36,7 +36,7 @@ public class MusicPlayer {
         if (isPlaying()) stopChannel();
         stream = BASS_StreamCreateFile(false, path, 0, 0, 0);
         System.out.println(Bass.BASS_ErrorGetCode());
-
+        setVolume(0.05f); // remove later
         play();
     }
 
@@ -52,7 +52,8 @@ public class MusicPlayer {
 
     public float getVolume() {
         FloatBuffer b = BufferUtils.newFloatBuffer(1);
-        Bass.BASS_ChannelGetAttribute(stream.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, b);
+        if (stream != null) Bass.BASS_ChannelGetAttribute(stream.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, b);
+        else b.put(0.05f);
         return b.get(0);
     }
 
@@ -96,7 +97,7 @@ public class MusicPlayer {
         try {
             r = Bass.BASS_ChannelIsActive(stream.asInt());
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
         return r == BASS_ACTIVE.BASS_ACTIVE_PLAYING;
     }
