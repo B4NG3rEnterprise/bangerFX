@@ -3,10 +3,6 @@
     -fx-text-fill: white;
 }
 
-.statusbar .statusbar_slider {
-    //-fx-padding: 9px 0 0 0;
-}
-
 .statusbar .statusbar_slider .track { // Slider Bahn
     -fx-padding: 0 0 1px 0;
     -fx-background-color: white;
