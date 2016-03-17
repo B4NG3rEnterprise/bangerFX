@@ -7,16 +7,10 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Paint;
 
 
@@ -31,7 +25,10 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 	private Button repeat;
 	
 	private Slider volume;
+
+    private StackPane progress;
 	private Slider songPosition;
+    private ProgressBar songIndicator;
 	
 	private Label currentPos;
 	private Label songLength;
@@ -87,15 +84,30 @@ public class StatusBar extends HBox implements EventHandler<Event> {
         mute.getStyleClass().add("statusbar_icon");
         mute.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
 
-        songPosition = new Slider();
+        songPosition = new Slider(0,100,0);
         HBox.setHgrow(songPosition, Priority.ALWAYS);
         songPosition.addEventHandler(MouseEvent.ANY, this);
         songPosition.getStyleClass().add("statusbar_slider");
+        songPosition.getStyleClass().add("progress_slider");
+        songPosition.setMinWidth(300);
+
+        songIndicator = new ProgressBar();
+        songPosition.valueProperty().addListener((ov, old_val, new_val) -> {
+            songIndicator.setProgress(new_val.doubleValue()/100);
+        });
+        songIndicator.getStyleClass().add("progress_indicator");
+        songIndicator.setProgress(0);
+
+        progress = new StackPane(songIndicator, songPosition);
+        HBox.setHgrow(progress, Priority.ALWAYS);
+
+        songIndicator.minWidthProperty().bind(progress.widthProperty());
+        songIndicator.maxWidthProperty().bind(progress.widthProperty());
 
 		currentPos = new Label("00:00");
 		songLength = new Label("99:99");
 		
-		getChildren().addAll(prev, play, next, mute, volume, currentPos, songPosition, songLength, shuffle, repeat);
+		getChildren().addAll(prev, play, next, mute, volume, currentPos, progress, songLength, shuffle, repeat);
 	}
 
 	public void handleClick(MouseEvent event) {
