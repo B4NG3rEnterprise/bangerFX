@@ -1,5 +1,6 @@
-package audio;
+package banger.audio;
 
+import banger.util.DeviceItem;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import jouvieje.bass.Bass;
@@ -10,7 +11,6 @@ import jouvieje.bass.defines.BASS_POS;
 import jouvieje.bass.structures.BASS_DEVICEINFO;
 import jouvieje.bass.structures.HSTREAM;
 import jouvieje.bass.utils.BufferUtils;
-import util.DeviceItem;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;

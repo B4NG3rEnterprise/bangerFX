@@ -1,4 +1,4 @@
-package util;
+package banger.util;
 
 /**
  * Created by Merlin on 07.03.2016.

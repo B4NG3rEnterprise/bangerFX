@@ -1,5 +1,7 @@
-import audio.MusicPlayer;
-import gui.MainView;
+package banger;
+
+import banger.audio.MusicPlayer;
+import banger.gui.MainView;
 
 public class Test {
 
