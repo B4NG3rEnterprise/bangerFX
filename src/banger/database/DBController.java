@@ -1,9 +1,13 @@
 package banger.database;
 
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import banger.audio.Song;
+
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBController {
 
@@ -13,8 +17,15 @@ public class DBController {
 
     public static void main(String[] args) {
         DBController dbc = DBController.getInstance();
-        dbc.initDBConnection();
-        dbc.handleDB();
+        dbc.createDB();
+        dbc.fillTables();
+
+        // some tests
+        dbc.shuffleAll();
+
+        ObservableList<Song> allShuffled = dbc.shuffleAll();
+        for (int i = 0; i < allShuffled.size(); i++)
+            System.out.println(allShuffled.get(i));
     }
 
     static {
@@ -30,10 +41,8 @@ public class DBController {
         return dbcontroller;
     }
 
-    private void initDBConnection() {
+    private static void initDBConnection() {
         try {
-            if (connection != null)
-                return;
             System.out.println("Creating Connection to Database...");
             connection = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
             if (!connection.isClosed())
@@ -57,8 +66,9 @@ public class DBController {
         });
     }
 
-    private void handleDB() {
+    private static void createDB() {
         try {
+            initDBConnection();
             Statement stmt = connection.createStatement(); // new Statement for queries
 
             /* Drop all tables */
@@ -95,6 +105,20 @@ public class DBController {
                     " FOREIGN KEY (album) REFERENCES album (id)" +
                     ")");
 
+            System.out.println("Database setup successfull.");
+            connection.close();
+        } catch (SQLException e) {
+            System.err.println("Couldn't handle DB-Query");
+            e.printStackTrace();
+        }
+    }
+
+    public static void fillTables(){
+        try {
+            initDBConnection();
+
+            Statement stmt = connection.createStatement();
+
             /* Fill artist table */
             stmt.executeUpdate("INSERT INTO artist (artist_name) values('Macklemore and Ryan Lewis')");
             stmt.executeUpdate("INSERT INTO artist (artist_name) values('Hellberg')");
@@ -124,6 +148,54 @@ public class DBController {
             stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Wasted Summer', 2, 2, 'Elektro', 5, '/music/hellberg', 330)");
             stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Love You Now', 2, 2, 'Elektro', 5, '/music/hellberg', 330)");
 
+            System.out.println("Tables filled successfully.");
+            connection.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static ObservableList<Song> shuffleAll(){
+        try{
+            initDBConnection();
+
+            List<Song> list = new ArrayList<>();
+            ObservableList<Song> result = FXCollections.observableList(list);
+
+            Statement stmt = connection.createStatement();
+            ResultSet rs;
+
+            rs = stmt.executeQuery("SELECT *, album.album_name, artist.artist_name " +
+                    "FROM song " +
+                    "INNER JOIN album ON (song.album = album.id) " +
+                    "INNER JOIN artist ON (song.artist = artist.id)" +
+                    "ORDER BY RANDOM()");
+
+            int total = 0;
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("song_name");
+                String artist = rs.getString("artist_name");
+                String album = rs.getString("album_name");
+                String genre = rs.getString("genre");
+                byte rating = rs.getByte("rating");
+                String fileLocation = rs.getString("fileLocation");
+                result.add(new Song(id, name, artist, album, genre, rating, fileLocation));
+                total++;
+            }
+            System.out.println("Total songs: " + total);
+            connection.close();
+            return result;
+        } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void getData(){
+        try{
+            initDBConnection();
+            Statement stmt = connection.createStatement();
             ResultSet rs;
 
             /*
@@ -134,11 +206,11 @@ public class DBController {
             */
 
             rs = stmt.executeQuery("SELECT *, album.album_name, artist.artist_name " +
-                                "FROM song " +
-                                "INNER JOIN album ON (song.album = album.id) " +
-                                "INNER JOIN artist ON (song.artist = artist.id)" +
-                                "WHERE artist_name='Hellberg'" +
-                                "ORDER BY RANDOM()");
+                    "FROM song " +
+                    "INNER JOIN album ON (song.album = album.id) " +
+                    "INNER JOIN artist ON (song.artist = artist.id)" +
+                    "WHERE artist_name='Hellberg'" +
+                    "ORDER BY RANDOM()");
 
             while (rs.next()) {
                 System.out.println("ID = " + rs.getInt("id"));
@@ -147,10 +219,8 @@ public class DBController {
                 System.out.println("Album = " + rs.getString("album_name"));
             }
             rs.close();
-
             connection.close();
-        } catch (SQLException e) {
-            System.err.println("Couldn't handle DB-Query");
+        } catch (Exception e){
             e.printStackTrace();
         }
     }

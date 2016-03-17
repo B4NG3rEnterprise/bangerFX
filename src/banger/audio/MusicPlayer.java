@@ -28,7 +28,7 @@ public class MusicPlayer {
         BassInit.loadLibraries();
         Bass.BASS_Init(-1, 44100, 0, null, null);
 
-        String path = "C:/Users/david/Desktop/fun.mp3";
+        String path = "C:/Users/merlin/Desktop/fun.mp3";
 
         stream = BASS_StreamCreateFile(false, path, 0, 0, 0);
 
