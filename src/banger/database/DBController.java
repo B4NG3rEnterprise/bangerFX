@@ -5,6 +5,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import banger.audio.Song;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.nio.charset.Charset;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +24,7 @@ public class DBController {
         dbc.fillTables();
 
         // some tests
-        dbc.shuffleAll();
-
-        ObservableList<Song> allShuffled = dbc.shuffleAll();
+        ObservableList<Song> allShuffled = dbc.shuffleAllFiles();
         for (int i = 0; i < allShuffled.size(); i++)
             System.out.println(allShuffled.get(i));
     }
@@ -43,10 +44,10 @@ public class DBController {
 
     private static void initDBConnection() {
         try {
-            System.out.println("Creating Connection to Database...");
+            // System.out.println("Creating Connection to Database...");
             connection = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
-            if (!connection.isClosed())
-                System.out.println("...Connection established");
+            //if (!connection.isClosed())
+                //System.out.println("Connected to Database.");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -155,7 +156,67 @@ public class DBController {
         }
     }
 
-    public static ObservableList<Song> shuffleAll(){
+    public static void setContent(String path){
+        try {
+            System.out.println("\nLoading songs...\n");
+
+            initDBConnection();
+            createDB();
+
+            initDBConnection();
+            Statement stmt = connection.createStatement();
+            ArrayList<String> list = getAllFiles(path);
+
+            /* Fill artist table */
+            stmt.executeUpdate("INSERT INTO artist (artist_name) values('Unknown Artist')");
+
+            /* Fill album table */
+            stmt.executeUpdate("INSERT INTO album (album_name, artist, release) values('Unknown album', 1, 1111)");
+
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values (?, ?, ?, ?, ?, ?, ?)");
+
+            for (int i = 0; i < list.size(); i++) {
+                ps.setString(1, list.get(i));
+                ps.setInt(2, 1);
+                ps.setInt(3, 1);
+                ps.setString(4, "Rap");
+                ps.setInt(5, 5);
+                ps.setString(6, list.get(i));
+                ps.setInt(7, 500);
+
+                ps.executeUpdate();
+
+                // System.out.println(list.get(i));
+            }
+
+            System.out.println("Loaded " + list.size() + " songs.");
+            connection.close();
+        } catch (Exception e) {
+
+        }
+    }
+
+    private static ArrayList<String> getAllFiles(String path){
+        File file = new File(path);
+        File[] files = file.listFiles();
+        ArrayList<String> list = new ArrayList<>();
+
+        for(File f : files)
+        {
+            if (!f.isDirectory())
+            {
+                if (f.getAbsolutePath().endsWith(".mp3") || f.getAbsolutePath().endsWith(".wma")) list.add(f.getAbsolutePath());
+            } else {
+                ArrayList<String> temp = getAllFiles(path + "/" + f.getName());
+                for (int i = 0; i < temp.size(); i++)
+                    list.add(temp.get(i));
+            }
+        }
+
+        return list;
+    }
+
+    public static ObservableList<Song> shuffleAllFiles(){
         try{
             initDBConnection();
 
@@ -192,36 +253,39 @@ public class DBController {
         }
     }
 
-    public static void getData(){
+    public static ObservableList<Song> getAllFiles(){
         try{
             initDBConnection();
+
+            List<Song> list = new ArrayList<>();
+            ObservableList<Song> result = FXCollections.observableList(list);
+
             Statement stmt = connection.createStatement();
             ResultSet rs;
 
-            /*
             rs = stmt.executeQuery("SELECT *, album.album_name, artist.artist_name " +
                     "FROM song " +
                     "INNER JOIN album ON (song.album = album.id) " +
                     "INNER JOIN artist ON (song.artist = artist.id)");
-            */
 
-            rs = stmt.executeQuery("SELECT *, album.album_name, artist.artist_name " +
-                    "FROM song " +
-                    "INNER JOIN album ON (song.album = album.id) " +
-                    "INNER JOIN artist ON (song.artist = artist.id)" +
-                    "WHERE artist_name='Hellberg'" +
-                    "ORDER BY RANDOM()");
-
+            int total = 0;
             while (rs.next()) {
-                System.out.println("ID = " + rs.getInt("id"));
-                System.out.println("Title = " + rs.getString("song_name"));
-                System.out.println("Artist = " + rs.getString("artist_name"));
-                System.out.println("Album = " + rs.getString("album_name"));
+                int id = rs.getInt("id");
+                String name = rs.getString("song_name");
+                String artist = rs.getString("artist_name");
+                String album = rs.getString("album_name");
+                String genre = rs.getString("genre");
+                byte rating = rs.getByte("rating");
+                String fileLocation = rs.getString("fileLocation");
+                result.add(new Song(id, name, artist, album, genre, rating, fileLocation));
+                total++;
             }
-            rs.close();
+            System.out.println("Total songs: " + total);
             connection.close();
+            return result;
         } catch (Exception e){
             e.printStackTrace();
+            return null;
         }
     }
 }

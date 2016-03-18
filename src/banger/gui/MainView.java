@@ -1,10 +1,13 @@
 package banger.gui;
 
 import banger.audio.MusicPlayer;
+import banger.database.DBController;
 import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
@@ -53,6 +56,10 @@ public class MainView extends Application {
 
     public MusicPlayer getMusicPlayer() {
         return player;
+    }
+
+    public Library getLibrary() {
+        return library;
     }
 
     public void play(String path) {

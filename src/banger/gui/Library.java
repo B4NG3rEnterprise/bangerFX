@@ -20,12 +20,16 @@ public class Library extends TableView<Song> implements EventHandler<Event> {
         super();
 
         this.mainview = mainview;
+
         init();
     }
 
-    public void init(){
-        ObservableList<Song> show = DBController.shuffleAll();
+    public void fillTable(){
+        ObservableList<Song> show = DBController.getAllFiles();
+        setItems(show);
+    }
 
+    public void init(){
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         TableColumn song_id = new TableColumn("ID");
@@ -41,7 +45,7 @@ public class Library extends TableView<Song> implements EventHandler<Event> {
         album_name.setCellValueFactory(
                 new PropertyValueFactory<Song, String>("album"));
 
-        setItems(show);
+        fillTable();
         getColumns().addAll(song_id, song_name, artist_name, album_name);
 
         setOnMousePressed(new EventHandler<MouseEvent>() {
