@@ -69,17 +69,18 @@ public class MusicPlayer {
     }
 
     public void setVolume(float x) {
+        muted = false;
         Bass.BASS_ChannelSetAttribute(stream.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, x);
     }
 
     public void mute() {
         volume = getVolume();
-        muted = true;
         setVolume(0);
+        muted = true;
     }
 
     public void unmute() {
-        if (getVolume() <= 0) {
+        if (muted) {
             muted = false;
             setVolume(volume);
         }

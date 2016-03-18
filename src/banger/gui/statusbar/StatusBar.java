@@ -58,13 +58,25 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		prev = new Button();
 		GlyphsDude.setIcon(prev, MaterialDesignIcon.SKIP_PREVIOUS, size);
 		prev.getStyleClass().add("statusbar_icon");
+		prev.setOnMouseEntered(event -> {
+			prev.setEffect(new Glow(1));
+		});
+		prev.setOnMouseExited(event -> {
+			prev.setEffect(null);
+		});
 		prev.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
 		
 		next = new Button();
 		GlyphsDude.setIcon(next, MaterialDesignIcon.SKIP_NEXT, size);
 		next.getStyleClass().add("statusbar_icon");
+		next.setOnMouseEntered(event -> {
+			next.setEffect(new Glow(1));
+		});
+		next.setOnMouseExited(event -> {
+			next.setEffect(null);
+		});
 		next.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
-		
+
 		play = new ToggleButton();
 		GlyphsDude.setIcon(play, MaterialDesignIcon.PLAY, size);
 		play.getStyleClass().add("statusbar_icon");
@@ -112,14 +124,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
         mute = new ToggleButton();
         GlyphsDude.setIcon(mute, getVolumeIcon(volumePosition.getValue()), size);
         mute.getStyleClass().add("statusbar_icon");
-        mute.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
-		mute.selectedProperty().addListener((ov, old_val, new_val)  -> {
-			if(new_val) {
-				GlyphsDude.setIcon(mute, MaterialDesignIcon.VOLUME_OFF, size);
-			} else {
-				GlyphsDude.setIcon(mute, getVolumeIcon(volumePosition.getValue()), size);
-			}
-		});
+        mute.addEventHandler(EventType.ROOT, e -> handleMuteBtn(e));
 
 		//endregion
 
@@ -146,7 +151,6 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		//endregion
 
 		currentPos = new Label("--:--");
-		//currentPos.textProperty().bind(new SimpleStringProperty(asMinutes(songPosition.getValue())));
 		songLength = new Label("--:--");
 
 		time = new Thread(() -> {
@@ -174,28 +178,16 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		getChildren().addAll(prev, play, next, mute, volume, currentPos, progress, songLength, shuffle, repeat);
 	}
 
-	public void handleClick(MouseEvent event) {
-		if (event.getSource().equals(mute)) {
-			if (mute.isSelected()) {
-                mainview.getMusicPlayer().mute();
-			} else {
-                mainview.getMusicPlayer().unmute();
-			}
-		} else if (event.getSource().equals(volumePosition)) {
-            mainview.getMusicPlayer().setVolume((float) (volumePosition.getValue()/100));
-        }
-    }
-
     public void handleMouse(MouseEvent event) {
-        if (event.getSource().equals(volumePosition) && event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
+        if (event.getSource().equals(volumePosition) &&
+				(event.getEventType().equals(MouseEvent.MOUSE_DRAGGED) || event.getEventType().equals(MouseEvent.MOUSE_CLICKED))) {
             if(mainview.getMusicPlayer().isMuted()) {
-                GlyphsDude.setIcon(mute, MaterialDesignIcon.VOLUME_HIGH, size);
                 mute.setSelected(false);
             }
-            GlyphsDude.setIcon(mute, getVolumeIcon(volumePosition.getValue()), size);
-
-            mainview.getMusicPlayer().setVolume((float) (volumePosition.getValue()/100));
-        } else if(event.getSource().equals(songPosition)) {
+			GlyphsDude.setIcon(mute, getVolumeIcon(volumePosition.getValue()), size);
+			mainview.getMusicPlayer().setVolume((float) (volumePosition.getValue()/100));
+        }
+		else if(event.getSource().equals(songPosition)) {
 			if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
 				mainview.getMusicPlayer().pause();
 				mainview.getMusicPlayer().setPosition(songPosition.getValue());
@@ -250,13 +242,24 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 
 	}
 
+	public void handleMuteBtn(Event e){
+		EventType type = e.getEventType();
+		if (type.equals(MouseEvent.MOUSE_CLICKED)) {
+			if(mainview.getMusicPlayer().isMuted()) {
+				mainview.getMusicPlayer().unmute();
+				GlyphsDude.setIcon(mute, getVolumeIcon(volumePosition.getValue()), size);
+			} else {
+				mainview.getMusicPlayer().mute();
+				GlyphsDude.setIcon(mute, MaterialDesignIcon.VOLUME_OFF, size);
+			}
+		}
+	}
+
 	@Override
 	public void handle(Event event) {
 		EventType type = event.getEventType();
 		
-		if(type.equals(MouseEvent.MOUSE_CLICKED)) {
-			handleClick((MouseEvent) event);
-		} else if (type.getSuperType().equals(ScrollEvent.ANY)) {
+		if (type.getSuperType().equals(ScrollEvent.ANY)) {
             handleScroll((ScrollEvent) event);
 		} else if (type.getSuperType().equals(MouseEvent.ANY)){
             handleMouse((MouseEvent) event);
