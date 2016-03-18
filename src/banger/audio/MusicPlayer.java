@@ -22,8 +22,9 @@ import static jouvieje.bass.Bass.*;
 public class MusicPlayer {
 
     HSTREAM stream;
-    float volume;
+    float volume = 0.05f;
     boolean muted;
+    Song nowPlaying;
 
     private MainView mainview;
 
@@ -38,13 +39,13 @@ public class MusicPlayer {
         Bass.BASS_ChannelPlay(stream.asInt(), false);
     }
 
-    public void play(String path) {
+    public void play(Song s) {
         if (isPlaying()) stop();
-
-        stream = BASS_StreamCreateFile(false, path, 0, 0, 0);
+        nowPlaying = s;
+        stream = BASS_StreamCreateFile(false, s.getFileLocation(), 0, 0, 0);
         System.out.println(Bass.BASS_ErrorGetCode());
 
-        setVolume(0.05f); // remove later
+        setVolume(volume); // remove later
 
         play();
     }
@@ -64,12 +65,13 @@ public class MusicPlayer {
     public float getVolume() {
         FloatBuffer b = BufferUtils.newFloatBuffer(1);
         if (stream != null) Bass.BASS_ChannelGetAttribute(stream.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, b);
-        else b.put(0.05f);
+        else return volume;
         return b.get(0);
     }
 
     public void setVolume(float x) {
         muted = false;
+        volume = x;
         Bass.BASS_ChannelSetAttribute(stream.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, x);
     }
 
@@ -112,6 +114,10 @@ public class MusicPlayer {
             // e.printStackTrace();
         }
         return r == BASS_ACTIVE.BASS_ACTIVE_PLAYING;
+    }
+
+    public Song getNowPlaying() {
+        return nowPlaying;
     }
 
     public ObservableList<DeviceItem> getDevices() {

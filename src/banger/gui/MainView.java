@@ -1,16 +1,18 @@
 package banger.gui;
 
 import banger.audio.MusicPlayer;
-import banger.database.DBController;
+import banger.audio.Song;
 import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
+
+import java.util.Collections;
+import java.util.Iterator;
 
 
 public class MainView extends Application {
@@ -62,8 +64,8 @@ public class MainView extends Application {
         return library;
     }
 
-    public void play(String path) {
-        player.play(path);
+    public void play(Song s) {
+        player.play(s);
         statusbar.play();
     }
 
@@ -74,6 +76,28 @@ public class MainView extends Application {
 
     public void pause() {
         player.pause();
+    }
+
+    public void skipForward() {
+        for (Iterator<Song> iterator = library.getItems().iterator(); iterator.hasNext(); ) {
+            if (iterator.next().equals(player.getNowPlaying())) {
+                if (iterator.hasNext())
+                    play(iterator.next());
+            }
+        }
+    }
+
+    //TODO: Think of some better way!
+    public void skipBackward() {
+        ObservableList<Song> s = library.getItems();
+        Collections.reverse(s); //Problem: Changes the underlying list (and with that even the order in the table)
+        for (Iterator<Song> iterator = s.iterator(); iterator.hasNext(); ) {
+            if (iterator.next().equals(player.getNowPlaying())) {
+                if (iterator.hasNext())
+                    play(iterator.next());
+            }
+        }
+        Collections.reverse(s);
     }
 
 }

@@ -52,7 +52,7 @@ public class Library extends TableView<Song> implements EventHandler<Event> {
             @Override
             public void handle(MouseEvent event) {
                 if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
-                    mainview.play((getSelectionModel().getSelectedItem().getFileLocation()));
+                    mainview.play((getSelectionModel().getSelectedItem()));
                 }
             }
         });

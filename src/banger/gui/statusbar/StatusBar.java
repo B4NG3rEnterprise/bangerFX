@@ -203,6 +203,22 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 				currentPos.setText(asMinutes(songPosition.getValue()));
 			}
 		}
+		else if (event.getSource().equals(next)) {
+			if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
+				mainview.skipForward();
+			}
+		}
+		else if (event.getSource().equals(prev)) {
+			if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
+				if (songPosition.getValue() < 20)
+					mainview.skipBackward();
+				else {
+					songPosition.setValue(0);
+					mainview.getMusicPlayer().setPosition(songPosition.getValue());
+					currentPos.setText(asMinutes(songPosition.getValue()));
+				}
+			}
+		}
     }
 
     public void handleScroll(ScrollEvent event) {
