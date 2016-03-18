@@ -1,6 +1,5 @@
 package banger.gui;
 
-import banger.audio.MusicPlayer;
 import banger.audio.Song;
 import banger.database.DBController;
 import javafx.collections.ObservableList;
@@ -49,7 +48,7 @@ public class Library extends TableView<Song> implements EventHandler<Event> {
             @Override
             public void handle(MouseEvent event) {
                 if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
-                    mainview.getMusicPlayer().play((getSelectionModel().getSelectedItem().getFileLocation()));
+                    mainview.play((getSelectionModel().getSelectedItem().getFileLocation()));
                 }
             }
         });
@@ -59,7 +58,7 @@ public class Library extends TableView<Song> implements EventHandler<Event> {
         EventType type = event.getEventType();
 
         if(type.equals(MouseEvent.MOUSE_CLICKED)) {
-            handle((MouseEvent) event);
+            //handle((MouseEvent) event);
         } else {
 
             System.out.println(type);

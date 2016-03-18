@@ -1,5 +1,6 @@
 package banger.audio;
 
+import banger.gui.MainView;
 import banger.util.DeviceItem;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,29 +25,39 @@ public class MusicPlayer {
     float volume;
     boolean muted;
 
-    public MusicPlayer() {
+    private MainView mainview;
+
+    public MusicPlayer(MainView m) {
         BassInit.loadLibraries();
         Bass.BASS_Init(-1, 44100, 0, null, null);
 
+        mainview = m;
     }
 
-    public void play() { Bass.BASS_ChannelPlay(stream.asInt(), false); }
+    public void play() {
+        Bass.BASS_ChannelPlay(stream.asInt(), false);
+    }
 
-    public void play(String path){
-        if (isPlaying()) stopChannel();
+    public void play(String path) {
+        if (isPlaying()) stop();
+
         stream = BASS_StreamCreateFile(false, path, 0, 0, 0);
         System.out.println(Bass.BASS_ErrorGetCode());
+
         setVolume(0.05f); // remove later
+
         play();
     }
 
-    public void stopChannel(){ Bass.BASS_ChannelStop(stream.asInt());}
+    public void stop() {
+        Bass.BASS_ChannelStop(stream.asInt());
+    }
 
     public void pause() {
         Bass.BASS_ChannelPause(stream.asInt());
     }
 
-    public void stop() {
+    public void kill() {
         Bass.BASS_Free();
     }
 

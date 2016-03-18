@@ -3,6 +3,8 @@ package banger.gui.statusbar;
 import banger.gui.MainView;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -37,6 +39,8 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 	private Label songLength;
 
 	private String size = "2em";
+
+	private Thread time;
 	
 	public StatusBar(MainView m) {
 		super(15);
@@ -64,13 +68,14 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		play = new ToggleButton();
 		GlyphsDude.setIcon(play, MaterialDesignIcon.PLAY, size);
 		play.getStyleClass().add("statusbar_icon");
-		play.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
         play.setOnMouseEntered(event -> {
             play.setEffect(new Glow(1));
         });
         play.setOnMouseExited(event -> {
             play.setEffect(null);
         });
+		play.addEventHandler(EventType.ROOT, e -> handlePlayBtn(e));
+
 
 		
 		repeat = new Button();
@@ -84,6 +89,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		shuffle.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
 
 		//region Volume Slider
+		
 		volumePosition = new Slider(0, 100, mainview.getMusicPlayer().getVolume()*100);
 		volumePosition.addEventHandler(MouseEvent.ANY, this);
 		volumePosition.addEventHandler(ScrollEvent.ANY, this);
@@ -107,6 +113,14 @@ public class StatusBar extends HBox implements EventHandler<Event> {
         GlyphsDude.setIcon(mute, getVolumeIcon(volumePosition.getValue()), size);
         mute.getStyleClass().add("statusbar_icon");
         mute.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
+		mute.selectedProperty().addListener((ov, old_val, new_val)  -> {
+			if(new_val) {
+				GlyphsDude.setIcon(mute, MaterialDesignIcon.VOLUME_OFF, size);
+			} else {
+				GlyphsDude.setIcon(mute, getVolumeIcon(volumePosition.getValue()), size);
+			}
+		});
+
 		//endregion
 
 		//region ProgressBar
@@ -119,7 +133,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 
         songIndicator = new ProgressBar();
         songPosition.valueProperty().addListener((ov, old_val, new_val) -> {
-            songIndicator.setProgress(new_val.doubleValue()/100);
+            songIndicator.setProgress(new_val.doubleValue()/songPosition.getMax());
         });
         songIndicator.getStyleClass().add("progress_indicator");
         songIndicator.setProgress(0);
@@ -131,9 +145,32 @@ public class StatusBar extends HBox implements EventHandler<Event> {
         songIndicator.maxWidthProperty().bind(progress.widthProperty());
 		//endregion
 
-		currentPos = new Label("00:00");
-		songLength = new Label("99:99");
-		
+		currentPos = new Label("--:--");
+		//currentPos.textProperty().bind(new SimpleStringProperty(asMinutes(songPosition.getValue())));
+		songLength = new Label("--:--");
+
+		time = new Thread(() -> {
+			while(true) {
+				if(!mainview.getMusicPlayer().isPlaying()) {
+					Thread.yield();
+				} else {
+					long now = System.currentTimeMillis();
+					while (System.currentTimeMillis() - now < 300) {
+						Thread.yield();
+					}
+					double pos = mainview.getMusicPlayer().getPosition();
+					Platform.runLater(() -> {
+						currentPos.setText(asMinutes(pos));
+						songPosition.setValue(pos);
+					});
+					if (pos == mainview.getMusicPlayer().getLength()) {
+						System.out.println("STOP");
+					}
+				}
+			}
+		});
+		time.start();
+
 		getChildren().addAll(prev, play, next, mute, volume, currentPos, progress, songLength, shuffle, repeat);
 	}
 
@@ -141,18 +178,8 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		if (event.getSource().equals(mute)) {
 			if (mute.isSelected()) {
                 mainview.getMusicPlayer().mute();
-				GlyphsDude.setIcon(mute, MaterialDesignIcon.VOLUME_OFF, size);
 			} else {
                 mainview.getMusicPlayer().unmute();
-				GlyphsDude.setIcon(mute, getVolumeIcon(volumePosition.getValue()), size);
-			}
-		} else if (event.getSource().equals(play)) {
-			if (mainview.getMusicPlayer().isPlaying()) {
-				mainview.getMusicPlayer().pause();
-				GlyphsDude.setIcon(play, MaterialDesignIcon.PLAY, size);
-			} else {
-				mainview.getMusicPlayer().play();
-				GlyphsDude.setIcon(play, MaterialDesignIcon.PAUSE, size);
 			}
 		} else if (event.getSource().equals(volumePosition)) {
             mainview.getMusicPlayer().setVolume((float) (volumePosition.getValue()/100));
@@ -168,12 +195,60 @@ public class StatusBar extends HBox implements EventHandler<Event> {
             GlyphsDude.setIcon(mute, getVolumeIcon(volumePosition.getValue()), size);
 
             mainview.getMusicPlayer().setVolume((float) (volumePosition.getValue()/100));
-        }
+        } else if(event.getSource().equals(songPosition)) {
+			if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
+				mainview.getMusicPlayer().pause();
+				mainview.getMusicPlayer().setPosition(songPosition.getValue());
+				currentPos.setText(asMinutes(songPosition.getValue()));
+			}
+			else if (event.getEventType().equals(MouseEvent.MOUSE_RELEASED)) {
+				mainview.getMusicPlayer().setPosition(songPosition.getValue());
+				currentPos.setText(asMinutes(songPosition.getValue()));
+				if (!play.isSelected())
+					mainview.getMusicPlayer().play();
+			}
+			else if (event.getEventType().equals(MouseEvent.MOUSE_DRAGGED)) {
+				currentPos.setText(asMinutes(songPosition.getValue()));
+			}
+		}
     }
 
     public void handleScroll(ScrollEvent event) {
-
+		if(event.getSource().equals(volumePosition)) {
+			double d = event.getDeltaY();
+			if(d > 0) {
+				volumePosition.setValue(volumePosition.getValue() + 2);
+				mainview.getMusicPlayer().setVolume((float) volumePosition.getValue()/100);
+			} else {
+				volumePosition.setValue(volumePosition.getValue() - 2);
+				mainview.getMusicPlayer().setVolume((float) volumePosition.getValue()/100);
+			}
+			if(mainview.getMusicPlayer().isMuted()) {
+				GlyphsDude.setIcon(mute, MaterialDesignIcon.VOLUME_HIGH, size);
+				mute.setSelected(false);
+			}
+			GlyphsDude.setIcon(mute, getVolumeIcon(volumePosition.getValue()), size);
+		}
     }
+
+	public void handlePlayBtn(Event e) {
+		EventType type = e.getEventType();
+		if (type.equals(MouseEvent.MOUSE_PRESSED)) {
+			if (mainview.getMusicPlayer().isPlaying()) {
+				mainview.pause();
+			} else {
+				mainview.play();
+			}
+		} else if(type.equals(ActionEvent.ACTION)) {
+			if(!play.isSelected()) {
+				GlyphsDude.setIcon(play, MaterialDesignIcon.PAUSE, size);
+			} else {
+				GlyphsDude.setIcon(play, MaterialDesignIcon.PLAY, size);
+			}
+		}
+
+
+	}
 
 	@Override
 	public void handle(Event event) {
@@ -188,6 +263,15 @@ public class StatusBar extends HBox implements EventHandler<Event> {
         }
 	}
 
+	public void play() {
+		double len = mainview.getMusicPlayer().getLength();
+		songPosition.setMax(len);
+		currentPos.setText(asMinutes(songPosition.getValue()));
+		songLength.setText(asMinutes(len));
+		play.setSelected(true);
+		play.fire();
+	}
+
     private MaterialDesignIcon getVolumeIcon(double volume) {
         MaterialDesignIcon i;
         if (volume > 60)
@@ -198,7 +282,18 @@ public class StatusBar extends HBox implements EventHandler<Event> {
             i = MaterialDesignIcon.VOLUME_LOW;
         return i;
     }
-	
-	
 
+	private void setCurrentTimeLabel(String l) {
+		currentPos.setText(l);
+	}
+
+	private String asMinutes(double val) {
+		int min = 0;
+		int sec = 0;
+
+		min = (int) val/60;
+		sec = (int) (val) % 60;
+
+		return String.format("%d:%02d", min, sec);
+	}
 }
