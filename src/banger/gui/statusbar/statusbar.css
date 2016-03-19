@@ -30,7 +30,7 @@
 }
 
 .statusbar .progress_indicator {
-    -fx-padding: 2px;
+    -fx-padding: 0px;
     -fx-border-color: transparent;
 }
 

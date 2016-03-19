@@ -101,5 +101,4 @@ public class MainView extends Application {
         }
         Collections.reverse(s);
     }
-
 }
