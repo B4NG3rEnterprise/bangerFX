@@ -4,8 +4,11 @@
 }
 
 .statusbar .statusbar_slider .track { // Slider Bahn
-    -fx-padding: 0 0 1px 0;
+    -fx-padding: 0px 0 1px 0;
     -fx-background-color: white;
+    -fx-border-color: transparent;
+    -fx-border-width: 5px 0 6px;
+    -fx-background-insets: 5px 0 5px 0;
 }
 
 .statusbar .statusbar_slider .thumb { // Slider-Knopf
@@ -27,7 +30,8 @@
 }
 
 .statusbar .progress_indicator {
-    -fx-padding: 0;
+    -fx-padding: 2px;
+    -fx-border-color: transparent;
 }
 
 .statusbar .progress_indicator .track {

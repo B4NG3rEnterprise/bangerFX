@@ -83,6 +83,7 @@ public class MainView extends Application {
             if (iterator.next().equals(player.getNowPlaying())) {
                 if (iterator.hasNext())
                     play(iterator.next());
+                break;
             }
         }
     }
@@ -95,6 +96,7 @@ public class MainView extends Application {
             if (iterator.next().equals(player.getNowPlaying())) {
                 if (iterator.hasNext())
                     play(iterator.next());
+                break;
             }
         }
         Collections.reverse(s);

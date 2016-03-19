@@ -1,13 +1,11 @@
 package banger.database;
 
 
+import banger.audio.Song;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import banger.audio.Song;
 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.nio.charset.Charset;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -205,7 +203,7 @@ public class DBController {
         {
             if (!f.isDirectory())
             {
-                if (f.getAbsolutePath().endsWith(".mp3") || f.getAbsolutePath().endsWith(".wma")) list.add(f.getAbsolutePath());
+                if (f.getAbsolutePath().endsWith(".mp3") || f.getAbsolutePath().endsWith(".wma") || f.getAbsolutePath().endsWith(".flac")) list.add(f.getAbsolutePath());
             } else {
                 ArrayList<String> temp = getAllFiles(path + "/" + f.getName());
                 for (int i = 0; i < temp.size(); i++)

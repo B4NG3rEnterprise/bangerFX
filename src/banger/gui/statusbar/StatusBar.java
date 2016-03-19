@@ -180,7 +180,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 
     public void handleMouse(MouseEvent event) {
         if (event.getSource().equals(volumePosition) &&
-				(event.getEventType().equals(MouseEvent.MOUSE_DRAGGED) || event.getEventType().equals(MouseEvent.MOUSE_CLICKED))) {
+				(event.getEventType().equals(MouseEvent.MOUSE_DRAGGED) || event.getEventType().equals(MouseEvent.MOUSE_PRESSED))) {
             if(mainview.getMusicPlayer().isMuted()) {
                 mute.setSelected(false);
             }
