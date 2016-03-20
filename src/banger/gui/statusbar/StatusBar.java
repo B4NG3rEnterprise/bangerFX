@@ -159,7 +159,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 					Thread.yield();
 				} else {
 					long now = System.currentTimeMillis();
-					while (System.currentTimeMillis() - now < 300) {
+					while (System.currentTimeMillis() - now < 333) {
 						Thread.yield();
 					}
 					double pos = mainview.getMusicPlayer().getPosition();
@@ -167,8 +167,12 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 						currentPos.setText(asMinutes(pos));
 						songPosition.setValue(pos);
 					});
-					if (pos == mainview.getMusicPlayer().getLength()) {
-						System.out.println("STOP");
+					if (pos >= mainview.getMusicPlayer().getLength()) {
+						now = System.currentTimeMillis();
+						while (System.currentTimeMillis() - now < 1000) {
+							Thread.yield();
+						}
+						Platform.runLater(() -> mainview.skipForward());
 					}
 				}
 			}
@@ -179,14 +183,16 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 	}
 
     public void handleMouse(MouseEvent event) {
+		// VolumeBar
         if (event.getSource().equals(volumePosition) &&
-				(event.getEventType().equals(MouseEvent.MOUSE_DRAGGED) || event.getEventType().equals(MouseEvent.MOUSE_CLICKED))) {
+				(event.getEventType().equals(MouseEvent.MOUSE_DRAGGED) || event.getEventType().equals(MouseEvent.MOUSE_PRESSED))) {
             if(mainview.getMusicPlayer().isMuted()) {
                 mute.setSelected(false);
             }
 			GlyphsDude.setIcon(mute, getVolumeIcon(volumePosition.getValue()), size);
 			mainview.getMusicPlayer().setVolume((float) (volumePosition.getValue()/100));
         }
+		// ProgressBar
 		else if(event.getSource().equals(songPosition)) {
 			if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED)) {
 				mainview.getMusicPlayer().pause();
@@ -203,11 +209,13 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 				currentPos.setText(asMinutes(songPosition.getValue()));
 			}
 		}
+		// SkipForward
 		else if (event.getSource().equals(next)) {
 			if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
 				mainview.skipForward();
 			}
 		}
+		// SkipBackward
 		else if (event.getSource().equals(prev)) {
 			if (event.getEventType().equals(MouseEvent.MOUSE_CLICKED)) {
 				if (songPosition.getValue() < 20)

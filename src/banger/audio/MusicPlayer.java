@@ -76,8 +76,9 @@ public class MusicPlayer {
     }
 
     public void mute() {
-        volume = getVolume();
+        float v = getVolume();
         setVolume(0);
+        volume = v;
         muted = true;
     }
 
