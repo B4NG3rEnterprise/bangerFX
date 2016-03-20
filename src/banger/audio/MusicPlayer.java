@@ -136,6 +136,7 @@ public class MusicPlayer {
     public void setOutputDevice(int device){
         BASS_Init(device, 44100, 0, null, null);
         BASS_ChannelSetDevice(stream.asInt(), device);
+        BASS_SetDevice(device);
         System.out.println(device);
     }
 }

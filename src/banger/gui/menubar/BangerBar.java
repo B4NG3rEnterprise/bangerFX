@@ -25,8 +25,9 @@ public class BangerBar extends MenuBar {
     }
 
     public void init() {
-        MenuItem cd = new MenuItem("Choose Directory...");
-        cd.setOnAction(e -> {
+
+        MenuItem changeDir = new MenuItem("Choose Directory...");
+        changeDir.setOnAction(e -> {
             Stage stage = new Stage();
             stage.centerOnScreen();
             DirectoryChooser dc = new DirectoryChooser();
@@ -36,10 +37,50 @@ public class BangerBar extends MenuBar {
             mainview.getLibrary().fillTable();
         });
 
-        Menu options = new Menu("Options");
-        options.getItems().add(initDeviceMenu());
-        options.getItems().add(cd);
-        getMenus().add(options);
+        Menu file = new Menu("Datei");
+        file.getItems().add(new MenuItem("Importieren..."));
+        file.getItems().add(new MenuItem("Exportieren..."));
+        MenuItem close = new MenuItem("Schließen");
+        close.setOnAction(event -> {
+            mainview.getMusicPlayer().kill();
+            System.exit(0);
+        });
+        file.getItems().add(close);
+
+        Menu edit = new Menu("Datei");
+        edit.getItems().add(initPlaylistMenu());
+        edit.getItems().add(new MenuItem("Playlist löschen"));
+        edit.getItems().add(new MenuItem("Optionen..."));
+        edit.getItems().add(new MenuItem("Equalizer"));
+
+        Menu view = new Menu("Ansicht");
+        view.getItems().add(new MenuItem("Widget-Ansicht"));
+        view.getItems().add(new MenuItem("Benachrichtigungen"));
+        view.getItems().add(new MenuItem("Hintergrundfarbe"));
+        view.getItems().add(new MenuItem("Fonts"));
+
+        Menu help = new Menu("Hilfe");
+        help.getItems().add(new MenuItem("Hilfe..."));
+        help.getItems().add(new MenuItem("Über"));
+        help.getItems().add(new MenuItem("Get Premium"));
+
+        Menu extra = new Menu("Extra");
+        extra.getItems().add(initDeviceMenu());
+        extra.getItems().add(changeDir);
+
+        getMenus().addAll(file, edit, view, help, extra);
+    }
+
+    private Menu initPlaylistMenu(){
+        Menu playlistMenu = new Menu("Hinzufügen zu...");
+
+        // just examples, loop through playlists and add them to the menu
+        playlistMenu.getItems().add(new MenuItem("Sport"));
+        playlistMenu.getItems().add(new MenuItem("Chillen"));
+
+        playlistMenu.getItems().add(new MenuItem("Neue Playlist erstellen..."));
+
+        return playlistMenu;
     }
 
     private Menu initDeviceMenu(){
@@ -54,15 +95,12 @@ public class BangerBar extends MenuBar {
         return deviceMenu;
     }
 
-    private Menu initOptionsMenu(){
-        Menu deviceMenu = new Menu("Devices");
-        ObservableList<DeviceItem> deviceList = mainview.getMusicPlayer().getDevices();
-        for (int i = 0; i < deviceList.size(); i++) {
-            int deviceNum = deviceList.get(i).getDeviceInt();
-            MenuItem m = new MenuItem(deviceList.get(i).toString());
-            m.setOnAction(e -> mainview.getMusicPlayer().setOutputDevice(deviceNum));
-            deviceMenu.getItems().add(m);
-        }
-        return deviceMenu;
+    private Menu initSettingsMenu(){
+        Menu settingsMenu = new Menu("Settings");
+
+        MenuItem mi = new MenuItem("Fun");
+
+        settingsMenu.getItems().add(mi);
+        return settingsMenu;
     }
 }

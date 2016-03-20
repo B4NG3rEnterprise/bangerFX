@@ -1,13 +1,17 @@
 package banger.database;
 
 
+import banger.util.BangerVars;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import banger.audio.Song;
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioHeader;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
 
 import java.io.File;
-import java.io.FilenameFilter;
-import java.nio.charset.Charset;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,17 +21,6 @@ public class DBController {
     private static final DBController dbcontroller = new DBController();
     private static Connection connection;
     private static final String DB_PATH = "res/" + "testdb.db";
-
-    public static void main(String[] args) {
-        DBController dbc = DBController.getInstance();
-        dbc.createDB();
-        dbc.fillTables();
-
-        // some tests
-        ObservableList<Song> allShuffled = dbc.shuffleAllFiles();
-        for (int i = 0; i < allShuffled.size(); i++)
-            System.out.println(allShuffled.get(i));
-    }
 
     static {
         try {
@@ -79,16 +72,17 @@ public class DBController {
 
             /* Create artist table */
             stmt.executeUpdate("CREATE TABLE artist" +
-                    "(id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    " artist_name varchar(32) DEFAULT NULL" +
+                    "(id INTEGER PRIMARY KEY," +
+                    " artist_name varchar(32) DEFAULT NULL UNIQUE" +
                     ")");
 
             /* Create album table */
             stmt.executeUpdate("CREATE TABLE album" +
-                    "(id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "(id INTEGER PRIMARY KEY," +
                     " album_name varchar(32) DEFAULT NULL," +
-                    " artist bigint(20) NOT NULL," +
-                    " release smallint(5) DEFAULT NULL," +
+                    " artist bigint(20) NOT NULL DEFAULT 1," +
+                    " release varchar(32) DEFAULT NULL," +
+                    " UNIQUE(album_name, artist)" +
                     " FOREIGN KEY (artist) REFERENCES artist (id)" +
                     ")");
 
@@ -96,8 +90,8 @@ public class DBController {
             stmt.executeUpdate("CREATE TABLE song" +
                     "(id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     " song_name varchar(32) DEFAULT NULL," +
-                    " artist bigint(20) NOT NULL," +
-                    " album bigint(20) NOT NULL," +
+                    " artist bigint(20) NOT NULL DEFAULT 1," +
+                    " album bigint(20) NOT NULL DEFAULT 1," +
                     " genre varchar(32) DEFAULT NULL," +
                     " rating tinyint(4) DEFAULT NULL," +
                     " fileLocation varchar(32) DEFAULT NULL," +
@@ -114,48 +108,6 @@ public class DBController {
         }
     }
 
-    public static void fillTables(){
-        try {
-            initDBConnection();
-
-            Statement stmt = connection.createStatement();
-
-            /* Fill artist table */
-            stmt.executeUpdate("INSERT INTO artist (artist_name) values('Macklemore and Ryan Lewis')");
-            stmt.executeUpdate("INSERT INTO artist (artist_name) values('Hellberg')");
-
-            /* Fill album table */
-            stmt.executeUpdate("INSERT INTO album (album_name, artist, release) values('This Unruly Mess I''ve Made', 1, 2016)");
-            stmt.executeUpdate("INSERT INTO album (album_name, artist, release) values('This Is Me EP', 2, 2015)");
-
-            /* Fill song table */
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Light Tunnels', 1, 1, 'Rap', 5, '/music/macklemore', 500)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Downtown', 1, 1, 'Rap', 4, '/music/macklemore', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Brad Pitt''s Cousin', 1, 1, 'Rap', 3, '/music/macklemore', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Buckshot', 1, 1, 'Rap', 2, '/music/macklemore', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Growing Up', 1, 1, 'Rap', 5, '/music/macklemore', 300)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Kevin', 1, 1, 'Rap', 4, '/music/macklemore', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('St. Ides', 1, 1, 'Rap', 3, '/music/macklemore', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Need To Know', 1, 1, 'Rap', 2, '/music/macklemore', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Dance Off', 1, 1, 'Rap', 5, '/music/macklemore', 300)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Let''s Eat', 1, 1, 'Rap', 4, '/music/macklemore', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Bolo Tie', 1, 1, 'Rap', 3, '/music/macklemore', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('The Train', 1, 1, 'Rap', 2, '/music/macklemore', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('White Privilege II', 1, 1, 'Rap', 2, '/music/macklemore', 330)");
-
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('A Heartbeat Away', 2, 2, 'Elektro', 5, 'res/music/hellberg/this is me ep/a heartbeat away.mp3', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('The Girl', 2, 2, 'Elektro', 5, 'res/music/hellberg/this is me ep/the girl (feat. Cozi Zuehlsdorff).mp3', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Back2You', 2, 2, 'Elektro', 5, 'res/music/hellberg/this is me ep/back2you.mp3', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Wasted Summer', 2, 2, 'Elektro', 5, 'res/music/hellberg/this is me ep/wasted summer (feat. jessarae).mp3', 330)");
-            stmt.executeUpdate("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values('Love You Now', 2, 2, 'Elektro', 5, 'res/music/hellberg/this is me ep/love you now.mp3', 330)");
-
-            System.out.println("Tables filled successfully.");
-            connection.close();
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
     public static void setContent(String path){
         try {
             System.out.println("\nLoading songs...\n");
@@ -167,32 +119,136 @@ public class DBController {
             Statement stmt = connection.createStatement();
             ArrayList<String> list = getAllFiles(path);
 
-            /* Fill artist table */
+            /* Fill artist table with default value */
             stmt.executeUpdate("INSERT INTO artist (artist_name) values('Unknown Artist')");
 
-            /* Fill album table */
-            stmt.executeUpdate("INSERT INTO album (album_name, artist, release) values('Unknown album', 1, 1111)");
+            /* Fill album table with default value */
+            stmt.executeUpdate("INSERT INTO album (album_name, artist) values('Unknown Album', 1)");
 
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values (?, ?, ?, ?, ?, ?, ?)");
+            PreparedStatement ps = connection.prepareStatement("INSERT OR IGNORE INTO artist (artist_name) values(?)");
+            PreparedStatement ps2 = connection.prepareStatement("INSERT OR IGNORE INTO album (album_name, artist, release) values(?, ?, ?)");
+            PreparedStatement ps3 = connection.prepareStatement("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values (?, ?, ?, ?, ?, ?, ?)");
+
+
+            // single artists
+            for (int i = 0; i < list.size(); i++) {
+                AudioFile f = AudioFileIO.read(new File(list.get(i)));
+                Tag tag = f.getTag();
+
+                if(!f.getFile().getName().endsWith(".wav")) {
+                    String artistName = tag.getFirst(FieldKey.ARTIST);
+
+                    if (artistName == null || artistName.isEmpty()) continue;
+                        // add artist to artist table
+                    else {
+                        ps.setString(1, artistName);
+                        ps.addBatch();
+                    }
+                }
+            }
+            ps.executeBatch();
+
+            // album artists
+            for (int i = 0; i < list.size(); i++) {
+                AudioFile f = AudioFileIO.read(new File(list.get(i)));
+                Tag tag = f.getTag();
+
+                if(!f.getFile().getName().endsWith(".wav")) {
+                    String artistName = tag.getFirst(FieldKey.ALBUM_ARTIST);
+
+                    if (artistName == null || artistName.isEmpty()) continue;
+                        // add artist to artist table
+                    else {
+                        ps.setString(1, artistName);
+                        ps.addBatch();
+                    }
+                }
+            }
+            ps.executeBatch();
+            ps.close();
+
+            ResultSet rs = stmt.executeQuery("SELECT id, artist_name FROM artist");
+            while (rs.next()) System.out.println(rs.getInt("id") + ": " + rs.getString("artist_name"));
 
             for (int i = 0; i < list.size(); i++) {
-                ps.setString(1, list.get(i));
-                ps.setInt(2, 1);
-                ps.setInt(3, 1);
-                ps.setString(4, "Rap");
-                ps.setInt(5, 5);
-                ps.setString(6, list.get(i));
-                ps.setInt(7, 500);
+                AudioFile f = AudioFileIO.read(new File(list.get(i)));
+                Tag tag = f.getTag();
 
-                ps.executeUpdate();
+                if(!f.getFile().getName().endsWith(".wav")) {
+                    String albumName = tag.getFirst(FieldKey.ALBUM);
+                    if (albumName == null || albumName.isEmpty()) albumName = "Unknown Album";
+                    String artistName = tag.getFirst(FieldKey.ALBUM_ARTIST).replace("'", "''");
+                    if (artistName == null || artistName.isEmpty())
+                        artistName = tag.getFirst(FieldKey.ARTIST).replace("'", "''");
+                    if (artistName == null || artistName.isEmpty()) artistName = "Unknown Artist";
+                    int artistID = stmt.executeQuery("SELECT id FROM artist WHERE (artist_name = '" + artistName + "')").getInt("id");
+                    String release = null;
+                    if (tag.getFirst(FieldKey.YEAR).matches(".*\\d.*")) release = tag.getFirst(FieldKey.YEAR);
 
-                // System.out.println(list.get(i));
+                    // add album to album table
+                    ps2.setString(1, albumName);
+                    ps2.setInt(2, artistID);
+                    ps2.setString(3, release);
+                    ps2.addBatch();
+                }
             }
+            ps2.executeBatch();
+            ps2.close();
+
+            rs = stmt.executeQuery("SELECT id, album_name, release FROM album");
+            while (rs.next()) System.out.println(rs.getInt("id") + ": " + rs.getString("album_name")+ ", " + rs.getInt("release"));
+
+
+            for (int i = 0; i < list.size(); i++) {
+                AudioFile f = AudioFileIO.read(new File(list.get(i)));
+                Tag tag = f.getTag();
+
+                if(!f.getFile().getName().endsWith(".wav")) {
+                    AudioHeader audioheader = f.getAudioHeader();
+
+                    String albumName = tag.getFirst(FieldKey.ALBUM).replace("'", "''");
+                    if (albumName == null || albumName.isEmpty()) albumName = "Unknown Album";
+                    String artistName = tag.getFirst(FieldKey.ARTIST).replace("'", "''");
+                    if (artistName == null || artistName.isEmpty()) artistName = "Unknown Artist";
+                    int artistID = stmt.executeQuery("SELECT id FROM artist WHERE (artist_name = '" + artistName + "')").getInt("id");
+                    int albumID = stmt.executeQuery("SELECT id FROM album WHERE (album_name = '" + albumName + "')").getInt("id");
+
+                    String songTitle = tag.getFirst(FieldKey.TITLE);
+                    String genre = tag.getFirst(FieldKey.GENRE);
+                    int length = audioheader.getTrackLength();
+
+                    if (songTitle == null || songTitle.isEmpty()) songTitle = f.getFile().getName();
+
+                    // add song to song table
+                    ps3.setString(1, songTitle);
+                    ps3.setInt(2, artistID);
+                    ps3.setInt(3, albumID);
+                    ps3.setString(4, genre);
+                    ps3.setInt(5, 5);
+                    ps3.setString(6, list.get(i));
+                    ps3.setInt(7, length);
+                    ps3.addBatch();
+
+                    // System.out.println(list.get(i));
+                    System.out.println(songTitle + ", " + artistName);
+                } else {
+                    ps3.setString(1, f.getFile().getName());
+                    ps3.setInt(2, 1);
+                    ps3.setInt(3, 1);
+                    ps3.setString(4, "Unknown");
+                    ps3.setInt(5, 5);
+                    ps3.setString(6, list.get(i));
+                    ps3.setInt(7, 0);
+                    ps3.addBatch();
+                }
+            }
+            ps3.executeBatch();
+            ps3.close();
 
             System.out.println("Loaded " + list.size() + " songs.");
             connection.close();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -205,7 +261,8 @@ public class DBController {
         {
             if (!f.isDirectory())
             {
-                if (f.getAbsolutePath().endsWith(".mp3") || f.getAbsolutePath().endsWith(".wma")) list.add(f.getAbsolutePath());
+                for (int x = 0; x < BangerVars.FILE_EXTENSIONS.length; x++)
+                    if (f.getAbsolutePath().endsWith(BangerVars.FILE_EXTENSIONS[x])) list.add(f.getAbsolutePath());
             } else {
                 ArrayList<String> temp = getAllFiles(path + "/" + f.getName());
                 for (int i = 0; i < temp.size(); i++)

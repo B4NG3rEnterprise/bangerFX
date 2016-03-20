@@ -22,6 +22,7 @@ public class MainView extends Application {
     StatusBar statusbar;
     Library library;
     BangerBar bangerBar;
+    Queue queue;
 
     public void start(Stage stage) throws Exception {
         player = new MusicPlayer(this);
@@ -36,9 +37,13 @@ public class MainView extends Application {
         bangerBar = new BangerBar(this);
         bangerBar.setMinSize(0,0);
 
+        queue = new Queue(this);
+        queue.setMinSize(0, 0);
+
         BorderPane bl = new BorderPane();
         bl.setTop(bangerBar);
         bl.setCenter(library);
+        bl.setRight(queue);
         bl.setBottom(statusbar);
 
         Scene scene = new Scene(bl);
