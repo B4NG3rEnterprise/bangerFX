@@ -1,7 +1,6 @@
 package banger.gui;
 
 import banger.audio.Song;
-import banger.database.DBController;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
 import javafx.event.EventHandler;
@@ -15,6 +14,7 @@ import javafx.scene.input.MouseEvent;
 public class Queue extends TableView<Song> implements EventHandler<Event> {
 
     private MainView mainview;
+    private ObservableList<Song> songs;
 
     public Queue(MainView mainview) {
         super();
@@ -24,15 +24,11 @@ public class Queue extends TableView<Song> implements EventHandler<Event> {
         init();
     }
 
-    public void fillTable(){
-        ObservableList<Song> show = DBController.shuffleAllFiles();
-        setItems(show);
-    }
-
     public void init(){
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        setMaxWidth(213);
+        setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        setPrefWidth(213);
+        setMaxWidth(400);
 
         TableColumn song_name = new TableColumn("Queue");
         song_name.setCellValueFactory(
@@ -41,17 +37,19 @@ public class Queue extends TableView<Song> implements EventHandler<Event> {
         artist_name.setCellValueFactory(
                 new PropertyValueFactory<Song, String>("artist"));
 
-        song_name.setMaxWidth(100);
-        artist_name.setMaxWidth(100);
+        song_name.prefWidthProperty().bind(this.widthProperty().divide(2));
+        artist_name.prefWidthProperty().bind(this.widthProperty().divide(2));
 
-        fillTable();
         getColumns().addAll(song_name, artist_name);
 
         setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
-                    mainview.play((getSelectionModel().getSelectedItem()));
+                    Song current = getSelectionModel().getSelectedItem();
+                    mainview.play(current);
+                    mainview.getLibrary().getSelectionModel().clearSelection();
+                    mainview.getLibrary().getSelectionModel().select(current);
                 }
             }
         });

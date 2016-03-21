@@ -1,6 +1,7 @@
 package banger.gui.statusbar;
 
 import banger.gui.MainView;
+import banger.util.BangerVars;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.application.Platform;
@@ -39,6 +40,9 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 	private Label songLength;
 
 	private String size = "2em";
+
+	private boolean isShuffle;
+	private byte repeatType;
 
 	private Thread time;
 	
@@ -94,11 +98,12 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		GlyphsDude.setIcon(repeat, MaterialDesignIcon.REPEAT, size);
 		repeat.getStyleClass().add("statusbar_icon");
 		repeat.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
+		repeat.addEventHandler(EventType.ROOT, e -> handleRepeatBtn(e));
 		
 		shuffle = new Button();
 		GlyphsDude.setIcon(shuffle, MaterialDesignIcon.SHUFFLE, size);
 		shuffle.getStyleClass().add("statusbar_icon");
-		shuffle.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
+		shuffle.addEventHandler(EventType.ROOT, e -> handleShuffleBtn(e));
 
 		//region Volume Slider
 		
@@ -172,7 +177,14 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 						while (System.currentTimeMillis() - now < 1000) {
 							Thread.yield();
 						}
-						Platform.runLater(() -> mainview.skipForward());
+						Platform.runLater(() -> {
+							switch (repeatType){
+								case 0: mainview.skipForward(); break;
+								case 1: mainview.getMusicPlayer().loop(); break;
+								case 2: mainview.getMusicPlayer().loopOnce(); break;
+								case 3: mainview.skipForward();
+							}
+						});
 					}
 				}
 			}
@@ -279,6 +291,33 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		}
 	}
 
+	public void handleShuffleBtn(Event e) {
+		EventType type = e.getEventType();
+		if (type.equals(MouseEvent.MOUSE_PRESSED)) {
+			if(!isShuffle) shuffle.setEffect(new Glow(2));
+			else shuffle.setEffect(null);
+			isShuffle = !isShuffle;
+			mainview.getLibrary().updateQueue();
+		}
+	}
+
+	public void handleRepeatBtn(Event e) {
+		EventType type = e.getEventType();
+		if (type.equals(MouseEvent.MOUSE_PRESSED)) {
+			switch (repeatType){
+				case 0: repeatType = (byte) BangerVars.RepeatState.LOOP_SINGLE.ordinal(); repeat.setEffect(new Glow(2)); break;
+				case 1: repeatType = (byte) BangerVars.RepeatState.LOOP_ONCE.ordinal(); break;
+				case 2: repeatType = (byte) BangerVars.RepeatState.LOOP_QUEUE.ordinal(); break;
+				case 3: repeatType = (byte) BangerVars.RepeatState.NO_REPEAT.ordinal(); repeat.setEffect(null); break;
+			}
+			System.out.println(BangerVars.RepeatState.values()[repeatType]);
+		}
+	}
+
+	public byte getRepeatType(){
+		return repeatType;
+	}
+
 	@Override
 	public void handle(Event event) {
 		EventType type = event.getEventType();
@@ -314,7 +353,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		currentPos.setText(l);
 	}
 
-	private String asMinutes(double val) {
+	public String asMinutes(double val) {
 		int min = 0;
 		int sec = 0;
 
@@ -323,4 +362,9 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 
 		return String.format("%d:%02d", min, sec);
 	}
+
+	public boolean isShuffling(){
+		return isShuffle;
+	}
+
 }

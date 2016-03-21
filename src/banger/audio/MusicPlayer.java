@@ -9,11 +9,18 @@ import jouvieje.bass.BassInit;
 import jouvieje.bass.defines.BASS_ACTIVE;
 import jouvieje.bass.defines.BASS_ATTRIB;
 import jouvieje.bass.defines.BASS_POS;
+import jouvieje.bass.defines.BASS_SAMPLE;
 import jouvieje.bass.structures.BASS_DEVICEINFO;
 import jouvieje.bass.structures.HSTREAM;
 import jouvieje.bass.utils.BufferUtils;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
 import java.nio.FloatBuffer;
+import java.nio.charset.Charset;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +33,7 @@ public class MusicPlayer {
     boolean muted;
     Song nowPlaying;
 
+    private boolean played;
     private MainView mainview;
 
     public MusicPlayer(MainView m) {
@@ -42,12 +50,28 @@ public class MusicPlayer {
     public void play(Song s) {
         if (isPlaying()) stop();
         nowPlaying = s;
+
         stream = BASS_StreamCreateFile(false, s.getFileLocation(), 0, 0, 0);
+
         System.out.println(Bass.BASS_ErrorGetCode());
 
         setVolume(volume); // remove later
 
         play();
+    }
+
+    public void loop(){
+        play(nowPlaying);
+    }
+
+    public void loopOnce(){
+        if (!played) {
+            play(nowPlaying);
+            played = true;
+        } else {
+            mainview.skipForward();
+            played = false;
+        }
     }
 
     public void stop() {

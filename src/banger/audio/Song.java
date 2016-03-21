@@ -9,8 +9,9 @@ public class Song {
     private String genre;
     private byte rating;
     private String fileLocation;
+    private int length;
 
-    public Song(int id, String name, String artist, String album, String genre, byte rating, String fileLocation){
+    public Song(int id, String name, String artist, String album, String genre, byte rating, String fileLocation, int length){
         this.id = id;
         this.name = name;
         this.artist = artist;
@@ -18,6 +19,7 @@ public class Song {
         this.genre = genre;
         this.rating = rating;
         this.fileLocation = fileLocation;
+        this.length = length;
     }
 
     public String toString(){
@@ -79,4 +81,8 @@ public class Song {
     public void setFileLocation(String fileLocation) {
         this.fileLocation = fileLocation;
     }
+
+    public int getLength() { return length; }
+
+    public void setLength(int length) { this.length = length; }
 }

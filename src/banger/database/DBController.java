@@ -12,7 +12,9 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
 import java.io.File;
+import java.net.URI;
 import java.sql.*;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,7 @@ public class DBController {
 
     private static final DBController dbcontroller = new DBController();
     private static Connection connection;
-    private static final String DB_PATH = "res/" + "testdb.db";
+    private static final String DB_PATH = "res/" + "banger.db";
 
     static {
         try {
@@ -200,7 +202,19 @@ public class DBController {
 
 
             for (int i = 0; i < list.size(); i++) {
-                AudioFile f = AudioFileIO.read(new File(list.get(i)));
+                String filePath = list.get(i);
+
+                /*
+                if(list.get(i).contains("é")) {
+                    File f1 = new File(filePath);
+                    filePath = list.get(i).replace("é", "e");
+                    File f2 = new File(filePath);
+                    f1.renameTo(f2);
+                }
+                */
+
+
+                AudioFile f = AudioFileIO.read(new File(filePath));
                 Tag tag = f.getTag();
 
                 if(!f.getFile().getName().endsWith(".wav")) {
@@ -225,7 +239,7 @@ public class DBController {
                     ps3.setInt(3, albumID);
                     ps3.setString(4, genre);
                     ps3.setInt(5, 5);
-                    ps3.setString(6, list.get(i));
+                    ps3.setString(6, filePath);
                     ps3.setInt(7, length);
                     ps3.addBatch();
 
@@ -237,7 +251,7 @@ public class DBController {
                     ps3.setInt(3, 1);
                     ps3.setString(4, "Unknown");
                     ps3.setInt(5, 5);
-                    ps3.setString(6, list.get(i));
+                    ps3.setString(6, filePath);
                     ps3.setInt(7, 0);
                     ps3.addBatch();
                 }
@@ -298,7 +312,8 @@ public class DBController {
                 String genre = rs.getString("genre");
                 byte rating = rs.getByte("rating");
                 String fileLocation = rs.getString("fileLocation");
-                result.add(new Song(id, name, artist, album, genre, rating, fileLocation));
+                int length = rs.getInt("length");
+                result.add(new Song(id, name, artist, album, genre, rating, fileLocation, length));
                 total++;
             }
             System.out.println("Total songs: " + total);
@@ -334,7 +349,8 @@ public class DBController {
                 String genre = rs.getString("genre");
                 byte rating = rs.getByte("rating");
                 String fileLocation = rs.getString("fileLocation");
-                result.add(new Song(id, name, artist, album, genre, rating, fileLocation));
+                int length = rs.getInt("length");
+                result.add(new Song(id, name, artist, album, genre, rating, fileLocation, length));
                 total++;
             }
             System.out.println("Total songs: " + total);

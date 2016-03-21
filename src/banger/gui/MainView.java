@@ -4,6 +4,7 @@ import banger.audio.MusicPlayer;
 import banger.audio.Song;
 import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
+import banger.util.BangerVars;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
@@ -69,6 +70,10 @@ public class MainView extends Application {
         return library;
     }
 
+    public Queue getQueue() { return queue; }
+
+    public StatusBar getStatusbar() { return statusbar; }
+
     public void play(Song s) {
         player.play(s);
         statusbar.play();
@@ -84,11 +89,23 @@ public class MainView extends Application {
     }
 
     public void skipForward() {
-        for (Iterator<Song> iterator = library.getItems().iterator(); iterator.hasNext(); ) {
+        for (Iterator<Song> iterator = queue.getItems().iterator(); iterator.hasNext(); ) {
             if (iterator.next().equals(player.getNowPlaying())) {
-                if (iterator.hasNext())
-                    play(iterator.next());
-                break;
+                if (iterator.hasNext()){
+                    Song next = iterator.next();
+                    library.getSelectionModel().clearSelection();
+                    library.getSelectionModel().select(next);
+                    queue.getSelectionModel().clearSelection();
+                    queue.getSelectionModel().select(next);
+                    play(next);
+                } else if (getStatusbar().getRepeatType() == BangerVars.RepeatState.LOOP_QUEUE.ordinal()){
+                    Song next = queue.getItems().get(0);
+                    library.getSelectionModel().clearSelection();
+                    library.getSelectionModel().select(next);
+                    queue.getSelectionModel().clearSelection();
+                    queue.getSelectionModel().select(next);
+                    play(next);
+                } break;
             }
         }
     }
@@ -105,5 +122,11 @@ public class MainView extends Application {
             }
         }
         Collections.reverse(s);
+    }
+
+    public void setQueueItems(ObservableList<Song> songs){
+        queue.setItems(songs);
+        queue.getSelectionModel().clearSelection();
+        queue.getSelectionModel().select(songs.get(0));
     }
 }

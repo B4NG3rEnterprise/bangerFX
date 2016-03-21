@@ -7,6 +7,10 @@ public class BangerVars {
 
     public final static String FILE_EXTENSIONS[] = {".mp3", ".wav", ".wma", ".aiff", ".flac"};
 
+    public enum RepeatState{
+        NO_REPEAT, LOOP_SINGLE, LOOP_ONCE, LOOP_QUEUE
+    }
+
     private BangerVars(){};
 
 }
