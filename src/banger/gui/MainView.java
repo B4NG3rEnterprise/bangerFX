@@ -5,9 +5,13 @@ import banger.audio.Song;
 import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
+import banger.util.InputHandler;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
@@ -16,7 +20,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 
-public class MainView extends Application {
+public class MainView extends Application{
 
     MusicPlayer player;
 
@@ -49,6 +53,8 @@ public class MainView extends Application {
 
         Scene scene = new Scene(bl);
 		scene.getStylesheets().add("banger/gui/statusbar/statusbar.css");
+
+        scene.addEventHandler(KeyEvent.ANY, new InputHandler(this));
 
 		stage.setScene(scene);
         stage.setTitle("MusicPlayer");
