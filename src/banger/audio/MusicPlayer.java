@@ -7,6 +7,8 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,16 @@ public class MusicPlayer {
         System.out.println(bass.BASS_ErrorGetCode());
 
         setVolume(volume); // remove later
+
+        // popup
+        TextFlow flow = new TextFlow();
+        Text song = new Text(nowPlaying.getName());
+        Text artist = new Text(" - " + nowPlaying.getArtist());
+        song.setStyle("-fx-font-weight: bold; -fx-font-size: 120%;");
+        Text album = new Text("\n" + nowPlaying.getAlbum());
+        album.setStyle("-fx-font-size: 90%;");
+        flow.getChildren().addAll(song, artist, album);
+        mainview.showPopupMessage(flow);
 
         play();
     }

@@ -11,7 +11,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 
-public class Queue extends TableView<Song> implements EventHandler<Event> {
+public class Queue extends TableView<Song> {
 
     private MainView mainview;
     private ObservableList<Song> songs;
@@ -53,19 +53,6 @@ public class Queue extends TableView<Song> implements EventHandler<Event> {
                 }
             }
         });
-    }
-
-    public void handle(Event event){
-        EventType type = event.getEventType();
-
-        if(type.equals(MouseEvent.MOUSE_CLICKED)) {
-            //handle((MouseEvent) event);
-        } else {
-
-            System.out.println(type);
-            System.out.println(type.getClass());
-            System.out.println(type.getName());
-        }
     }
 }
 

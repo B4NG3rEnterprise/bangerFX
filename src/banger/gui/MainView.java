@@ -6,16 +6,30 @@ import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
 import banger.util.InputHandler;
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import javafx.scene.web.WebView;
+import javafx.stage.Popup;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 
+import java.awt.*;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -23,6 +37,7 @@ import java.util.Iterator;
 public class MainView extends Application{
 
     MusicPlayer player;
+    static Stage stage;
 
     StatusBar statusbar;
     Library library;
@@ -30,6 +45,7 @@ public class MainView extends Application{
     Queue queue;
 
     public void start(Stage stage) throws Exception {
+        this.stage = stage;
         player = new MusicPlayer(this);
 
         statusbar = new StatusBar(this);
@@ -66,7 +82,7 @@ public class MainView extends Application{
             System.exit(0);
         });
         stage.show();
-	}
+    }
 
     public MusicPlayer getMusicPlayer() {
         return player;
@@ -134,5 +150,86 @@ public class MainView extends Application{
         queue.setItems(songs);
         queue.getSelectionModel().clearSelection();
         queue.getSelectionModel().select(songs.get(0));
+    }
+
+    private static boolean isDark(String color){
+        String fontColor = color;
+        boolean isDark = false;
+
+        // remove hash character from string
+        String rawFontColor = fontColor.substring(1,fontColor.length());
+
+        // convert hex string to int
+        int rgb = Integer.parseInt(rawFontColor, 16);
+        Color c = new Color(rgb);
+        float[] hsb = Color.RGBtoHSB(c.getRed(), c.getGreen(), c.getBlue(), null);
+        float brightness = hsb[2];
+        if (brightness < 0.5) isDark = true;
+
+        return isDark;
+    }
+
+    private static Popup createPopup(final TextFlow message) {
+        final Popup popup = new Popup();
+        String color = "#FA7D38";  // #FA7D38
+        TextFlow label = message;
+        if (isDark(color)) label.getStylesheets().add("banger/gui/darkpopup.css");
+        else label.getStylesheets().add("banger/gui/popup.css");
+        label.getStyleClass().add("popup");
+        label.setStyle("-fx-background-color: " + color);
+        label.setMinWidth(200);
+        popup.getContent().add(label);
+        popup.setOnShowing(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent event) {
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    for(int i = 15; i >= 0; i--) {
+                        double opacity = (double) i / 20;
+                        try {
+                            Thread.sleep(40);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        Platform.runLater(() -> {
+                            popup.setOpacity(opacity);
+                        });
+                    }
+                    Platform.runLater(() -> {
+                        popup.hide();
+                    });
+                }).start();
+            }
+        });
+        return popup;
+    }
+
+    public static void showPopupMessage(final TextFlow message) {
+        final Popup popup = createPopup(message);
+        popup.setOnShown(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent e) {
+                Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
+                popup.setX(primaryScreenBounds.getMinX() + primaryScreenBounds.getWidth() - popup.getWidth() - 5);
+                popup.setY(primaryScreenBounds.getMinY() + primaryScreenBounds.getHeight() - popup.getHeight() - 5);
+            }
+        });
+        popup.setOpacity(0);
+        popup.show(stage);
+        new Thread(() -> {
+            for(int i = 0; i <= 15; i++) {
+                double opacity = (double) i / 20;
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Platform.runLater(() -> {
+                    popup.setOpacity(opacity);
+                });
+            }
+        }).start();
     }
 }

@@ -89,17 +89,4 @@ public class Library extends TableView<Song> implements EventHandler<Event> {
             list.add(songs.get(i));
         return result;
     }
-
-    public void handle(Event event){
-        EventType type = event.getEventType();
-
-        if(type.equals(MouseEvent.MOUSE_CLICKED)) {
-            //handle((MouseEvent) event);
-        } else {
-
-            System.out.println(type);
-            System.out.println(type.getClass());
-            System.out.println(type.getName());
-        }
-    }
 }
