@@ -4,7 +4,6 @@ import banger.audio.Song;
 import banger.database.DBController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableListBase;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;

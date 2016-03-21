@@ -4,13 +4,12 @@ import banger.database.DBController;
 import banger.gui.MainView;
 import banger.util.DeviceItem;
 import javafx.collections.ObservableList;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.Region;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
-import javax.swing.*;
 import java.io.File;
 
 public class BangerBar extends MenuBar {

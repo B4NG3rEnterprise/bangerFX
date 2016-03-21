@@ -2,33 +2,19 @@ package banger.audio;
 
 import banger.gui.MainView;
 import banger.util.DeviceItem;
+import com.sun.jna.Memory;
+import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import jouvieje.bass.Bass;
-import jouvieje.bass.BassInit;
-import jouvieje.bass.defines.BASS_ACTIVE;
-import jouvieje.bass.defines.BASS_ATTRIB;
-import jouvieje.bass.defines.BASS_POS;
-import jouvieje.bass.defines.BASS_SAMPLE;
-import jouvieje.bass.structures.BASS_DEVICEINFO;
-import jouvieje.bass.structures.HSTREAM;
-import jouvieje.bass.utils.BufferUtils;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.nio.FloatBuffer;
-import java.nio.charset.Charset;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jouvieje.bass.Bass.*;
-
 public class MusicPlayer {
 
-    HSTREAM stream;
+    Bass bass;
+    int stream;
     float volume = 0.05f;
     boolean muted;
     Song nowPlaying;
@@ -37,23 +23,28 @@ public class MusicPlayer {
     private MainView mainview;
 
     public MusicPlayer(MainView m) {
-        BassInit.loadLibraries();
-        Bass.BASS_Init(-1, 44100, 0, null, null);
+        bass = (Bass) Native.loadLibrary("bass.dll", Bass.class);
+        bass.BASS_Init(-1, 44100, 0, null, null);
 
         mainview = m;
     }
 
     public void play() {
-        Bass.BASS_ChannelPlay(stream.asInt(), false);
+        bass.BASS_ChannelPlay(stream, false);
     }
 
     public void play(Song s) {
         if (isPlaying()) stop();
         nowPlaying = s;
 
-        stream = BASS_StreamCreateFile(false, s.getFileLocation(), 0, 0, 0);
+        String path = s.getFileLocation();
 
-        System.out.println(Bass.BASS_ErrorGetCode());
+        Pointer p = new Memory(Native.WCHAR_SIZE * (path.length() + 1));
+        p.setWideString(0, path);
+
+        stream = bass.BASS_StreamCreateFile(false, p, 0, 0, Bass.BASS_UNICODE);
+
+        System.out.println(bass.BASS_ErrorGetCode());
 
         setVolume(volume); // remove later
 
@@ -75,28 +66,28 @@ public class MusicPlayer {
     }
 
     public void stop() {
-        Bass.BASS_ChannelStop(stream.asInt());
+        bass.BASS_ChannelStop(stream);
     }
 
     public void pause() {
-        Bass.BASS_ChannelPause(stream.asInt());
+        bass.BASS_ChannelPause(stream);
     }
 
     public void kill() {
-        Bass.BASS_Free();
+        bass.BASS_Free();
     }
 
     public float getVolume() {
-        FloatBuffer b = BufferUtils.newFloatBuffer(1);
-        if (stream != null) Bass.BASS_ChannelGetAttribute(stream.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, b);
+        Pointer b = new Memory(Native.getNativeSize(Float.TYPE));
+        if (stream != 0) bass.BASS_ChannelGetAttribute(stream, Bass.BASS_ATTRIB_VOL, b);
         else return volume;
-        return b.get(0);
+        return b.getFloat(0);
     }
 
     public void setVolume(float x) {
         muted = false;
         volume = x;
-        Bass.BASS_ChannelSetAttribute(stream.asInt(), BASS_ATTRIB.BASS_ATTRIB_VOL, x);
+        bass.BASS_ChannelSetAttribute(stream, Bass.BASS_ATTRIB_VOL, x);
     }
 
     public void mute() {
@@ -118,27 +109,27 @@ public class MusicPlayer {
     }
 
     public synchronized double getPosition() {
-        long pos = Bass.BASS_ChannelGetPosition(stream.asInt(), BASS_POS.BASS_POS_BYTE);
-        return Bass.BASS_ChannelBytes2Seconds(stream.asInt(), pos);
+        long pos = bass.BASS_ChannelGetPosition(stream, Bass.BASS_POS_BYTE);
+        return bass.BASS_ChannelBytes2Seconds(stream, pos);
     }
 
     public synchronized void setPosition(double x) {
-        Bass.BASS_ChannelSetPosition(stream.asInt(), Bass.BASS_ChannelSeconds2Bytes(stream.asInt(), x), BASS_POS.BASS_POS_BYTE);
+        bass.BASS_ChannelSetPosition(stream, bass.BASS_ChannelSeconds2Bytes(stream, x), Bass.BASS_POS_BYTE);
     }
 
     public synchronized double getLength() {
-        long pos = Bass.BASS_ChannelGetLength(stream.asInt(), BASS_POS.BASS_POS_BYTE);
-        return Bass.BASS_ChannelBytes2Seconds(stream.asInt(), pos);
+        long pos = bass.BASS_ChannelGetLength(stream, Bass.BASS_POS_BYTE);
+        return bass.BASS_ChannelBytes2Seconds(stream, pos);
     }
 
     public boolean isPlaying() {
         int r = 0;
         try {
-            r = Bass.BASS_ChannelIsActive(stream.asInt());
+            r = bass.BASS_ChannelIsActive(stream);
         } catch (NullPointerException e) {
             // e.printStackTrace();
         }
-        return r == BASS_ACTIVE.BASS_ACTIVE_PLAYING;
+        return r == Bass.BASS_ACTIVE_PLAYING;
     }
 
     public Song getNowPlaying() {
@@ -148,20 +139,19 @@ public class MusicPlayer {
     public ObservableList<DeviceItem> getDevices() {
         List<DeviceItem> list = new ArrayList<>();
         ObservableList<DeviceItem> devices = FXCollections.observableList(list);
-        BASS_DEVICEINFO info = BASS_DEVICEINFO.allocate();
-        for(int c = 1; BASS_GetDeviceInfo(c, info); c++) {
-            String name = info.getName();
+        Bass.BASS_DEVICEINFO info = new Bass.BASS_DEVICEINFO();
+        for(int c = 1; bass.BASS_GetDeviceInfo(c, info); c++) {
+            String name = info.name;
             devices.add(new DeviceItem(name, c));
         }
-        info.release();
 
         return devices;
     }
 
     public void setOutputDevice(int device){
-        BASS_Init(device, 44100, 0, null, null);
-        BASS_ChannelSetDevice(stream.asInt(), device);
-        BASS_SetDevice(device);
+        bass.BASS_Init(device, 44100, 0, null, null);
+        bass.BASS_ChannelSetDevice(stream, device);
+        bass.BASS_SetDevice(device);
         System.out.println(device);
     }
 }
