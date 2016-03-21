@@ -1,20 +1,18 @@
 package banger.database;
 
 
+import banger.audio.Song;
 import banger.util.BangerVars;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import banger.audio.Song;
 import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.AudioHeader;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
 import java.io.File;
-import java.net.URI;
 import java.sql.*;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
