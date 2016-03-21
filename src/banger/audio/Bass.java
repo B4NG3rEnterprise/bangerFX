@@ -11,6 +11,46 @@ import java.util.List;
 public interface Bass extends Library {
     int BASS_UNICODE = 0x80000000;
 
+    //region Error codes returned by BASS_ErrorGetCode
+    final int BASS_OK               = 0;    // all is OK
+    final int BASS_ERROR_MEM        = 1;    // memory error
+    final int BASS_ERROR_FILEOPEN   = 2;	// can't open the file
+    final int BASS_ERROR_DRIVER     = 3;	// can't find a free/valid driver
+    final int BASS_ERROR_BUFLOST    = 4;	// the sample buffer was lost
+    final int BASS_ERROR_HANDLE     = 5;	// invalid handle
+    final int BASS_ERROR_FORMAT     = 6;	// unsupported sample format
+    final int BASS_ERROR_POSITION   = 7;	// invalid position
+    final int BASS_ERROR_INIT       = 8;    // BASS_Init has not been successfully called
+    final int BASS_ERROR_START      = 9;    // BASS_Start has not been successfully called
+    final int BASS_ERROR_SSL        = 10;   // SSL/HTTPS support isn't available
+    final int BASS_ERROR_ALREADY    = 14;	// already initialized/paused/whatever
+    final int BASS_ERROR_NOCHAN     = 18;	// can't get a free channel
+    final int BASS_ERROR_ILLTYPE    = 19;	// an illegal type was specified
+    final int BASS_ERROR_ILLPARAM   = 20;	// an illegal parameter was specified
+    final int BASS_ERROR_NO3D       = 21;   // no 3D support
+    final int BASS_ERROR_NOEAX      = 22;	// no EAX support
+    final int BASS_ERROR_DEVICE     = 23;	// illegal device number
+    final int BASS_ERROR_NOPLAY     = 24;	// not playing
+    final int BASS_ERROR_FREQ       = 25;   // illegal sample rate
+    final int BASS_ERROR_NOTFILE    = 27;	// the stream is not a file stream
+    final int BASS_ERROR_NOHW       = 29;   // no hardware voices available
+    final int BASS_ERROR_EMPTY      = 31;	// the MOD music has no sequence data
+    final int BASS_ERROR_NONET      = 32;	// no internet connection could be opened
+    final int BASS_ERROR_CREATE     = 33;	// couldn't create the file
+    final int BASS_ERROR_NOFX       = 34;   // effects are not available
+    final int BASS_ERROR_NOTAVAIL   = 37;	// requested data is not available
+    final int BASS_ERROR_DECODE     = 38;	// the channel is/isn't a "decoding channel"
+    final int BASS_ERROR_DX         = 39;	// a sufficient DirectX version is not installed
+    final int BASS_ERROR_TIMEOUT    = 40;	// connection timedout
+    final int BASS_ERROR_FILEFORM   = 41;	// unsupported file format
+    final int BASS_ERROR_SPEAKER    = 42;	// unavailable speaker
+    final int BASS_ERROR_VERSION    = 43;	// invalid BASS version (used by add-ons)
+    final int BASS_ERROR_CODEC      = 44;	// codec is not available/supported
+    final int BASS_ERROR_ENDED      = 45;	// the channel/file has ended
+    final int BASS_ERROR_BUSY       = 46;	// the device is busy
+    final int BASS_ERROR_UNKNOWN    = -1;	// some other mystery problem
+    //endregion
+
     //region Plugins
     int BASS_PluginLoad(String file, int flags);
     boolean BASS_PluginFree(int handle);
