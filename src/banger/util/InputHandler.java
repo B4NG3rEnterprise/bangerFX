@@ -28,7 +28,7 @@ public class InputHandler implements EventHandler<KeyEvent> {
             }
         }
         else if (t.getCode() == KeyCode.UP)
-            System.out.println("UP");
+            mainview.showLyrics();
         else if (t.getCode() == KeyCode.DOWN)
             System.out.println("DOWN");
         else if (t.getCode() == KeyCode.LEFT)
@@ -37,7 +37,7 @@ public class InputHandler implements EventHandler<KeyEvent> {
             mainview.skipForward();
         else if (t.getCode() == KeyCode.SPACE) {
             if (mainview.getMusicPlayer().isPlaying()) mainview.pause();
-            else if (mainview.getMusicPlayer().getNowPlaying() != null) mainview.play();
+            else if (mainview.getMusicPlayer().getNowPlaying() != null && !mainview.getMusicPlayer().isPlaying()) mainview.play();
         }
     }
 }

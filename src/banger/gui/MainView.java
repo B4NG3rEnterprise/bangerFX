@@ -7,6 +7,7 @@ import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
 import banger.util.InputHandler;
+import banger.util.LyricsGetter;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -16,6 +17,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -30,7 +32,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -79,8 +81,8 @@ public class MainView extends Application{
         scene.addEventHandler(KeyEvent.ANY, new InputHandler(this));
 
 		stage.setScene(scene);
-        stage.setTitle("MusicPlayer");
-        stage.setMinWidth(1000);
+        stage.setTitle("B4NG3rFX");
+        stage.setMinWidth(1200);
         stage.setMaxWidth(1400);
         stage.setMinHeight(120);
         stage.setOnCloseRequest(e -> {
@@ -244,6 +246,24 @@ public class MainView extends Application{
                     popup.setOpacity(opacity);
                 });
             }
+        }).start();
+    }
+
+    public void showLyrics(){
+        new Thread(() -> {
+            ScrollPane sp = new ScrollPane();
+            Song current = getMusicPlayer().getNowPlaying();
+            String color = "#FA7D38";  // #FA7D38
+            String songtext = LyricsGetter.getLyrics(current.getArtist(), current.getName());
+
+            sp.setContent(new Label(songtext));
+            sp.setMaxHeight(500);
+
+            Platform.runLater(() -> {
+                Stage lyricStage = new Stage();
+                lyricStage.setScene(new Scene(sp));
+                lyricStage.show();
+            });
         }).start();
     }
 }
