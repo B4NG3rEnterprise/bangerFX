@@ -126,6 +126,7 @@ public class MainView extends Application{
                     queue.getSelectionModel().clearSelection();
                     queue.getSelectionModel().select(next);
                     play(next);
+                    filebrowser.requestFocus();
                 } else if (getStatusbar().getRepeatType() == BangerVars.RepeatState.LOOP_QUEUE.ordinal()){
                     Song next = queue.getItems().get(0);
                     library.getSelectionModel().clearSelection();
@@ -133,6 +134,7 @@ public class MainView extends Application{
                     queue.getSelectionModel().clearSelection();
                     queue.getSelectionModel().select(next);
                     play(next);
+                    filebrowser.requestFocus();
                 } break;
             }
         }
