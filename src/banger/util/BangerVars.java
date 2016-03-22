@@ -5,7 +5,7 @@ package banger.util;
  */
 public class BangerVars {
 
-    public final static String FILE_EXTENSIONS[] = {".mp3", ".wav", ".wma", ".aiff", ".flac"};
+    public final static String FILE_EXTENSIONS[] = {".mp3", ".wav", ".wma", ".aiff", ".flac", ".m4a"};
 
     public enum RepeatState{
         NO_REPEAT, LOOP_SINGLE, LOOP_ONCE, LOOP_QUEUE

@@ -93,7 +93,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		play.addEventHandler(EventType.ROOT, e -> handlePlayBtn(e));
 
 		repeat = new Button();
-		GlyphsDude.setIcon(repeat, MaterialDesignIcon.REPEAT, size);
+		GlyphsDude.setIcon(repeat, MaterialDesignIcon.REPEAT_OFF, size);
 		repeat.getStyleClass().add("statusbar_icon");
 		repeat.addEventHandler(MouseEvent.MOUSE_CLICKED, this);
 		repeat.addEventHandler(EventType.ROOT, e -> handleRepeatBtn(e));
@@ -303,10 +303,23 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		EventType type = e.getEventType();
 		if (type.equals(MouseEvent.MOUSE_PRESSED)) {
 			switch (repeatType){
-				case 0: repeatType = (byte) BangerVars.RepeatState.LOOP_SINGLE.ordinal(); repeat.setEffect(new Glow(2)); break;
-				case 1: repeatType = (byte) BangerVars.RepeatState.LOOP_ONCE.ordinal(); break;
-				case 2: repeatType = (byte) BangerVars.RepeatState.LOOP_QUEUE.ordinal(); break;
-				case 3: repeatType = (byte) BangerVars.RepeatState.NO_REPEAT.ordinal(); repeat.setEffect(null); break;
+				case 0:
+					repeatType = (byte) BangerVars.RepeatState.LOOP_SINGLE.ordinal();
+					GlyphsDude.setIcon(repeat, MaterialDesignIcon.REPEAT, size);
+					break;
+				case 1:
+					repeatType = (byte) BangerVars.RepeatState.LOOP_ONCE.ordinal();
+					GlyphsDude.setIcon(repeat, MaterialDesignIcon.REPEAT_ONCE, size);
+					break;
+				case 2:
+					repeatType = (byte) BangerVars.RepeatState.LOOP_QUEUE.ordinal();
+                    repeat.setEffect(new Glow(2));
+					break;
+				case 3:
+					repeatType = (byte) BangerVars.RepeatState.NO_REPEAT.ordinal();
+					GlyphsDude.setIcon(repeat, MaterialDesignIcon.REPEAT_OFF, size);
+					repeat.setEffect(null);
+					break;
 			}
 			System.out.println(BangerVars.RepeatState.values()[repeatType]);
 		}
@@ -319,7 +332,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 	@Override
 	public void handle(Event event) {
 		EventType type = event.getEventType();
-		
+
 		if (type.getSuperType().equals(ScrollEvent.ANY)) {
             handleScroll((ScrollEvent) event);
 		} else if (type.getSuperType().equals(MouseEvent.ANY)){
@@ -333,6 +346,11 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		currentPos.setText(asMinutes(songPosition.getValue()));
 		songLength.setText(asMinutes(len));
 		play.setSelected(true);
+		play.fire();
+	}
+
+	public void pause() {
+		play.setSelected(false);
 		play.fire();
 	}
 
