@@ -5,13 +5,14 @@ import org.ini4j.Ini;
 import java.io.File;
 import java.io.IOException;
 
-public class Options {
+public class Option {
     private final static String PATH = "res/options.ini";
     private static Ini ini;
 
-    private static int audio_device = -1;
+    public static String audio_device = "-1";
+    public static String backgroundColor = "#FA7D38";
 
-    private Options(){}
+    private Option(){}
 
     private static void initialize(){
         try {
@@ -21,7 +22,12 @@ public class Options {
         }
     }
 
-    public static void saveData(String cat, String name, String value){
+    private static void getOption(String cat, String name){
+        Ini.Section section = ini.get("Options");
+        System.out.println(backgroundColor);
+    }
+
+    public static void saveOption(String cat, String name, String value){
         initialize();
         ini.clear();
         ini.put(cat, name, value);
@@ -34,6 +40,6 @@ public class Options {
 
 
     public static void main (String[] args){
-        saveData("Options", "AudioDevice", "-1");
+        saveOption("Options", "AudioDevice", "-1");
     }
 }

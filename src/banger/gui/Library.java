@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class Library extends TableView<Song> implements EventHandler<Event> {
+public class Library extends TableView<Song>{
 
     private MainView mainview;
     private ObservableList<Song> songs;
@@ -38,6 +38,7 @@ public class Library extends TableView<Song> implements EventHandler<Event> {
 
     public void init(){
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        getStylesheets().add("banger/gui/tableview.css");
 
         TableColumn song_id = new TableColumn("ID");
         song_id.setCellValueFactory(
@@ -88,18 +89,5 @@ public class Library extends TableView<Song> implements EventHandler<Event> {
         for (int i = songs.indexOf(s) + 1; i < songs.size(); i++)
             list.add(songs.get(i));
         return result;
-    }
-
-    public void handle(Event event){
-        EventType type = event.getEventType();
-
-        if(type.equals(MouseEvent.MOUSE_CLICKED)) {
-            //handle((MouseEvent) event);
-        } else {
-
-            System.out.println(type);
-            System.out.println(type.getClass());
-            System.out.println(type.getName());
-        }
     }
 }

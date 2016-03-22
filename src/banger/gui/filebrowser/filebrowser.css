@@ -1,0 +1,23 @@
+.tree-view{
+   -fx-background-color: transparent, -fx-box-border,-fx-control-inner-background;
+}
+
+.tree-view:focused{
+    -fx-background-color: transparent, -fx-box-border,-fx-control-inner-background;
+}
+
+.tree-cell:selected {
+    -fx-background-color: #FA7D38;
+}
+
+.tree-cell:focused {
+    -fx-background-color: transparent, -fx-box-border,-fx-control-inner-background;
+    -fx-background: -fx-control-inner-background ;
+     -fx-background-insets: 0, 0 0 1 0 ;
+}
+
+.tree-cell:filled:selected{
+      -fx-background: -fx-control-inner-background ;
+      -fx-background-color: #FA7D38;
+      -fx-background-insets: 0, 0 0 1 0 ;
+}

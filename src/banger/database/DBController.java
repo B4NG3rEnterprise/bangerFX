@@ -5,9 +5,12 @@ import banger.audio.Song;
 import banger.util.BangerVars;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
@@ -132,36 +135,47 @@ public class DBController {
 
             // single artists
             for (int i = 0; i < list.size(); i++) {
-                AudioFile f = AudioFileIO.read(new File(list.get(i)));
-                Tag tag = f.getTag();
+                try {
+                    AudioFile f = new AudioFile();
+                    f = AudioFileIO.read(new File(list.get(i)));
+                    Tag tag = f.getTag();
 
-                if(!f.getFile().getName().endsWith(".wav")) {
-                    String artistName = tag.getFirst(FieldKey.ARTIST);
+                    if(!f.getFile().getName().endsWith(".wav")) {
+                        String artistName = null;
+                        if (tag != null) artistName = tag.getFirst(FieldKey.ARTIST);
 
-                    if (artistName == null || artistName.isEmpty()) continue;
-                        // add artist to artist table
-                    else {
-                        ps.setString(1, artistName);
-                        ps.addBatch();
+                        if (artistName == null || artistName.isEmpty()) continue;
+                            // add artist to artist table
+                        else {
+                            ps.setString(1, artistName);
+                            ps.addBatch();
+                        }
                     }
+                } catch (InvalidAudioFrameException e){
+                    continue;
                 }
             }
             ps.executeBatch();
 
             // album artists
             for (int i = 0; i < list.size(); i++) {
-                AudioFile f = AudioFileIO.read(new File(list.get(i)));
-                Tag tag = f.getTag();
+                try {
+                    AudioFile f = AudioFileIO.read(new File(list.get(i)));
+                    Tag tag = f.getTag();
 
-                if(!f.getFile().getName().endsWith(".wav")) {
-                    String artistName = tag.getFirst(FieldKey.ALBUM_ARTIST);
+                    if(!f.getFile().getName().endsWith(".wav")) {
+                        String artistName = null;
+                        if (tag != null) artistName = tag.getFirst(FieldKey.ALBUM_ARTIST);
 
-                    if (artistName == null || artistName.isEmpty()) continue;
-                        // add artist to artist table
-                    else {
-                        ps.setString(1, artistName);
-                        ps.addBatch();
+                        if (artistName == null || artistName.isEmpty()) continue;
+                            // add artist to artist table
+                        else {
+                            ps.setString(1, artistName);
+                            ps.addBatch();
+                        }
                     }
+                } catch (InvalidAudioFrameException e){
+                    continue;
                 }
             }
             ps.executeBatch();
@@ -171,25 +185,31 @@ public class DBController {
             while (rs.next()) System.out.println(rs.getInt("id") + ": " + rs.getString("artist_name"));
 
             for (int i = 0; i < list.size(); i++) {
-                AudioFile f = AudioFileIO.read(new File(list.get(i)));
-                Tag tag = f.getTag();
+                try {
+                    AudioFile f = AudioFileIO.read(new File(list.get(i)));
+                    Tag tag = f.getTag();
 
-                if(!f.getFile().getName().endsWith(".wav")) {
-                    String albumName = tag.getFirst(FieldKey.ALBUM);
-                    if (albumName == null || albumName.isEmpty()) albumName = "Unknown Album";
-                    String artistName = tag.getFirst(FieldKey.ALBUM_ARTIST).replace("'", "''");
-                    if (artistName == null || artistName.isEmpty())
-                        artistName = tag.getFirst(FieldKey.ARTIST).replace("'", "''");
-                    if (artistName == null || artistName.isEmpty()) artistName = "Unknown Artist";
-                    int artistID = stmt.executeQuery("SELECT id FROM artist WHERE (artist_name = '" + artistName + "')").getInt("id");
-                    String release = null;
-                    if (tag.getFirst(FieldKey.YEAR).matches(".*\\d.*")) release = tag.getFirst(FieldKey.YEAR);
+                    if(!f.getFile().getName().endsWith(".wav")) {
+                        String albumName = null;
+                        String artistName = null;
+                        if (tag != null) albumName = tag.getFirst(FieldKey.ALBUM);
+                        if (albumName == null || albumName.isEmpty()) albumName = "Unknown Album";
+                        if (tag != null) artistName = tag.getFirst(FieldKey.ALBUM_ARTIST).replace("'", "''");
+                        if ((artistName == null || artistName.isEmpty()) && tag != null)
+                            artistName = tag.getFirst(FieldKey.ARTIST).replace("'", "''");
+                        if (artistName == null || artistName.isEmpty()) artistName = "Unknown Artist";
+                        int artistID = stmt.executeQuery("SELECT id FROM artist WHERE (artist_name = '" + artistName + "')").getInt("id");
+                        String release = null;
+                        if (tag != null && tag.getFirst(FieldKey.YEAR).matches(".*\\d.*")) release = tag.getFirst(FieldKey.YEAR);
 
-                    // add album to album table
-                    ps2.setString(1, albumName);
-                    ps2.setInt(2, artistID);
-                    ps2.setString(3, release);
-                    ps2.addBatch();
+                        // add album to album table
+                        ps2.setString(1, albumName);
+                        ps2.setInt(2, artistID);
+                        ps2.setString(3, release);
+                        ps2.addBatch();
+                    }
+                } catch (InvalidAudioFrameException e){
+                    continue;
                 }
             }
             ps2.executeBatch();
@@ -200,51 +220,59 @@ public class DBController {
 
 
             for (int i = 0; i < list.size(); i++) {
-                String filePath = list.get(i);
-
-                /*
-                if(list.get(i).contains("é")) {
-                    File f1 = new File(filePath);
-                    filePath = list.get(i).replace("é", "e");
-                    File f2 = new File(filePath);
-                    f1.renameTo(f2);
-                }
-                */
+                try{
+                    String filePath = list.get(i);
 
 
-                AudioFile f = AudioFileIO.read(new File(filePath));
-                Tag tag = f.getTag();
+                    AudioFile f = AudioFileIO.read(new File(filePath));
+                    Tag tag = f.getTag();
 
-                if(!f.getFile().getName().endsWith(".wav")) {
-                    AudioHeader audioheader = f.getAudioHeader();
+                    if(!f.getFile().getName().endsWith(".wav")) {
+                        AudioHeader audioheader = f.getAudioHeader();
+                        String albumName = null;
+                        String artistName = null;
+                        String songTitle = null;
+                        String genre = null;
+                        int length = 0;
 
-                    String albumName = tag.getFirst(FieldKey.ALBUM).replace("'", "''");
-                    if (albumName == null || albumName.isEmpty()) albumName = "Unknown Album";
-                    String artistName = tag.getFirst(FieldKey.ARTIST).replace("'", "''");
-                    if (artistName == null || artistName.isEmpty()) artistName = "Unknown Artist";
-                    int artistID = stmt.executeQuery("SELECT id FROM artist WHERE (artist_name = '" + artistName + "')").getInt("id");
-                    int albumID = stmt.executeQuery("SELECT id FROM album WHERE (album_name = '" + albumName + "')").getInt("id");
+                        if (tag != null) albumName = tag.getFirst(FieldKey.ALBUM).replace("'", "''");
+                        if (albumName == null || albumName.isEmpty()) albumName = "Unknown Album";
+                        if (tag != null) artistName = tag.getFirst(FieldKey.ARTIST).replace("'", "''");
+                        if (artistName == null || artistName.isEmpty()) artistName = "Unknown Artist";
+                        int artistID = stmt.executeQuery("SELECT id FROM artist WHERE (artist_name = '" + artistName + "')").getInt("id");
+                        int albumID = stmt.executeQuery("SELECT id FROM album WHERE (album_name = '" + albumName + "')").getInt("id");
 
-                    String songTitle = tag.getFirst(FieldKey.TITLE);
-                    String genre = tag.getFirst(FieldKey.GENRE);
-                    int length = audioheader.getTrackLength();
+                        if (tag != null) songTitle = tag.getFirst(FieldKey.TITLE);
+                        if (tag != null) genre = tag.getFirst(FieldKey.GENRE);
+                        if (audioheader != null) length = audioheader.getTrackLength();
 
-                    if (songTitle == null || songTitle.isEmpty()) songTitle = f.getFile().getName();
+                        if (songTitle == null || songTitle.isEmpty()) songTitle = f.getFile().getName();
 
-                    // add song to song table
-                    ps3.setString(1, songTitle);
-                    ps3.setInt(2, artistID);
-                    ps3.setInt(3, albumID);
-                    ps3.setString(4, genre);
-                    ps3.setInt(5, 5);
-                    ps3.setString(6, filePath);
-                    ps3.setInt(7, length);
-                    ps3.addBatch();
+                        // add song to song table
+                        ps3.setString(1, songTitle);
+                        ps3.setInt(2, artistID);
+                        ps3.setInt(3, albumID);
+                        ps3.setString(4, genre);
+                        ps3.setInt(5, 5);
+                        ps3.setString(6, filePath);
+                        ps3.setInt(7, length);
+                        ps3.addBatch();
 
-                    // System.out.println(list.get(i));
-                    System.out.println(songTitle + ", " + artistName);
-                } else {
-                    ps3.setString(1, f.getFile().getName());
+                        // System.out.println(list.get(i));
+                        System.out.println(songTitle + ", " + artistName);
+                    } else {
+                        ps3.setString(1, f.getFile().getName());
+                        ps3.setInt(2, 1);
+                        ps3.setInt(3, 1);
+                        ps3.setString(4, "Unknown");
+                        ps3.setInt(5, 5);
+                        ps3.setString(6, filePath);
+                        ps3.setInt(7, 0);
+                        ps3.addBatch();
+                    }
+                } catch (InvalidAudioFrameException e){
+                    String filePath = list.get(i);
+                    ps3.setString(1, new File(filePath).getName());
                     ps3.setInt(2, 1);
                     ps3.setInt(3, 1);
                     ps3.setString(4, "Unknown");
@@ -281,7 +309,6 @@ public class DBController {
                     list.add(temp.get(i));
             }
         }
-
         return list;
     }
 
