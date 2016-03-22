@@ -2,12 +2,10 @@ package banger.gui.filebrowser;
 
 import banger.gui.MainView;
 import banger.util.BangerVars;
-import javafx.event.EventType;
-import javafx.scene.Node;
+import de.jensd.fx.glyphs.GlyphsDude;
+import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 import java.io.File;
 
@@ -31,25 +29,17 @@ public class FileBrowser extends TreeView<TreeFile> {
         getStylesheets().add("banger/gui/filebrowser/filebrowser.css");
 
         setMinWidth(150);
-        setPrefWidth(150);
+        setPrefWidth(200);
         setMaxWidth(300);
 
         getSelectionModel().clearSelection();
 
-        findFiles(new File("C:\\Users\\Merlin\\Music"), null);
+        findFiles(new File("D:\\Musik"), null);
     }
 
-
-    private final Node folderIcon = new ImageView(
-            new Image("png/interface.png")
-    );
-
-    private final Node musicIcon = new ImageView(
-            new Image("png/shapes.png")
-    );
-
     private void findFiles(File dir, TreeItem<TreeFile> parent) {
-        TreeItem<TreeFile> root = new TreeItem<>(new TreeFile(dir), folderIcon);
+        TreeItem<TreeFile> root = new TreeItem<>(new TreeFile(dir));
+        GlyphsDude.setIcon(root, MaterialDesignIcon.FOLDER, "15px");
         try {
             File[] files = dir.listFiles();
             for (File file : files) {
@@ -60,7 +50,8 @@ public class FileBrowser extends TreeView<TreeFile> {
                     // System.out.println("     file:" + file.getCanonicalPath());
                     for (int x = 0; x < BangerVars.FILE_EXTENSIONS.length; x++)
                         if (file.getAbsolutePath().endsWith(BangerVars.FILE_EXTENSIONS[x])) {
-                            TreeItem<TreeFile> item = new TreeItem<>(new TreeFile(file), musicIcon); // add icon
+                            TreeItem<TreeFile> item = new TreeItem<>(new TreeFile(file)); // add icon
+                            GlyphsDude.setIcon(item, MaterialDesignIcon.MUSIC_NOTE, "15px");
                             root.getChildren().add(item);
                         }
                 }

@@ -7,7 +7,6 @@ import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
 import banger.util.InputHandler;
-import banger.util.LyricsGetter;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -17,7 +16,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -32,7 +30,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -41,15 +39,19 @@ public class MainView extends Application{
 
     MusicPlayer player;
     static Stage stage;
+    Scene scene;
 
     StatusBar statusbar;
     Library library;
     BangerBar bangerBar;
     Queue queue;
     FileBrowser filebrowser;
+    InputHandler handler;
 
     public void start(Stage stage) throws Exception {
         this.stage = stage;
+        handler = new InputHandler(this);
+
         player = new MusicPlayer(this);
 
         statusbar = new StatusBar(this);
@@ -75,10 +77,9 @@ public class MainView extends Application{
         bl.setBottom(statusbar);
         bl.setLeft(filebrowser);
 
-        Scene scene = new Scene(bl);
+        scene = new Scene(bl);
 		scene.getStylesheets().add("banger/gui/statusbar/statusbar.css");
-
-        scene.addEventHandler(KeyEvent.ANY, new InputHandler(this));
+        scene.addEventHandler(KeyEvent.ANY, handler);
 
 		stage.setScene(scene);
         stage.setTitle("B4NG3rFX");
@@ -107,6 +108,8 @@ public class MainView extends Application{
 
     public FileBrowser getFilebrowser(){ return filebrowser; }
 
+    public InputHandler getInputHandler() { return handler; }
+
     public void play(Song s) {
         player.play(s);
         statusbar.play();
@@ -119,6 +122,7 @@ public class MainView extends Application{
 
     public void pause() {
         player.pause();
+        statusbar.pause();
     }
 
     public void skipForward() {
@@ -145,21 +149,22 @@ public class MainView extends Application{
 
     //TODO: Think of some better way!
     public void skipBackward() {
-        ObservableList<Song> s = library.getItems();
-        Collections.reverse(s); //Problem: Changes the underlying list (and with that even the order in the table)
-        for (Iterator<Song> iterator = s.iterator(); iterator.hasNext(); ) {
-            if (iterator.next().equals(player.getNowPlaying())) {
-                if (iterator.hasNext()) {
-                    Song next = iterator.next();
+        ObservableList<Song> s = queue.getItems();
+        for (int i = 0; i < s.size(); i++) {
+            if (s.get(i).equals(player.getNowPlaying())) {
+                if (i > 0) {
+                    Song next = s.get(i-1);
                     library.getSelectionModel().clearSelection();
                     library.getSelectionModel().select(next);
                     queue.getSelectionModel().clearSelection();
                     queue.getSelectionModel().select(next);
                     play(next);
-                } break;
+                } else {
+                    getMusicPlayer().setPosition(0);
+                }
+                break;
             }
         }
-        Collections.reverse(s);
     }
 
     public void setQueueItems(ObservableList<Song> songs){
@@ -225,12 +230,12 @@ public class MainView extends Application{
 
     public static void showPopupMessage(final TextFlow message) {
         final Popup popup = createPopup(message);
-        popup.setOnShown(new EventHandler<WindowEvent>() {
-            public void handle(WindowEvent e) {
-                Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
-                popup.setX(primaryScreenBounds.getMinX() + primaryScreenBounds.getWidth() - popup.getWidth() - 5);
-                popup.setY(primaryScreenBounds.getMinY() + primaryScreenBounds.getHeight() - popup.getHeight() - 5);
-            }
+        popup.setOnShown(e -> {
+            //Add the popup to the monitor with the application on it.
+            ObservableList<Screen> screens = Screen.getScreensForRectangle(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+            Rectangle2D primaryScreenBounds = screens.get(0).getVisualBounds();
+            popup.setX(primaryScreenBounds.getMinX() + primaryScreenBounds.getWidth() - popup.getWidth() - 5);
+            popup.setY(primaryScreenBounds.getMinY() + primaryScreenBounds.getHeight() - popup.getHeight() - 5);
         });
         popup.setOpacity(0);
         popup.show(stage);
