@@ -10,24 +10,34 @@ import javafx.scene.input.KeyEvent;
  */
 public class InputHandler implements EventHandler<KeyEvent> {
 
-    private MainView mainView;
+    private MainView mainview;
 
-    public InputHandler(MainView mainView){
-        this.mainView = mainView;
+    public InputHandler(MainView mainview){
+        this.mainview = mainview;
     }
 
     public void handle(KeyEvent t){
         if (t.getEventType() == KeyEvent.KEY_PRESSED)
             System.out.println(t.getCode());
-        else if (t.getCode() == KeyCode.ENTER)
-            System.out.println("ENTER");
+        else if (t.getCode() == KeyCode.ENTER){
+            if (mainview.getLibrary().isFocused()) {
+                mainview.play(mainview.getLibrary().getSelectionModel().getSelectedItem());
+                mainview.getLibrary().updateQueue();
+            } else if (mainview.getFilebrowser().isFocused()){
+                System.out.println(mainview.getFilebrowser().getSelectionModel().getSelectedItem());
+            }
+        }
         else if (t.getCode() == KeyCode.UP)
             System.out.println("UP");
         else if (t.getCode() == KeyCode.DOWN)
             System.out.println("DOWN");
         else if (t.getCode() == KeyCode.LEFT)
-            System.out.println("LEFT");
+            mainview.skipBackward();
         else if (t.getCode() == KeyCode.RIGHT)
-            System.out.println("RIGHT");
+            mainview.skipForward();
+        else if (t.getCode() == KeyCode.SPACE) {
+            if (mainview.getMusicPlayer().isPlaying()) mainview.pause();
+            else if (mainview.getMusicPlayer().getNowPlaying() != null) mainview.play();
+        }
     }
 }

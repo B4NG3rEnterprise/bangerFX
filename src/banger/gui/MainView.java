@@ -2,6 +2,7 @@ package banger.gui;
 
 import banger.audio.MusicPlayer;
 import banger.audio.Song;
+import banger.gui.filebrowser.FileBrowser;
 import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
@@ -43,6 +44,7 @@ public class MainView extends Application{
     Library library;
     BangerBar bangerBar;
     Queue queue;
+    FileBrowser filebrowser;
 
     public void start(Stage stage) throws Exception {
         this.stage = stage;
@@ -61,11 +63,15 @@ public class MainView extends Application{
         queue = new Queue(this);
         queue.setMinSize(0, 0);
 
+        filebrowser = new FileBrowser(this);
+        filebrowser.setMinSize(0, 0);
+
         BorderPane bl = new BorderPane();
         bl.setTop(bangerBar);
         bl.setCenter(library);
         bl.setRight(queue);
         bl.setBottom(statusbar);
+        bl.setLeft(filebrowser);
 
         Scene scene = new Scene(bl);
 		scene.getStylesheets().add("banger/gui/statusbar/statusbar.css");
@@ -82,6 +88,7 @@ public class MainView extends Application{
             System.exit(0);
         });
         stage.show();
+
     }
 
     public MusicPlayer getMusicPlayer() {
@@ -95,6 +102,8 @@ public class MainView extends Application{
     public Queue getQueue() { return queue; }
 
     public StatusBar getStatusbar() { return statusbar; }
+
+    public FileBrowser getFilebrowser(){ return filebrowser; }
 
     public void play(Song s) {
         player.play(s);
@@ -138,9 +147,14 @@ public class MainView extends Application{
         Collections.reverse(s); //Problem: Changes the underlying list (and with that even the order in the table)
         for (Iterator<Song> iterator = s.iterator(); iterator.hasNext(); ) {
             if (iterator.next().equals(player.getNowPlaying())) {
-                if (iterator.hasNext())
-                    play(iterator.next());
-                break;
+                if (iterator.hasNext()) {
+                    Song next = iterator.next();
+                    library.getSelectionModel().clearSelection();
+                    library.getSelectionModel().select(next);
+                    queue.getSelectionModel().clearSelection();
+                    queue.getSelectionModel().select(next);
+                    play(next);
+                } break;
             }
         }
         Collections.reverse(s);
@@ -187,7 +201,7 @@ public class MainView extends Application{
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    for(int i = 15; i >= 0; i--) {
+                    for(int i = 17; i >= 0; i--) {
                         double opacity = (double) i / 20;
                         try {
                             Thread.sleep(40);
@@ -219,7 +233,7 @@ public class MainView extends Application{
         popup.setOpacity(0);
         popup.show(stage);
         new Thread(() -> {
-            for(int i = 0; i <= 15; i++) {
+            for(int i = 0; i <= 17; i++) {
                 double opacity = (double) i / 20;
                 try {
                     Thread.sleep(20);

@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-public class Library extends TableView<Song> implements EventHandler<Event> {
+public class Library extends TableView<Song>{
 
     private MainView mainview;
     private ObservableList<Song> songs;
@@ -38,6 +38,7 @@ public class Library extends TableView<Song> implements EventHandler<Event> {
 
     public void init(){
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        getStylesheets().add("banger/gui/tableview.css");
 
         TableColumn song_id = new TableColumn("ID");
         song_id.setCellValueFactory(

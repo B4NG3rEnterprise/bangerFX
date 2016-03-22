@@ -5,6 +5,8 @@ import banger.audio.Song;
 import banger.util.BangerVars;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
@@ -307,7 +309,6 @@ public class DBController {
                     list.add(temp.get(i));
             }
         }
-
         return list;
     }
 

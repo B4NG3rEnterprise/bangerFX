@@ -25,6 +25,7 @@ public class BangerBar extends MenuBar {
 
     public void init() {
 
+        getStylesheets().add("banger/gui/menubar/bangerbar.css");
         MenuItem changeDir = new MenuItem("Choose Directory...");
         changeDir.setOnAction(e -> {
             Stage stage = new Stage();
@@ -46,7 +47,7 @@ public class BangerBar extends MenuBar {
         });
         file.getItems().add(close);
 
-        Menu edit = new Menu("Datei");
+        Menu edit = new Menu("Bearbeiten");
         edit.getItems().add(initPlaylistMenu());
         edit.getItems().add(new MenuItem("Playlist löschen"));
         edit.getItems().add(new MenuItem("Optionen..."));

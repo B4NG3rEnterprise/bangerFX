@@ -92,8 +92,6 @@ public class StatusBar extends HBox implements EventHandler<Event> {
         });
 		play.addEventHandler(EventType.ROOT, e -> handlePlayBtn(e));
 
-
-		
 		repeat = new Button();
 		GlyphsDude.setIcon(repeat, MaterialDesignIcon.REPEAT, size);
 		repeat.getStyleClass().add("statusbar_icon");

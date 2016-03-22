@@ -1,0 +1,22 @@
+.table-view{
+   -fx-background-color: transparent, -fx-box-border,-fx-control-inner-background;
+}
+
+.table-view:focused{
+    -fx-background-color: transparent, -fx-box-border,-fx-control-inner-background;
+}
+
+.table-row-cell:selected, .table-cell:selected, .table-row-cell:focused {
+    -fx-background-color: #FA7D38;
+}
+
+.table-row-cell:filled:selected, .table-cell:selected, .table-row-cell:focused {
+      -fx-background: -fx-control-inner-background ;
+      -fx-background-color: #FA7D38;
+      -fx-background-insets: 0, 0 0 1 0 ;
+      -fx-table-cell-border-color: #FA7D38;;
+}
+
+.table-row-cell:odd:filled:selected {
+    -fx-background-color: #FA7D38;
+}
