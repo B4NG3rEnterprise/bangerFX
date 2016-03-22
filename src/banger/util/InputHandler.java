@@ -28,7 +28,7 @@ public class InputHandler implements EventHandler<KeyEvent> {
             }
         }
         else if (t.getCode() == KeyCode.UP)
-            mainview.showLyrics();
+            System.out.println("UP");
         else if (t.getCode() == KeyCode.DOWN)
             System.out.println("DOWN");
         else if (t.getCode() == KeyCode.LEFT)
