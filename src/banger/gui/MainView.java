@@ -29,8 +29,9 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.util.Iterator;
 
-
 public class MainView extends Application{
+
+    private final boolean TEST_LYRICS = false;
 
     MusicPlayer player;
     static Stage stage;
@@ -93,11 +94,22 @@ public class MainView extends Application{
         lyricsview.setMinSize(0, 0);
 
         BorderPane bl = new BorderPane();
-        bl.setTop(bangerBar);
-        bl.setCenter(library);
-        bl.setRight(v1);
-        bl.setBottom(statusbar);
-        bl.setLeft(filebrowser);
+
+        if (TEST_LYRICS){
+            library.setMaxWidth(150);
+
+            bl.setTop(bangerBar);
+            bl.setCenter(lyricsview);
+            bl.setRight(v1);
+            bl.setBottom(statusbar);
+            bl.setLeft(library);
+        } else {
+            bl.setTop(bangerBar);
+            bl.setCenter(library);
+            bl.setRight(v1);
+            bl.setBottom(statusbar);
+            bl.setLeft(filebrowser);
+        }
 
         scene = new Scene(bl);
 		scene.getStylesheets().add("banger/gui/statusbar/statusbar.css");
@@ -125,7 +137,7 @@ public class MainView extends Application{
 
     public void play(Song s) {
         player.play(s);
-        lyricsview.initLyrics();
+        // lyricsview.initLyrics(); // TODO only get lyrics when view is selected (IP block!)
         statusbar.play();
 
         // popup

@@ -19,9 +19,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 
-/**
- * Created by Merlin on 22.03.2016.
- */
 public class LyricsView extends VBox {
 
     private MainView mainview;

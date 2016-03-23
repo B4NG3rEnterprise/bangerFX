@@ -1,21 +1,24 @@
-package banger.util; /**
- * Created by Merlin on 05.03.2016.
- */
+package banger.util;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.nio.charset.Charset;
+import java.util.concurrent.TimeoutException;
 
 public class LyricsGetter {
 
-    private final static boolean DEBUG = false;
+    // TODO return error + value + URL for search
+
+    private final static boolean DEBUG = true;
 
     private LyricsGetter(){}
 
@@ -23,8 +26,8 @@ public class LyricsGetter {
     public static String getLyricsMusixMatch(String art, String tit) {
         try {
             String artist = "";
-            if (!art.isEmpty()) artist = art.replaceAll("\\(.+?\\)", "").replaceAll("\\[.+?\\]", "").replaceAll("[^A-Za-z0-9\\s]","");
-            String title = tit.replaceAll("\\(.+?\\)", "").replaceAll("\\[.+?\\]", "").replaceAll("[^A-Za-z0-9'\\s]","");
+            if (!art.isEmpty()) artist = art.replaceAll("\\(.+?\\)", "").replaceAll("\\[.+?\\]", "").replaceAll("[^A-Za-z0-9'.\\s]","");
+            String title = tit.replaceAll("\\(.+?\\)", "").replaceAll("\\[.+?\\]", "").replaceAll("[^A-Za-z0-9'.\\s]","");
 
             // prepare url for searchQuery on genius.com
             String url = title.toLowerCase() + " " + artist.toLowerCase();
@@ -35,6 +38,8 @@ public class LyricsGetter {
             // connect to genius.com with the search link
             URLConnection connection = new URL("https://www.musixmatch.com/search/" + url + "/tracks").openConnection();
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(5000);
             connection.connect();
 
             // save result website into a string
@@ -55,6 +60,8 @@ public class LyricsGetter {
             // connect to genius.com with the url from the results
             connection = new URL("https://www.musixmatch.com/" + url).openConnection();
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(5000);
             connection.connect();
 
             // save lyric website into a string
@@ -70,6 +77,10 @@ public class LyricsGetter {
             String result = lyrics.toString().replace("<br>", "\n").replaceAll("\\<.*?>","");
 
             return result;
+        } catch (SocketTimeoutException e) {
+            return "Der Server antwortet nicht...versuch' es bitte später noch einmal.";
+        } catch(UnknownHostException uhe){
+            return "Es kann zurzeit keine Verbindung zum Server hergestellt werden.";
         } catch (Exception e){
             return null;
         }
@@ -78,8 +89,8 @@ public class LyricsGetter {
     public static String getLyricsSongTexte(String art, String tit) {
         try {
             String artist = "";
-            if (!art.isEmpty()) artist = art.replaceAll("\\(.+?\\)", "").replaceAll("\\[.+?\\]", "").replaceAll("[^A-Za-z0-9\\s]","");
-            String title = tit.replaceAll("\\(.+?\\)", "").replaceAll("\\[.+?\\]", "").replaceAll("[^A-Za-z0-9\\s]","");
+            if (!art.isEmpty()) artist = art.replaceAll("\\(.+?\\)", "").replaceAll("\\[.+?\\]", "").replaceAll("[^A-Za-z0-9'.\\s]","");
+            String title = tit.replaceAll("\\(.+?\\)", "").replaceAll("\\[.+?\\]", "").replaceAll("[^A-Za-z0-9'.\\s]","");
 
             // prepare url for searchQuery on genius.com
             String url = title.toLowerCase() + " " + artist.toLowerCase();
@@ -90,6 +101,8 @@ public class LyricsGetter {
             // connect to genius.com with the search link
             URLConnection connection = new URL("http://www.songtexte.com/search?q=" + url + "&c=songs").openConnection();
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(5000);
             connection.connect();
 
             // save result website into a string
@@ -110,6 +123,8 @@ public class LyricsGetter {
             // connect to genius.com with the url from the results
             connection = new URL("http://www.songtexte.com/" + url).openConnection();
             connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+            connection.setReadTimeout(5000);
+            connection.setConnectTimeout(5000);
             connection.connect();
 
             // save lyric website into a string
@@ -125,6 +140,10 @@ public class LyricsGetter {
             String result = lyrics.toString().replace("<br>", "\n").replaceAll("\\<.*?>","");
 
             return result;
+        } catch (SocketTimeoutException e) {
+            return "Der Server antwortet nicht...versuch' es bitte später noch einmal.";
+        } catch(UnknownHostException uhe){
+            return "Es kann zurzeit keine Verbindung zum Server hergestellt werden.";
         } catch (Exception e){
             return null;
         }
