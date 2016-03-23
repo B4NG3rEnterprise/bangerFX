@@ -2,6 +2,7 @@ package banger.gui;
 
 import banger.audio.MusicPlayer;
 import banger.audio.Song;
+import banger.gui.coverview.CoverView;
 import banger.gui.filebrowser.FileBrowser;
 import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
@@ -14,14 +15,17 @@ import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -44,6 +48,7 @@ public class MainView extends Application{
     Scene scene;
 
     StatusBar statusbar;
+    CoverView coverview;
     Library library;
     BangerBar bangerBar;
     Queue queue;
@@ -71,11 +76,21 @@ public class MainView extends Application{
 
         filebrowser = new FileBrowser(this);
         filebrowser.setMinSize(0, 0);
+        
+        coverview = new CoverView(this);
+        
+        VBox v1 = new VBox();
+        v1.getChildren().add(queue);
+        v1.getChildren().add(new Separator
+        		(Orientation.HORIZONTAL));
+        v1.getChildren().add(coverview.getPane());
+
+        
 
         BorderPane bl = new BorderPane();
         bl.setTop(bangerBar);
         bl.setCenter(library);
-        bl.setRight(queue);
+        bl.setRight(v1);
         bl.setBottom(statusbar);
         bl.setLeft(filebrowser);
 
