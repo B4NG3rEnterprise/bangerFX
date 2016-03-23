@@ -256,8 +256,7 @@ public class DBController {
                         ps3.setInt(7, length);
                         ps3.addBatch();
 
-                        // System.out.println(list.get(i));
-                        System.out.println(songTitle + ", " + artistName);
+                        // System.out.println(songTitle + ", " + artistName);
                     } else {
                         ps3.setString(1, f.getFile().getName());
                         ps3.setInt(2, 1);
@@ -268,7 +267,7 @@ public class DBController {
                         ps3.setInt(7, 0);
                         ps3.addBatch();
                     }
-                } catch (InvalidAudioFrameException e){
+                } catch (InvalidAudioFrameException e){ // only wav
                     String filePath = list.get(i);
                     ps3.setString(1, new File(filePath).getName());
                     ps3.setInt(2, 1);

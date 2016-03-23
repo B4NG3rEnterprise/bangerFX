@@ -67,11 +67,6 @@ public class BangerBar extends MenuBar {
         Menu extra = new Menu("Extra");
         extra.getItems().add(initDeviceMenu());
         extra.getItems().add(changeDir);
-        MenuItem lyrics = new MenuItem("Get Lyrics");
-        lyrics.setOnAction(event -> {
-            mainview.showLyrics();
-        });
-        extra.getItems().add(lyrics);
 
         getMenus().addAll(file, edit, view, help, extra);
     }

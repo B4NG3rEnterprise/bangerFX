@@ -1,9 +1,5 @@
-.table-view{
-   -fx-background-color: transparent, -fx-box-border,-fx-control-inner-background;
-}
-
-.table-view:focused{
-    -fx-background-color: transparent, -fx-box-border,-fx-control-inner-background;
+.table-view, .table-view:focused{
+   -fx-background-color: transparent;
 }
 
 .table-row-cell:selected, .table-cell:selected, .table-row-cell:focused {

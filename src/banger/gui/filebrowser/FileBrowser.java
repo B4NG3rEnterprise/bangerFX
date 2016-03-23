@@ -15,6 +15,7 @@ import java.io.File;
 public class FileBrowser extends TreeView<TreeFile> {
 
     private MainView mainview;
+    private String path = "C:\\Users\\Merlin\\Music";
 
     public FileBrowser(MainView mainview){
         super();
@@ -34,7 +35,7 @@ public class FileBrowser extends TreeView<TreeFile> {
 
         getSelectionModel().clearSelection();
 
-        findFiles(new File("D:\\Musik"), null);
+        findFiles(new File(path), null);
     }
 
     private void findFiles(File dir, TreeItem<TreeFile> parent) {

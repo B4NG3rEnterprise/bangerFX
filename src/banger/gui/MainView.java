@@ -9,24 +9,24 @@ import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
 import banger.util.InputHandler;
-import banger.util.LyricsGetter;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import java.awt.*;
+import javafx.stage.WindowEvent;
+import java.awt.Color;
 import java.util.Iterator;
 
 
@@ -35,17 +35,31 @@ public class MainView extends Application{
     MusicPlayer player;
     static Stage stage;
     Scene scene;
+    final int MIN_WIDTH = 1200;
+    final int MIN_HEIGHT = MIN_WIDTH / 16 * 9;
 
     StatusBar statusbar;
+    CoverView coverview;
     Library library;
     BangerBar bangerBar;
     Queue queue;
     CoverView coverview;
     FileBrowser filebrowser;
     InputHandler handler;
+    LyricsView lyricsview;
 
     public void start(Stage stage) throws Exception {
+        stage.setTitle("B4NG3rFX");
+        stage.setMinWidth(MIN_WIDTH);
+        stage.setMaxWidth(1800);
+        stage.setMinHeight(MIN_HEIGHT);
+        stage.setMaxHeight(1800 / 16 * 9);
+        stage.setOnCloseRequest(e -> {
+            player.kill();
+            System.exit(0);
+        });
         this.stage = stage;
+
         handler = new InputHandler(this);
 
         player = new MusicPlayer(this);
@@ -71,10 +85,23 @@ public class MainView extends Application{
         filebrowser = new FileBrowser(this);
         filebrowser.setMinSize(0, 0);
 
+        coverview = new CoverView(this);
+
+        VBox v1 = new VBox();
+        v1.getChildren().add(queue);
+        v1.getChildren().add(new Separator
+        		(Orientation.HORIZONTAL));
+        v1.getChildren().add(coverview.getPane());
+
+        lyricsview = new LyricsView(this);
+        lyricsview.setMinSize(0, 0);
+
         BorderPane bl = new BorderPane();
         bl.setTop(bangerBar);
         bl.setCenter(library);
-        bl.setRight(v);
+
+        bl.setRight(v1);
+
         bl.setBottom(statusbar);
         bl.setLeft(filebrowser);
 
@@ -82,17 +109,8 @@ public class MainView extends Application{
 		scene.getStylesheets().add("banger/gui/statusbar/statusbar.css");
         scene.addEventHandler(KeyEvent.ANY, handler);
 
-		stage.setScene(scene);
-        stage.setTitle("B4NG3rFX");
-        stage.setMinWidth(1200);
-        stage.setMaxWidth(1400);
-        stage.setMinHeight(120);
-        stage.setOnCloseRequest(e -> {
-            player.kill();
-            System.exit(0);
-        });
+        stage.setScene(scene);
         stage.show();
-
     }
 
     public MusicPlayer getMusicPlayer() {
@@ -113,6 +131,7 @@ public class MainView extends Application{
 
     public void play(Song s) {
         player.play(s);
+        lyricsview.initLyrics();
         statusbar.play();
 
         // popup
@@ -221,24 +240,6 @@ public class MainView extends Application{
                     popup.setOpacity(opacity);
                 });
             }
-        }).start();
-    }
-
-    public void showLyrics(){
-        new Thread(() -> {
-            ScrollPane sp = new ScrollPane();
-            Song current = getMusicPlayer().getNowPlaying();
-            String color = "#FA7D38";  // #FA7D38
-            String songtext = LyricsGetter.getLyrics(current.getArtist(), current.getName());
-
-            sp.setContent(new Label(songtext));
-            sp.setMaxHeight(500);
-
-            Platform.runLater(() -> {
-                Stage lyricStage = new Stage();
-                lyricStage.setScene(new Scene(sp));
-                lyricStage.show();
-            });
         }).start();
     }
 }
