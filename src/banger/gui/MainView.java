@@ -21,6 +21,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
@@ -49,6 +51,7 @@ public class MainView extends Application{
     Queue queue;
     FileBrowser filebrowser;
     InputHandler handler;
+    LyricsView lyricsview;
 
     public void start(Stage stage) throws Exception {
         this.stage = stage;
@@ -72,12 +75,15 @@ public class MainView extends Application{
         filebrowser = new FileBrowser(this);
         filebrowser.setMinSize(0, 0);
 
+        lyricsview = new LyricsView(this);
+        lyricsview.setMinSize(0, 0);
+
         BorderPane bl = new BorderPane();
         bl.setTop(bangerBar);
-        bl.setCenter(library);
+        bl.setCenter(library);;
         bl.setRight(queue);
         bl.setBottom(statusbar);
-        bl.setLeft(filebrowser);
+        bl.setLeft(lyricsview);
 
         scene = new Scene(bl);
 		scene.getStylesheets().add("banger/gui/statusbar/statusbar.css");
@@ -114,6 +120,7 @@ public class MainView extends Application{
 
     public void play(Song s) {
         player.play(s);
+        lyricsview.updateLyrics(s);
         statusbar.play();
     }
 
@@ -261,9 +268,16 @@ public class MainView extends Application{
             ScrollPane sp = new ScrollPane();
             Song current = getMusicPlayer().getNowPlaying();
             String color = "#FA7D38";  // #FA7D38
-            String songtext = LyricsGetter.getLyrics(current.getArtist(), current.getName());
+            String artist = current.getArtist();
+            if (artist.equals("Unknown Artist")) artist = "";
+            String songtext = LyricsGetter.getLyricsMusixMatch(artist, current.getName());
+            if (songtext == null) songtext = LyricsGetter.getLyricsSongTexte(artist, current.getName());
+            if (songtext == null) songtext = LyricsGetter.getLyricsGenius(artist, current.getName());
+            if (songtext == null) songtext = "Leider kein Songtext vorhanden.";
 
-            sp.setContent(new Label(songtext));
+            Label songtextLabel = new Label(songtext);
+
+            sp.setContent(songtextLabel);
             sp.setMaxHeight(500);
 
             Platform.runLater(() -> {
