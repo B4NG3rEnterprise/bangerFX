@@ -1,12 +1,12 @@
 package banger.database;
 
 
+import banger.audio.Album;
+import banger.audio.Artist;
 import banger.audio.Song;
 import banger.util.BangerVars;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
@@ -111,11 +111,10 @@ public class DBController {
         }
     }
 
-    public static void setContent(String path){
+    public static void setContent(String path) {
         try {
             System.out.println("\nLoading songs...\n");
 
-            initDBConnection();
             createDB();
 
             initDBConnection();
@@ -126,7 +125,7 @@ public class DBController {
             stmt.executeUpdate("INSERT INTO artist (artist_name) values('Unknown Artist')");
 
             /* Fill album table with default value */
-            stmt.executeUpdate("INSERT INTO album (album_name, artist) values('Unknown Album', 1)");
+            stmt.executeUpdate("INSERT INTO album (album_name, artist, release) values('Unknown Album', 1, 0)");
 
             PreparedStatement ps = connection.prepareStatement("INSERT OR IGNORE INTO artist (artist_name) values(?)");
             PreparedStatement ps2 = connection.prepareStatement("INSERT OR IGNORE INTO album (album_name, artist, release) values(?, ?, ?)");
@@ -136,8 +135,7 @@ public class DBController {
             // single artists
             for (int i = 0; i < list.size(); i++) {
                 try {
-                    AudioFile f = new AudioFile();
-                    f = AudioFileIO.read(new File(list.get(i)));
+                    AudioFile f = AudioFileIO.read(new File(list.get(i)));
                     Tag tag = f.getTag();
 
                     if(!f.getFile().getName().endsWith(".wav")) {
@@ -292,7 +290,7 @@ public class DBController {
         }
     }
 
-    private static ArrayList<String> getAllFiles(String path){
+    private static ArrayList<String> getAllFiles(String path) {
         File file = new File(path);
         File[] files = file.listFiles();
         ArrayList<String> list = new ArrayList<>();
@@ -312,7 +310,7 @@ public class DBController {
         return list;
     }
 
-    public static ObservableList<Song> shuffleAllFiles(){
+    public static ObservableList<Song> shuffleAllFiles() {
         try{
             initDBConnection();
 
@@ -350,7 +348,7 @@ public class DBController {
         }
     }
 
-    public static ObservableList<Song> getAllFiles(){
+    public static ObservableList<Song> getAllSongs() {
         try{
             initDBConnection();
 
@@ -382,6 +380,126 @@ public class DBController {
             connection.close();
             return result;
         } catch (Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ObservableList<Album> getAllAlbums() {
+        try {
+            initDBConnection();
+
+            ObservableList<Album> albums = FXCollections.observableArrayList();
+
+            Statement s = connection.createStatement();
+            ResultSet rs;
+
+            rs = s.executeQuery("SELECT * FROM album " +
+                                "INNER JOIN artist ON (album.artist = artist.id)");
+
+            while(rs.next()) {
+                albums.add(new Album(
+                   rs.getInt("id"),
+                    rs.getString("album_name"),
+                    rs.getString("artist_name"),
+                    rs.getInt("release")
+                ));
+            }
+
+            connection.close();
+            return albums;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ObservableList<Artist> getAllArtists() {
+        try {
+            initDBConnection();
+
+            ObservableList<Artist> artists = FXCollections.observableArrayList();
+
+            Statement s = connection.createStatement();
+            ResultSet rs;
+
+            rs = s.executeQuery("SELECT * FROM artist");
+
+            while(rs.next()) {
+                artists.add(new Artist(
+                    rs.getInt("id"),
+                    rs.getString("artist_name")
+                ));
+            }
+
+            connection.close();
+            return artists;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ObservableList<Song> getSongsFrom(Album album) {
+        try {
+            initDBConnection();
+
+            ObservableList<Song> songs = FXCollections.observableArrayList();
+
+            Statement s = connection.createStatement();
+            ResultSet rs;
+
+            rs = s.executeQuery("select * from song " +
+                                "inner join album on song.album = album.id " +
+                                "inner join artist on song.artist = artist.id " +
+                                "where album.id = " + album.getId());
+
+            while(rs.next()) {
+                songs.add(new Song(
+                    rs.getInt("id"),
+                    rs.getString("song_name"),
+                    rs.getString("artist_name"),
+                    rs.getString("album_name"),
+                    rs.getString("genre"),
+                    rs.getByte("rating"),
+                    rs.getString("filelocation"),
+                    rs.getInt("length")
+                ));
+            }
+
+            connection.close();
+            return songs;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ObservableList<Album> getAlbumsFrom(Artist artist) {
+        try {
+            initDBConnection();
+
+            ObservableList<Album> albums = FXCollections.observableArrayList();
+
+            Statement s = connection.createStatement();
+            ResultSet rs;
+
+            rs = s.executeQuery("select * from album " +
+                                "inner join artist on album.artist = artist.id " +
+                                "where artist.id = " + artist.getId());
+
+            while(rs.next()) {
+                albums.add(new Album(
+                    rs.getInt("id"),
+                    rs.getString("album_name"),
+                    rs.getString("artist_name"),
+                    rs.getInt("release")
+                ));
+            }
+
+            connection.close();
+            return albums;
+        } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }

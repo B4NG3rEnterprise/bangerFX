@@ -34,7 +34,7 @@ public class BangerBar extends MenuBar {
             // dc.setInitialDirectory(new File("F:/Musik"));
             File directory = dc.showDialog(stage);
             DBController.setContent(directory.toString());
-            mainview.getLibrary().fillTable();
+            mainview.getLibrary().refreshData();
         });
 
         Menu file = new Menu("Datei");

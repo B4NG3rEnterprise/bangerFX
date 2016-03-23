@@ -34,7 +34,7 @@ public class FileBrowser extends TreeView<TreeFile> {
 
         getSelectionModel().clearSelection();
 
-        findFiles(new File("C:\\Users\\Merlin\\Music"), null);
+        findFiles(new File("D:\\Musik"), null);
     }
 
     private void findFiles(File dir, TreeItem<TreeFile> parent) {

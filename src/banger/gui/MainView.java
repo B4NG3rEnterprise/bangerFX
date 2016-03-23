@@ -2,38 +2,31 @@ package banger.gui;
 
 import banger.audio.MusicPlayer;
 import banger.audio.Song;
+import banger.gui.coverview.CoverView;
 import banger.gui.filebrowser.FileBrowser;
+import banger.gui.library.Library;
 import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
 import banger.util.InputHandler;
 import banger.util.LyricsGetter;
-import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
-import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import javafx.scene.web.WebView;
-import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import javafx.util.Duration;
 
-import java.awt.Color;
-import java.util.Collections;
+import java.awt.*;
 import java.util.Iterator;
 
 
@@ -47,6 +40,7 @@ public class MainView extends Application{
     Library library;
     BangerBar bangerBar;
     Queue queue;
+    CoverView coverview;
     FileBrowser filebrowser;
     InputHandler handler;
 
@@ -69,13 +63,18 @@ public class MainView extends Application{
         queue = new Queue(this);
         queue.setMinSize(0, 0);
 
+        coverview = new CoverView();
+        coverview.getPane().setMinSize(0,0);
+
+        VBox v = new VBox(queue, coverview.getPane());
+
         filebrowser = new FileBrowser(this);
         filebrowser.setMinSize(0, 0);
 
         BorderPane bl = new BorderPane();
         bl.setTop(bangerBar);
         bl.setCenter(library);
-        bl.setRight(queue);
+        bl.setRight(v);
         bl.setBottom(statusbar);
         bl.setLeft(filebrowser);
 
@@ -115,6 +114,16 @@ public class MainView extends Application{
     public void play(Song s) {
         player.play(s);
         statusbar.play();
+
+        // popup
+        TextFlow flow = new TextFlow();
+        Text song = new Text(s.getName());
+        Text artist = new Text(" - " + s.getArtist());
+        song.setStyle("-fx-font-weight: bold; -fx-font-size: 120%;");
+        Text album = new Text("\n" + s.getAlbum());
+        album.setStyle("-fx-font-size: 90%;");
+        flow.getChildren().addAll(song, artist, album);
+        showPopupMessage(flow);
     }
 
     public void play() {
@@ -132,15 +141,13 @@ public class MainView extends Application{
             if (iterator.next().equals(player.getNowPlaying())) {
                 if (iterator.hasNext()){
                     Song next = iterator.next();
-                    library.getSelectionModel().clearSelection();
-                    library.getSelectionModel().select(next);
+                    library.select(next);
                     queue.getSelectionModel().clearSelection();
                     queue.getSelectionModel().select(next);
                     play(next);
                 } else if (getStatusbar().getRepeatType() == BangerVars.RepeatState.LOOP_QUEUE.ordinal()){
                     Song next = queue.getItems().get(0);
-                    library.getSelectionModel().clearSelection();
-                    library.getSelectionModel().select(next);
+                    library.select(next);
                     queue.getSelectionModel().clearSelection();
                     queue.getSelectionModel().select(next);
                     play(next);
@@ -156,8 +163,7 @@ public class MainView extends Application{
             if (s.get(i).equals(player.getNowPlaying())) {
                 if (i > 0) {
                     Song next = s.get(i-1);
-                    library.getSelectionModel().clearSelection();
-                    library.getSelectionModel().select(next);
+                    library.select(next);
                     queue.getSelectionModel().clearSelection();
                     queue.getSelectionModel().select(next);
                     play(next);
@@ -175,7 +181,7 @@ public class MainView extends Application{
         queue.getSelectionModel().select(songs.get(0));
     }
 
-    private static boolean isDark(String color){
+    public boolean isDark(String color){
         String fontColor = color;
         boolean isDark = false;
 
@@ -192,46 +198,8 @@ public class MainView extends Application{
         return isDark;
     }
 
-    private static Popup createPopup(final TextFlow message) {
-        final Popup popup = new Popup();
-        String color = "#FA7D38";  // #FA7D38
-        TextFlow label = message;
-        if (isDark(color)) label.getStylesheets().add("banger/gui/darkpopup.css");
-        else label.getStylesheets().add("banger/gui/popup.css");
-        label.getStyleClass().add("popup");
-        label.setStyle("-fx-background-color: " + color);
-        label.setMinWidth(200);
-        popup.getContent().add(label);
-        popup.setOnShowing(new EventHandler<WindowEvent>() {
-            public void handle(WindowEvent event) {
-                new Thread(() -> {
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    for(int i = 17; i >= 0; i--) {
-                        double opacity = (double) i / 20;
-                        try {
-                            Thread.sleep(40);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        Platform.runLater(() -> {
-                            popup.setOpacity(opacity);
-                        });
-                    }
-                    Platform.runLater(() -> {
-                        popup.hide();
-                    });
-                }).start();
-            }
-        });
-        return popup;
-    }
-
-    public static void showPopupMessage(final TextFlow message) {
-        final Popup popup = createPopup(message);
+    public void showPopupMessage(final TextFlow message) {
+        final Popup popup = new Popup(message, this);
         popup.setOnShown(e -> {
             //Add the popup to the monitor with the application on it.
             ObservableList<Screen> screens = Screen.getScreensForRectangle(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());

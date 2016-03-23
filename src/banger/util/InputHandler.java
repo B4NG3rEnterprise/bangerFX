@@ -20,9 +20,9 @@ public class InputHandler implements EventHandler<KeyEvent> {
         if (t.getEventType() == KeyEvent.KEY_PRESSED)
             System.out.println(t.getCode());
         else if (t.getCode() == KeyCode.ENTER){
-            if (mainview.getLibrary().isFocused()) {
-                mainview.play(mainview.getLibrary().getSelectionModel().getSelectedItem());
-                mainview.getLibrary().updateQueue();
+            if (mainview.getLibrary().isInFocus()) {
+                mainview.play(mainview.getLibrary().getSelectedItem());
+                mainview.getLibrary().updateQueue(mainview.getLibrary().getSelectedItem());
             } else if (mainview.getFilebrowser().isFocused()){
                 System.out.println(mainview.getFilebrowser().getSelectionModel().getSelectedItem());
             }

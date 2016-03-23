@@ -295,7 +295,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 			if(!isShuffle) shuffle.setEffect(new Glow(2));
 			else shuffle.setEffect(null);
 			isShuffle = !isShuffle;
-			mainview.getLibrary().updateQueue();
+			mainview.getLibrary().updateQueue(mainview.getLibrary().getSelectedItem());
 		}
 	}
 
