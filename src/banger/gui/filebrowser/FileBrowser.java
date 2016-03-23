@@ -15,7 +15,7 @@ import java.io.File;
 public class FileBrowser extends TreeView<TreeFile> {
 
     private MainView mainview;
-    private String path = "C:\\Users\\Merlin\\Music";
+    private String path = "D:/Musik";
 
     public FileBrowser(MainView mainview){
         super();

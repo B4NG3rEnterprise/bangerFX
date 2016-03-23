@@ -33,7 +33,7 @@
          <children>
             <ImageView fx:id="cover" fitHeight="150.0" fitWidth="150.0" layoutX="10.0" layoutY="50.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                   <Image url="file:/D:/Data/Programming/bangerFX/res/cover_placeholder.png" />
+                   <Image url="file:/D:/Data/Programming/bangerFX/res/png/Cover0.jpg" />
                </image>
             </ImageView>
          </children>

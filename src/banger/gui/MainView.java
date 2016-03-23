@@ -12,7 +12,6 @@ import banger.util.InputHandler;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -21,12 +20,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import java.awt.Color;
+
+import java.awt.*;
 import java.util.Iterator;
 
 
@@ -39,7 +39,6 @@ public class MainView extends Application{
     final int MIN_HEIGHT = MIN_WIDTH / 16 * 9;
 
     StatusBar statusbar;
-    CoverView coverview;
     Library library;
     BangerBar bangerBar;
     Queue queue;
@@ -77,10 +76,8 @@ public class MainView extends Application{
         queue = new Queue(this);
         queue.setMinSize(0, 0);
 
-        coverview = new CoverView();
+        coverview = new CoverView(this);
         coverview.getPane().setMinSize(0,0);
-
-        VBox v = new VBox(queue, coverview.getPane());
 
         filebrowser = new FileBrowser(this);
         filebrowser.setMinSize(0, 0);
@@ -89,8 +86,7 @@ public class MainView extends Application{
 
         VBox v1 = new VBox();
         v1.getChildren().add(queue);
-        v1.getChildren().add(new Separator
-        		(Orientation.HORIZONTAL));
+        v1.getChildren().add(new Separator(Orientation.HORIZONTAL));
         v1.getChildren().add(coverview.getPane());
 
         lyricsview = new LyricsView(this);
@@ -99,9 +95,7 @@ public class MainView extends Application{
         BorderPane bl = new BorderPane();
         bl.setTop(bangerBar);
         bl.setCenter(library);
-
         bl.setRight(v1);
-
         bl.setBottom(statusbar);
         bl.setLeft(filebrowser);
 
@@ -143,6 +137,8 @@ public class MainView extends Application{
         album.setStyle("-fx-font-size: 90%;");
         flow.getChildren().addAll(song, artist, album);
         showPopupMessage(flow);
+
+        coverview.updateView(s.getName(), s.getArtist(), s.getAlbum(), null);
     }
 
     public void play() {
@@ -218,11 +214,16 @@ public class MainView extends Application{
     }
 
     public void showPopupMessage(final TextFlow message) {
-        final Popup popup = new Popup(message, this);
+        final Popup popup = new banger.gui.Popup(message, this);
         popup.setOnShown(e -> {
             //Add the popup to the monitor with the application on it.
-            ObservableList<Screen> screens = Screen.getScreensForRectangle(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-            Rectangle2D primaryScreenBounds = screens.get(0).getVisualBounds();
+            Rectangle2D primaryScreenBounds;
+            if(!stage.isIconified()) {
+                ObservableList<Screen> screens = Screen.getScreensForRectangle(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+                primaryScreenBounds = screens.get(0).getVisualBounds();
+            } else {
+                primaryScreenBounds = Screen.getPrimary().getBounds();
+            }
             popup.setX(primaryScreenBounds.getMinX() + primaryScreenBounds.getWidth() - popup.getWidth() - 5);
             popup.setY(primaryScreenBounds.getMinY() + primaryScreenBounds.getHeight() - popup.getHeight() - 5);
         });

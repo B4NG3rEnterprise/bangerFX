@@ -17,7 +17,7 @@ public class CoverView {
 		
 		FXMLLoader fxmlLoader = new FXMLLoader();	
 		try {
-		p = fxmlLoader.load(getClass().getResource("coverView.fxml").openStream());
+			p = fxmlLoader.load(getClass().getResource("coverView.fxml").openStream());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

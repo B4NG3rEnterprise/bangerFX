@@ -10,7 +10,7 @@ public class Album {
     private String albumName;
     private String artist;
     private int release;
-    private Image cover = new Image("file:/D:/Data/Programming/bangerFX/res/cover_placeholder.png");
+    private Image cover = new Image("file:/D:/Data/Programming/bangerFX/res/png/Cover0.jpg");
 
     public Album(int id, String albumName, String artist, int release) {
         this.id = id;
