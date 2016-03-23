@@ -15,10 +15,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -126,7 +123,7 @@ public class MainView extends Application{
 
     public void play(Song s) {
         player.play(s);
-        lyricsview.initLyrics();;
+        lyricsview.initLyrics();
         statusbar.play();
     }
 
