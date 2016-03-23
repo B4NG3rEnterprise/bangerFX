@@ -12,8 +12,8 @@ public class CoverView {
 	
 	private CoverViewController controller;
 	
-	public CoverView(/*MainView mv*/) {
-//		this.mainview = mv;
+	public CoverView(MainView mv) {
+		this.mainview = mv;
 		
 		FXMLLoader fxmlLoader = new FXMLLoader();	
 		try {
