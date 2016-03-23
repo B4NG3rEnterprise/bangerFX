@@ -11,6 +11,10 @@ public class BangerVars {
         NO_REPEAT, LOOP_SINGLE, LOOP_ONCE, LOOP_QUEUE
     }
 
+    public enum LyricService{
+        NONE, MUSIX_BOTH, SONGTEXTE_BOTH, MUSIX_TITLE, SONGTEXTE_TITLE
+    }
+
     private BangerVars(){};
 
 }

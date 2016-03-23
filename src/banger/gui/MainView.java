@@ -7,35 +7,22 @@ import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
 import banger.util.InputHandler;
-import banger.util.LyricsGetter;
-import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Paint;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import javafx.scene.web.WebView;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javafx.util.Duration;
 
 import java.awt.Color;
-import java.util.Collections;
 import java.util.Iterator;
 
 
@@ -44,6 +31,8 @@ public class MainView extends Application{
     MusicPlayer player;
     static Stage stage;
     Scene scene;
+    final int MIN_WIDTH = 1200;
+    final int MIN_HEIGHT = MIN_WIDTH / 16 * 9;
 
     StatusBar statusbar;
     Library library;
@@ -54,7 +43,17 @@ public class MainView extends Application{
     LyricsView lyricsview;
 
     public void start(Stage stage) throws Exception {
+        stage.setTitle("B4NG3rFX");
+        stage.setMinWidth(MIN_WIDTH);
+        stage.setMaxWidth(1800);
+        stage.setMinHeight(MIN_HEIGHT);
+        stage.setMaxHeight(1800 / 16 * 9);
+        stage.setOnCloseRequest(e -> {
+            player.kill();
+            System.exit(0);
+        });
         this.stage = stage;
+
         handler = new InputHandler(this);
 
         player = new MusicPlayer(this);
@@ -80,26 +79,17 @@ public class MainView extends Application{
 
         BorderPane bl = new BorderPane();
         bl.setTop(bangerBar);
-        bl.setCenter(library);;
+        bl.setCenter(library);
         bl.setRight(queue);
         bl.setBottom(statusbar);
-        bl.setLeft(lyricsview);
+        bl.setLeft(filebrowser);
 
         scene = new Scene(bl);
 		scene.getStylesheets().add("banger/gui/statusbar/statusbar.css");
         scene.addEventHandler(KeyEvent.ANY, handler);
 
-		stage.setScene(scene);
-        stage.setTitle("B4NG3rFX");
-        stage.setMinWidth(1200);
-        stage.setMaxWidth(1400);
-        stage.setMinHeight(120);
-        stage.setOnCloseRequest(e -> {
-            player.kill();
-            System.exit(0);
-        });
+        stage.setScene(scene);
         stage.show();
-
     }
 
     public MusicPlayer getMusicPlayer() {
@@ -120,7 +110,7 @@ public class MainView extends Application{
 
     public void play(Song s) {
         player.play(s);
-        lyricsview.updateLyrics(s);
+        lyricsview.initLyrics();;
         statusbar.play();
     }
 
@@ -260,31 +250,6 @@ public class MainView extends Application{
                     popup.setOpacity(opacity);
                 });
             }
-        }).start();
-    }
-
-    public void showLyrics(){
-        new Thread(() -> {
-            ScrollPane sp = new ScrollPane();
-            Song current = getMusicPlayer().getNowPlaying();
-            String color = "#FA7D38";  // #FA7D38
-            String artist = current.getArtist();
-            if (artist.equals("Unknown Artist")) artist = "";
-            String songtext = LyricsGetter.getLyricsMusixMatch(artist, current.getName());
-            if (songtext == null) songtext = LyricsGetter.getLyricsSongTexte(artist, current.getName());
-            if (songtext == null) songtext = LyricsGetter.getLyricsGenius(artist, current.getName());
-            if (songtext == null) songtext = "Leider kein Songtext vorhanden.";
-
-            Label songtextLabel = new Label(songtext);
-
-            sp.setContent(songtextLabel);
-            sp.setMaxHeight(500);
-
-            Platform.runLater(() -> {
-                Stage lyricStage = new Stage();
-                lyricStage.setScene(new Scene(sp));
-                lyricStage.show();
-            });
         }).start();
     }
 }

@@ -1,0 +1,4 @@
+.stack-pane, .stack-pane:focused, .scroll-pane, .scroll-pane:focused{
+   -fx-background-color: transparent;
+}
+

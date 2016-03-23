@@ -1,6 +1,4 @@
-package banger; /**
-				* Created by Merlin on 05.03.2016.
-				*/
+package banger.util;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
