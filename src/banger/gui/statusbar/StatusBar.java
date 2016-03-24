@@ -50,6 +50,7 @@ public class StatusBar extends HBox implements EventHandler<Event> {
 		super(15);
         mainview = m;
 		this.getStyleClass().add("statusbar");
+		getStylesheets().add("banger/gui/statusbar/statusbar.css");
         this.setAlignment(Pos.CENTER);
 		init();
 	}

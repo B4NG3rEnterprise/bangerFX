@@ -8,6 +8,8 @@ import banger.gui.MainView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
 import java.util.ArrayList;
@@ -34,9 +36,19 @@ public class Library extends StackPane {
         AlbumView a = new AlbumView(mainview, artists);
         TitleView t = new TitleView(mainview, songs);
 
-        currentView = a;
+        currentView = t;
 
-        getChildren().add((Node) currentView);
+        Node v = (Node) currentView;
+
+        if (v instanceof ScrollPane) {
+            this.widthProperty().addListener((observable, oldValue, newValue) -> {
+                System.out.println("OK");
+                ((ScrollPane) v).setVvalue(0);
+                ((ScrollPane) v).setHvalue(0);
+            });
+        }
+
+        getChildren().add(v);
     }
 
 

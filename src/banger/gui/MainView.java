@@ -70,6 +70,7 @@ public class MainView extends Application{
 
         library = new Library(this);
         library.setMinSize(0,0);
+        library.setPrefSize(600, 500);
 
         bangerBar = new BangerBar(this);
         bangerBar.setMinSize(0,0);
@@ -112,7 +113,6 @@ public class MainView extends Application{
         }
 
         scene = new Scene(bl);
-		scene.getStylesheets().add("banger/gui/statusbar/statusbar.css");
         scene.addEventHandler(KeyEvent.ANY, handler);
 
         stage.setScene(scene);

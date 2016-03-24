@@ -1,0 +1,39 @@
+.scrollpane {
+    -fx-padding: 5 0 5 5;
+    -fx-hbar-policy: never;
+    -fx-vbar-policy: as-needed;
+}
+
+.scrollpane .scroll-bar:vertical, .scrollpane .scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+}
+
+.scrollpane .scroll-bar:vertical .corner {
+    -fx-background-color: red;
+}
+
+.scrollpane .scroll-bar:vertical .decrement-button, .scrollpane .scroll-bar:vertical .decrement-button > *,
+.scrollpane .scroll-bar:vertical .increment-button, .scrollpane .scroll-bar:vertical .increment-button > * {
+    -fx-background-color: transparent;
+    -fx-min-height: 0;
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+}
+
+.scrollpane .scroll-bar .thumb {
+    -fx-background-radius: 50px;
+    -fx-background-insets: 0 2 0 5;
+    -fx-background-color: rgba(0,0,0,0.5);
+}
+
+.artist_label, .album_label {
+    -fx-font-family: sans-serif;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+
+.song_table {
+    -fx-fixed-cell-size: 2em;
+}
+

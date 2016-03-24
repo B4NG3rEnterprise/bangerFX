@@ -439,6 +439,41 @@ public class DBController {
         }
     }
 
+    public static ObservableList<Song> getSongsFrom(Artist artist) {
+        try {
+            initDBConnection();
+
+            ObservableList<Song> songs = FXCollections.observableArrayList();
+
+            Statement s = connection.createStatement();
+            ResultSet rs;
+
+            rs = s.executeQuery("select * from song " +
+                    "inner join album on song.album = album.id " +
+                    "inner join artist on song.artist = artist.id " +
+                    "where album.id = " + artist.getId());
+
+            while(rs.next()) {
+                songs.add(new Song(
+                        rs.getInt("id"),
+                        rs.getString("song_name"),
+                        rs.getString("artist_name"),
+                        rs.getString("album_name"),
+                        rs.getString("genre"),
+                        rs.getByte("rating"),
+                        rs.getString("filelocation"),
+                        rs.getInt("length")
+                ));
+            }
+
+            connection.close();
+            return songs;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static ObservableList<Song> getSongsFrom(Album album) {
         try {
             initDBConnection();

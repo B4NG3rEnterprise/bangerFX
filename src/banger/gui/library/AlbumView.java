@@ -1,142 +1,184 @@
 package banger.gui.library;
 
+import banger.Test;
 import banger.audio.Album;
 import banger.audio.Artist;
 import banger.audio.Song;
 import banger.gui.MainView;
-import javafx.beans.property.SimpleStringProperty;
+import com.sun.javafx.scene.control.skin.LabeledText;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TableCell;
+import javafx.concurrent.Task;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.util.Callback;
 
+import java.util.Iterator;
 
-public class AlbumView extends TableView<Album> implements View {
+
+public class AlbumView extends ScrollPane implements View {
 
     MainView mainview;
     private ObservableList<Artist> artists;
 
     public AlbumView(MainView m, ObservableList<Artist> ar) {
-        //super();
+        super();
         mainview = m;
         artists = ar;
 
-        TableColumn cover = new TableColumn<Album, Image>();
-        cover.setCellValueFactory(new PropertyValueFactory<Album, Image>("cover"));
-        cover.setCellFactory(new Callback<TableColumn<Album, Image>, TableCell<Album, Image>>() {
+        getStyleClass().add("scrollpane");
+        getStylesheets().add("/banger/gui/library/albumview.css");
+
+
+
+        Task<GridPane> task = new Task<GridPane>() {
             @Override
-            public TableCell<Album, Image> call(TableColumn<Album, Image> param) {
-                return new TableCell<Album, Image>() {
-                    @Override
-                    protected void updateItem(Image item, boolean empty) {
-                        if (item != null) {
-                            ImageView i = new ImageView(item);
-                            i.setFitWidth(100);
-                            i.setPreserveRatio(true);
-                            setGraphic(i);
-                        }
+            protected GridPane call() throws Exception {
+                GridPane g = new GridPane();
+                g.getStyleClass().add("gridpane");
+                //setAlignment(Pos.TOP_LEFT);
+                //g.setGridLinesVisible(true);
+                g.setHgap(10);
+                g.setVgap(5);
+
+                ColumnConstraints covercol = new ColumnConstraints(50, 100, 200);
+                ColumnConstraints infocol = new ColumnConstraints(100, 150, 200);
+                ColumnConstraints songcol = new ColumnConstraints(400, 450, 500);
+
+                g.getColumnConstraints().addAll(covercol, infocol, songcol);
+
+                //region Creation
+                Image i = new Image(Test.class.getResourceAsStream("/png/Cover0.jpg"));
+
+                Iterator<Artist> artistIterator = artists.iterator();
+
+                int row = 0;
+                while(artistIterator.hasNext()) {
+                    Artist artist = artistIterator.next();
+                    ObservableList<Album> albums = artist.getAlbums();
+
+                    if (artist.getSongs().size() > 0) {
+                        Label artistname = new Label(artist.getName());
+                        artistname.getStyleClass().add("artist_label");
+                        g.setConstraints(artistname, 0, row, 4, 1);
+                        Platform.runLater(() -> g.getChildren().add(artistname));
+                        row++;
                     }
-                };
-            }
-        });
 
-        TableColumn info = new TableColumn<Album, String>();
-        info.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Album, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Album, String> param) {
-                return new SimpleStringProperty(param.getValue().getAlbumName() + "\n" + param.getValue().getArtist() + "\n" + param.getValue().getRelease());
-            }
-        });
-        info.setCellFactory(new Callback<TableColumn<Album, String>, TableCell<Album, String>>() {
-            @Override
-            public TableCell<Album, String> call(TableColumn<Album, String> param) {
-                return new TableCell<Album, String>() {
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        if (item != null) {
-                            ObservableList<String> ot = FXCollections.observableArrayList(item.split("\n"));
-                            ListView list = new ListView(ot);
-                            setGraphic(list);
+                    for(Album album : albums) {
+                        if (album.getSongs().size() > 0) {
+                            ObservableList<Song> songs = album.getSongs();
+
+                            ImageView cover = new ImageView(i);
+                            cover.setFitWidth(100);
+                            cover.setPreserveRatio(true);
+                            cover.setSmooth(true);
+                            cover.setCache(true);
+                            g.setConstraints(cover, 0, row, 1, songs.size() > 1 ? songs.size() : 2, HPos.CENTER, VPos.TOP);
+
+                            Label albumName = new Label(album.getAlbumName());
+                            albumName.getStyleClass().add("album_label");
+                            g.setConstraints(albumName, 1, row);
+
+                            Label albumRelease = new Label(String.valueOf(album.getRelease()));
+                            albumRelease.getStyleClass().add("album_label");
+                            g.setConstraints(albumRelease, 1, row + 1, 1, 1, HPos.LEFT, VPos.TOP);
+
+                            TableView<Song> table = new TableView(album.getSongs());
+                            table.getStyleClass().addAll("song_table");
+
+                            TableColumn numberCol = new TableColumn("#");
+                            numberCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Song, Number>, ObservableValue<Number>>() {
+                                @Override
+                                public ObservableValue<Number> call(TableColumn.CellDataFeatures<Song, Number> p) {
+                                    return new ReadOnlyObjectWrapper(table.getItems().indexOf(p.getValue()) + 1);
+                                }
+                            });
+                            TableColumn song_name = new TableColumn("Name");
+                            song_name.setCellValueFactory(new PropertyValueFactory<Song, String>("name"));
+                            TableColumn genre = new TableColumn("Genre");
+                            genre.setCellValueFactory(new PropertyValueFactory<Song, String>("genre"));
+                            TableColumn length = new TableColumn("Length");
+                            length.setCellValueFactory(new PropertyValueFactory<Song, Integer>("length"));
+
+                            table.widthProperty().addListener(new ChangeListener<Number>()
+                            {
+                                @Override
+                                public void changed(ObservableValue<? extends Number> source, Number oldWidth, Number newWidth)
+                                {
+                                    //Don't show header
+                                    Pane header = (Pane) table.lookup("TableHeaderRow");
+                                    if (header.isVisible()){
+                                        header.setMaxHeight(0);
+                                        header.setMinHeight(0);
+                                        header.setPrefHeight(0);
+                                        header.setVisible(false);
+                                    }
+                                }
+                            });
+
+                            table.prefHeightProperty().bind(table.fixedCellSizeProperty().multiply(Bindings.size(table.getItems())).add(1.01));
+
+                            table.getColumns().addAll(numberCol, song_name, genre, length);
+
+                            table.setOnMousePressed(event -> {
+                                if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
+                                    mainview.play(table.getSelectionModel().getSelectedItem());
+                                    mainview.getLibrary().updateQueue(table.getSelectionModel().getSelectedItem());
+                                }
+                            });
+                            GridPane.setHgrow(table, Priority.ALWAYS);
+                            g.setConstraints(table, 2, row, 1, songs.size() > 1 ? songs.size() : 2, HPos.CENTER, VPos.TOP, Priority.ALWAYS, Priority.ALWAYS);
+
+                            Platform.runLater(() -> g.getChildren().addAll(cover, albumName, albumRelease, table));
+
+                            row += songs.size() > 1 ? songs.size() : 2;
                         }
+                        updateValue(g);
                     }
-                };
-            }
-        });
-
-        TableColumn songs = new TableColumn<Album, String>();
-        songs.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Album, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TableColumn.CellDataFeatures<Album, String> param) {
-                ObservableList<Song> songs = param.getValue().getSongs();
-                StringBuilder sb = new StringBuilder();
-
-                for(Song s : songs) {
-                    sb.append(s.getId() + "\t" + s.getName() + "\t" + s.getArtist() + "\t" + s.getAlbum() + "\t" + s.getGenre() + "\t" + s.getRating() + "\t" + s.getFileLocation() + "\t" + s.getLength() + "\n");
                 }
 
-                return new SimpleStringProperty(sb.toString());
+                //endregion
+
+                return g;
             }
-        });
-        songs.setCellFactory(new Callback<TableColumn<Album, String>, TableCell<Album, String>>() {
-            @Override
-            public TableCell<Album, String> call(TableColumn<Album, String> param) {
-                return new TableCell<Album, String>() {
-                    @Override
-                    protected void updateItem(String item, boolean empty) {
-                        if (item != null) {
-                            ObservableList songs = FXCollections.observableArrayList();
+        };
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
 
-                            for(String s : item.split("\n")) {
-                                String[] ss = s.split("\t");
-                                if (ss[0].length() > 0)
-                                    songs.add(new Song(Integer.valueOf(ss[0]),
-                                            ss[1],
-                                            ss[2],
-                                            ss[3],
-                                            ss[4],
-                                            Byte.valueOf(ss[5]),
-                                            ss[6],
-                                            Integer.valueOf(ss[7])));
-                            }
-
-                            TableView table = new TableView();
-
-                            TableColumn song_name = new TableColumn();
-                            song_name.setCellValueFactory(
-                                    new PropertyValueFactory<Song, String>("name"));
-                            TableColumn genre = new TableColumn();
-                            genre.setCellValueFactory(
-                                    new PropertyValueFactory<Song, String>("genre"));
-                            TableColumn length = new TableColumn();
-                            length.setCellValueFactory(
-                                    new PropertyValueFactory<Song, Integer>("length"));
-
-                            table.getColumns().addAll(song_name, genre, length);
-                            table.setItems(songs);
-
-                            setGraphic(table);
-                        }
-                    }
-                };
-            }
+        task.valueProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("CHANGE");
+            this.setContent(newValue);
         });
 
-        getColumns().addAll(cover, info, songs);
+        task.setOnFailed(event -> {
+            System.out.println("FAILED");
+            System.out.println(task.getException());
+        });
 
-        ObservableList<Album> albums = FXCollections.observableArrayList();
-        for(Artist a : artists)
-            albums.addAll(a.getAlbums());
-        setItems(albums);
+        task.setOnCancelled(event -> {
+            System.out.println("CANCELLED");
+        });
 
-        setPrefHeight(600);
+        task.setOnSucceeded(event -> {
+            System.out.println("SUCCESS");
+            this.setContent(task.getValue());
+        });
+
     }
 
     public void refreshData(ObservableList<Song> songs) {
@@ -152,3 +194,4 @@ public class AlbumView extends TableView<Album> implements View {
     }
 
 }
+

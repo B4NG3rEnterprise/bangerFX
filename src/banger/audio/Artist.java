@@ -24,4 +24,8 @@ public class Artist {
     public ObservableList<Album> getAlbums() {
         return DBController.getAlbumsFrom(this);
     }
+
+    public ObservableList<Song> getSongs() {
+        return DBController.getSongsFrom(this);
+    }
 }
