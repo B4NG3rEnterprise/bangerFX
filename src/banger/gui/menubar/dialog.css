@@ -1,0 +1,20 @@
+.dialog-pane {
+    -fx-border-color: grey;
+    -fx-border-style: solid;
+    -fx-background-color: #FA7D38;
+}
+
+.dialog-pane .button{
+    -fx-background-color: white;
+    -fx-text-fill: black;
+}
+
+.dialog-pane .button:focused, .dialog-pane .button:hover{
+    -fx-background-color: black;
+    -fx-text-fill: white;
+}
+
+.dialog-pane .editor, .dialog-pane .editor:focused{
+    -fx-background-color: transparent;
+    -fx-accent: transparent;
+}

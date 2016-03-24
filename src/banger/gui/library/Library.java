@@ -34,7 +34,7 @@ public class Library extends StackPane {
         AlbumView a = new AlbumView(mainview, artists);
         TitleView t = new TitleView(mainview, songs);
 
-        currentView = a;
+        currentView = t;
 
         getChildren().add((Node) currentView);
     }

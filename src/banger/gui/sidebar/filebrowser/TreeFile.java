@@ -1,4 +1,4 @@
-package banger.gui.filebrowser;
+package banger.gui.sidebar.filebrowser;
 
 import java.io.File;
 

@@ -7,11 +7,11 @@ public class Song {
     private String artist;
     private String album;
     private String genre;
-    private byte rating;
+    private int rating;
     private String fileLocation;
     private int length;
 
-    public Song(int id, String name, String artist, String album, String genre, byte rating, String fileLocation, int length){
+    public Song(int id, String name, String artist, String album, String genre, int rating, String fileLocation, int length){
         this.id = id;
         this.name = name;
         this.artist = artist;
@@ -66,11 +66,11 @@ public class Song {
         this.genre = genre;
     }
 
-    public byte getRating() {
+    public int getRating() {
         return rating;
     }
 
-    public void setRating(byte rating) {
+    public void setRating(int rating) {
         this.rating = rating;
     }
 
