@@ -1,0 +1,21 @@
+.tree-view{
+   -fx-background-color: transparent;
+}
+
+.tree-view:focused{
+    -fx-background-color: transparent;
+}
+
+.tree-cell:selected {
+    -fx-background-color: #FA7D38;
+}
+
+.tree-cell:focused {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0, 0 0 1 0 ;
+}
+
+.tree-cell:filled:selected{
+      -fx-background-color: #FA7D38;
+      -fx-background-insets: 0, 0 0 1 0 ;
+}

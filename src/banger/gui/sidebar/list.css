@@ -1,0 +1,23 @@
+.list-view, .list-view:focused{
+   -fx-background-color: transparent;
+}
+
+.list-cell:selected, .list-cell:selected, .list-cell:focused {
+    -fx-background-color: #FA7D38;
+}
+
+.list-cell:filled:selected, .list-cell:selected, .list-cell:focused {
+      -fx-background: -fx-control-inner-background ;
+      -fx-background-color: #FA7D38;
+      -fx-background-insets: 0, 0 0 1 0 ;
+      -fx-table-cell-border-color: #FA7D38;
+}
+
+.list-cell:odd {
+     -fx-background-color: white;
+     -fx-background-insets: 0, 0 0 1 0;
+}
+
+.list-cell:odd:filled:selected {
+    -fx-background-color: #FA7D38;
+}

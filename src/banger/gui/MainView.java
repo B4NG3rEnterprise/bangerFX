@@ -3,8 +3,10 @@ package banger.gui;
 import banger.audio.MusicPlayer;
 import banger.audio.Song;
 import banger.gui.coverview.CoverView;
-import banger.gui.filebrowser.FileBrowser;
+import banger.gui.sidebar.PlaylistSelector;
+import banger.gui.sidebar.filebrowser.FileBrowser;
 import banger.gui.library.Library;
+import banger.gui.library.LyricsView;
 import banger.gui.menubar.BangerBar;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
@@ -12,21 +14,23 @@ import banger.util.InputHandler;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
-import javafx.geometry.Orientation;
-import javafx.geometry.Rectangle2D;
+import javafx.geometry.*;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Iterator;
 
 public class MainView extends Application{
@@ -47,6 +51,7 @@ public class MainView extends Application{
     FileBrowser filebrowser;
     InputHandler handler;
     LyricsView lyricsview;
+    PlaylistSelector selector;
 
     public void start(Stage stage) throws Exception {
         stage.setTitle("B4NG3rFX");
@@ -80,10 +85,6 @@ public class MainView extends Application{
 
         coverview = new CoverView(this);
         coverview.getPane().setMinSize(0,0);
-
-        filebrowser = new FileBrowser(this);
-        filebrowser.setMinSize(0, 0);
-
         coverview = new CoverView(this);
 
         VBox v1 = new VBox();
@@ -93,6 +94,18 @@ public class MainView extends Application{
 
         lyricsview = new LyricsView(this);
         lyricsview.setMinSize(0, 0);
+
+        // Sidebar
+        VBox v2 = new VBox();
+        filebrowser = new FileBrowser(this);
+        filebrowser.setMinSize(0, 0);
+
+        Label plLabel = new Label("Playlists");
+        plLabel.setPadding(new Insets(5));
+
+        selector = new PlaylistSelector(this);
+        selector.setMinSize(0, 0);
+        v2.getChildren().addAll(filebrowser, plLabel, selector);
 
         BorderPane bl = new BorderPane();
 
@@ -109,7 +122,7 @@ public class MainView extends Application{
             bl.setCenter(library);
             bl.setRight(v1);
             bl.setBottom(statusbar);
-            bl.setLeft(filebrowser);
+            bl.setLeft(v2);
         }
 
         scene = new Scene(bl);
@@ -134,6 +147,10 @@ public class MainView extends Application{
     public FileBrowser getFilebrowser(){ return filebrowser; }
 
     public InputHandler getInputHandler() { return handler; }
+
+    public PlaylistSelector getPlaylistSelector() { return selector; }
+
+    public BangerBar getBangerBar() { return bangerBar; }
 
     public void play(Song s) {
         player.play(s);

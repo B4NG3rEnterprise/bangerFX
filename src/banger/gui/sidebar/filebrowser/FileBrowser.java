@@ -1,4 +1,4 @@
-package banger.gui.filebrowser;
+package banger.gui.sidebar.filebrowser;
 
 import banger.gui.MainView;
 import banger.util.BangerVars;
@@ -15,7 +15,7 @@ import java.io.File;
 public class FileBrowser extends TreeView<TreeFile> {
 
     private MainView mainview;
-    private String path = "D:/Musik";
+    private String path = "C:\\Users\\Merlin\\Music";
 
     public FileBrowser(MainView mainview){
         super();
@@ -27,7 +27,7 @@ public class FileBrowser extends TreeView<TreeFile> {
 
     @SuppressWarnings("unchecked")
     private void init(){
-        getStylesheets().add("banger/gui/filebrowser/filebrowser.css");
+        getStylesheets().add("banger/gui/sidebar/filebrowser/filebrowser.css");
 
         setMinWidth(150);
         setPrefWidth(200);
