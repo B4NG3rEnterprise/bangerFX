@@ -42,8 +42,6 @@ public class AlbumView extends ScrollPane implements View {
         getStyleClass().add("scrollpane");
         getStylesheets().add("/banger/gui/library/albumview.css");
 
-
-
         Task<GridPane> task = new Task<GridPane>() {
             @Override
             protected GridPane call() throws Exception {
@@ -193,5 +191,8 @@ public class AlbumView extends ScrollPane implements View {
         return null;
     }
 
+    public Song[] getSelectedItems(){
+        return null;
+    }
 }
 

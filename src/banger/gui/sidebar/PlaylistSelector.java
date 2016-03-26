@@ -37,7 +37,7 @@ public class PlaylistSelector extends ListView<String> {
         });
 
         setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.DELETE) {
+            if (event.getCode() == KeyCode.DELETE && getItems().size() > 0) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                 alert.setTitle("Playlist löschen?");
                 alert.setContentText("Wollen Sie die Playlist wirklich löschen?");
@@ -49,6 +49,7 @@ public class PlaylistSelector extends ListView<String> {
                     if (response == ButtonType.OK) {
                         PlaylistManager.deletePlaylist(getSelectionModel().getSelectedItem());
                         updatePlaylists();
+                        getSelectionModel().selectFirst();
                         mainview.getBangerBar().updatePlaylistMenu();
                     }
                 });

@@ -1,6 +1,7 @@
-package banger.gui.sidebar;
+package banger.gui.sidebar.viewselector;
 
 import banger.gui.MainView;
+import banger.gui.library.Library;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;

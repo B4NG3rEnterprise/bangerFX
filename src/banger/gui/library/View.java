@@ -10,4 +10,7 @@ public interface View {
     void select(Song song);
 
     Song getSelectedItem();
+
+    Song[] getSelectedItems();
+
 }

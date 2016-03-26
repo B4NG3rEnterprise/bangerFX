@@ -84,7 +84,7 @@ public class BangerBar extends MenuBar {
                 MenuItem item = new MenuItem(playlists[i]);
                 item.setOnAction(event -> {
                     // TODO add songs to playlist
-                    Song[] songs = null;
+                    Song[] songs = mainview.getLibrary().getSelectedItems();
                     PlaylistManager.addToPlaylist(item.getText(), songs);
                 });
                 playlistMenu.getItems().add(item);
@@ -94,7 +94,7 @@ public class BangerBar extends MenuBar {
         MenuItem newpl = new MenuItem("Neue Playlist erstellen...");
         newpl.setOnAction(event -> {
             // TODO add songs so playlist
-            Song[] songs = null;
+            Song[] songs = mainview.getLibrary().getSelectedItems();
 
             if (songs != null) { // show name input and create new playlist
                 String name = "New Playlist";

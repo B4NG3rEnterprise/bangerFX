@@ -61,4 +61,12 @@ public class TitleView extends TableView<Song> implements View {
         setItems(songs);
         updateBounds();
     }
+
+    public Song[] getSelectedItems(){
+        ObservableList<Song> songs = getSelectionModel().getSelectedItems();
+        Song[] result = new Song[songs.size()];
+        for (int i = 0; i < songs.size(); i++)
+            result[i] = songs.get(i);
+        return result;
+    }
 }

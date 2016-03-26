@@ -1,5 +1,6 @@
-package banger.gui.sidebar;
+package banger.gui.sidebar.viewselector;
 
+import banger.gui.sidebar.viewselector.ViewSelectorController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 
