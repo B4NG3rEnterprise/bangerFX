@@ -29,24 +29,24 @@ public class ViewSelectorController{
 
 
 	@FXML
-	protected void showSong() {
+	protected void showTitle() {
 		clearLabels();
 		song.setBackground(new Background(new BackgroundFill(Color.web("#FA7D38"), CornerRadii.EMPTY, Insets.EMPTY)));		
-		mv.getLibrary().setView(Library.SONG_VIEW);
+		mv.getLibrary().setView(Library.VIEW_TITLE);
 	}
 
 	@FXML
-	protected void showList() {
+	protected void showTable() {
 		clearLabels();
 		list.setBackground(new Background(new BackgroundFill(Color.web("#FA7D38"), CornerRadii.EMPTY, Insets.EMPTY)));	
-		mv.getLibrary().setView(Library.LIST_VIEW);
+		mv.getLibrary().setView(Library.VIEW_TABLE);
 	}
 
 	@FXML
 	protected void showAlbum() {
 		clearLabels();
 		album.setBackground(new Background(new BackgroundFill(Color.web("#FA7D38"), CornerRadii.EMPTY, Insets.EMPTY)));	
-		mv.getLibrary().setView(Library.ALBUM_VIEW);
+		mv.getLibrary().setView(Library.VIEW_ALBUM);
 	}
 
 	protected void clearLabels() {
