@@ -10,7 +10,7 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="152.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="banger.gui.sidebar.ViewSelectorController">
    <children>
       <Label fx:id="background" layoutY="-5.0" prefHeight="116.0" prefWidth="152.0" />
-      <Label fx:id="list" layoutX="-1.0" layoutY="14.0" onMouseClicked="#showList" prefHeight="19.0" prefWidth="152.0" text="Liste" AnchorPane.leftAnchor="-1.0" AnchorPane.topAnchor="20.0">
+      <Label fx:id="list" layoutX="-1.0" layoutY="14.0" onMouseClicked="#showTable" prefHeight="19.0" prefWidth="152.0" text="Liste" AnchorPane.leftAnchor="-1.0" AnchorPane.topAnchor="20.0">
          <font>
             <Font size="13.0" />
          </font>
@@ -18,7 +18,7 @@
             <Insets left="10.0" />
          </padding>
       </Label>
-      <Label fx:id="song" layoutY="39.0" onMouseClicked="#showSong" prefHeight="19.0" prefWidth="152.0" text="Songs" AnchorPane.leftAnchor="0.0">
+      <Label fx:id="song" layoutY="39.0" onMouseClicked="#showTitle" prefHeight="19.0" prefWidth="152.0" text="Titel" AnchorPane.leftAnchor="0.0">
          <font>
             <Font size="13.0" />
          </font>
