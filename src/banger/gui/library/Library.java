@@ -23,6 +23,12 @@ public class Library extends StackPane {
     private ObservableList<Artist> artists;
     private ObservableList<Album> albums;
     private ObservableList<Song> songs;
+    
+    
+    //title: album -> songs; album: cover, table: table ._.
+    public static final int VIEW_TITLE = 0;
+    public static final int VIEW_ALBUM = 1;
+    public static final int VIEW_TABLE = 2;
 
     View currentView;
 
@@ -83,5 +89,9 @@ public class Library extends StackPane {
 
     public boolean isInFocus() {
         return isFocused() || ((Node) currentView).isFocused();
+    }
+    
+    public void setView(int view) {
+        //TO-DO
     }
 }
