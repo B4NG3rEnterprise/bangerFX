@@ -8,6 +8,11 @@ import javafx.stage.StageStyle;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class PlaylistManager {
@@ -20,12 +25,12 @@ public class PlaylistManager {
 
     public static void createPlaylist(String name, Song[] songs){
         File playlist = new File(PLAYLIST_DIR + name + ".m3u");
-        // TODO make alert
-
         playlist.getParentFile().mkdirs();
 
-        if (!playlist.exists())
+        if (!playlist.exists() && songs != null){
+            createFile(playlist);
             addToPlaylist(name, songs);
+        }
         else {
             int ext = 1;
             File playlistExt = new File(PLAYLIST_DIR + name + "(" + ext + ")" + ".m3u");
@@ -86,11 +91,20 @@ public class PlaylistManager {
 
     private static String format(Song s){
         StringBuilder sb = new StringBuilder();
-        sb.append("#EXTM3U");
-        sb.append("\n#EXTINF:" + s.getLength() + "," + s.getName());
+        sb.append("#EXTINF:" + s.getLength() + "," + s.getName());
         String loc = s.getFileLocation();
         sb.append("\n" + loc.substring(loc.lastIndexOf("/") + 1));
         return sb.toString();
+    }
+
+    private static void createFile(File f){
+        List<String> lines = Arrays.asList("#EXTM3U");
+        Path file = Paths.get(f.toURI());
+        try {
+            Files.write(file, lines, Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void deleteFile(File f){

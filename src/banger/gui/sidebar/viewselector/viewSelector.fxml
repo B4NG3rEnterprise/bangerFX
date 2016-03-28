@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="152.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="banger.gui.sidebar.ViewSelectorController">
+   <children>
+      <Label fx:id="background" layoutY="-5.0" prefHeight="116.0" prefWidth="152.0" />
+      <Label fx:id="list" layoutX="-1.0" layoutY="14.0" onMouseClicked="#showTable" prefHeight="19.0" prefWidth="152.0" text="Liste" AnchorPane.leftAnchor="-1.0" AnchorPane.topAnchor="20.0">
+         <font>
+            <Font size="13.0" />
+         </font>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </Label>
+      <Label fx:id="song" layoutY="39.0" onMouseClicked="#showTitle" prefHeight="19.0" prefWidth="152.0" text="Titel" AnchorPane.leftAnchor="0.0">
+         <font>
+            <Font size="13.0" />
+         </font>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </Label>
+      <Label fx:id="album" layoutX="-1.0" layoutY="58.0" onMouseClicked="#showAlbum" prefHeight="19.0" prefWidth="152.0" text="Alben" AnchorPane.leftAnchor="-1.0">
+         <font>
+            <Font size="13.0" />
+         </font>
+         <padding>
+            <Insets left="10.0" />
+         </padding>
+      </Label>
+   </children>
+</AnchorPane>
