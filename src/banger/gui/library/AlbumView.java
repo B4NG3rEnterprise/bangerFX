@@ -63,12 +63,11 @@ public class AlbumView extends ScrollPane implements View {
                 //region Creation
                 Image i = new Image(Test.class.getResourceAsStream("/png/Cover0.jpg"));
 
-                Iterator<Artist> artistIterator = artists.iterator();
-
                 int row = 0;
-                while(artistIterator.hasNext()) {
-                    Artist artist = artistIterator.next();
+                for(Artist artist : artists) {
                     ObservableList<Album> albums = artist.getAlbums();
+
+                    //System.out.println(artist.getName() + ": " + artist.getId() + "\t" + artist.getAlbums().size());
 
                     if (artist.getSongs().size() > 0) {
                         Label artistname = new Label(artist.getName());
@@ -79,6 +78,8 @@ public class AlbumView extends ScrollPane implements View {
                     }
 
                     for(Album album : albums) {
+                        //System.out.println("\t" + album.getSongs().size());
+
                         if (album.getSongs().size() > 0) {
                             ObservableList<Song> songs = album.getSongs();
 
@@ -97,7 +98,7 @@ public class AlbumView extends ScrollPane implements View {
                             albumRelease.getStyleClass().add("album_label");
                             g.setConstraints(albumRelease, 1, row + 1, 1, 1, HPos.LEFT, VPos.TOP);
 
-                            TableView<Song> table = new TableView(album.getSongs());
+                            TableView<Song> table = new TableView<Song>(album.getSongs());
                             table.getStyleClass().addAll("song_table");
 
                             TableColumn numberCol = new TableColumn("#");

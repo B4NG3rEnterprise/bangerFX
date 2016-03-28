@@ -131,7 +131,7 @@ public class DBController {
             PreparedStatement ps2 = connection.prepareStatement("INSERT OR IGNORE INTO album (album_name, artist, release) values(?, ?, ?)");
             PreparedStatement ps3 = connection.prepareStatement("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values (?, ?, ?, ?, ?, ?, ?)");
 
-
+/*
             // single artists
             for (int i = 0; i < list.size(); i++) {
                 try {
@@ -153,7 +153,7 @@ public class DBController {
                     continue;
                 }
             }
-            ps.executeBatch();
+            ps.executeBatch();*/
 
             // album artists
             for (int i = 0; i < list.size(); i++) {
@@ -164,6 +164,9 @@ public class DBController {
                     if(!f.getFile().getName().endsWith(".wav")) {
                         String artistName = null;
                         if (tag != null) artistName = tag.getFirst(FieldKey.ALBUM_ARTIST);
+
+                        if (artistName == null || artistName.isEmpty())
+                            if (tag != null) artistName = tag.getFirst(FieldKey.ARTIST);
 
                         if (artistName == null || artistName.isEmpty()) continue;
                             // add artist to artist table
@@ -235,7 +238,9 @@ public class DBController {
 
                         if (tag != null) albumName = tag.getFirst(FieldKey.ALBUM).replace("'", "''");
                         if (albumName == null || albumName.isEmpty()) albumName = "Unknown Album";
-                        if (tag != null) artistName = tag.getFirst(FieldKey.ARTIST).replace("'", "''");
+                        if (tag != null) artistName = tag.getFirst(FieldKey.ALBUM_ARTIST).replace("'", "''");
+                        if ((artistName == null || artistName.isEmpty()) && tag != null)
+                            artistName = tag.getFirst(FieldKey.ARTIST).replace("'", "''");
                         if (artistName == null || artistName.isEmpty()) artistName = "Unknown Artist";
                         int artistID = stmt.executeQuery("SELECT id FROM artist WHERE (artist_name = '" + artistName + "')").getInt("id");
                         int albumID = stmt.executeQuery("SELECT id FROM album WHERE (album_name = '" + albumName + "')").getInt("id");
@@ -451,7 +456,7 @@ public class DBController {
             rs = s.executeQuery("select * from song " +
                     "inner join album on song.album = album.id " +
                     "inner join artist on song.artist = artist.id " +
-                    "where album.id = " + artist.getId());
+                    "where artist.id = " + artist.getId());
 
             while(rs.next()) {
                 songs.add(new Song(
@@ -460,7 +465,7 @@ public class DBController {
                         rs.getString("artist_name"),
                         rs.getString("album_name"),
                         rs.getString("genre"),
-                        rs.getByte("rating"),
+                        rs.getInt("rating"),
                         rs.getString("filelocation"),
                         rs.getInt("length")
                 ));
@@ -495,7 +500,7 @@ public class DBController {
                     rs.getString("artist_name"),
                     rs.getString("album_name"),
                     rs.getString("genre"),
-                    rs.getByte("rating"),
+                    rs.getInt("rating"),
                     rs.getString("filelocation"),
                     rs.getInt("length")
                 ));
