@@ -65,6 +65,8 @@ public class Library extends StackPane {
         getChildren().add(v);
     }
 
+    public int getCurrentView() { return currentViewNumber; }
+
 
     public void refreshData() {
         songs = DBController.getAllSongs();
@@ -109,7 +111,7 @@ public class Library extends StackPane {
             } else if (view == this.VIEW_TITLE) {
                 currentView = new TitleView(this.mainview,artists);
             } else if (view == this.VIEW_LYRICS) {
-//                currentView =  new LyricsView(this.mainview);
+                currentView =  new LyricsView(this.mainview);
             }
             this.getChildren().add((Node) currentView);
             currentViewNumber = view;

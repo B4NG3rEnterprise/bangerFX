@@ -6,6 +6,7 @@ import banger.util.BangerVars;
 import banger.util.LyricsGetter;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,7 +21,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 
-public class LyricsView extends VBox {
+public class LyricsView extends VBox implements View {
 
     private MainView mainview;
     private Text lyrics;
@@ -132,6 +133,8 @@ public class LyricsView extends VBox {
                 }
             }
         );
+
+        initLyrics();
     }
 
     public void initLyrics(){
@@ -197,6 +200,22 @@ public class LyricsView extends VBox {
         }
         prev.setDisable(prevDisabled);
         next.setDisable(nextDisabled);
+    }
+
+    public void refreshData(ObservableList<Song> songs) {
+        initLyrics();
+    }
+
+    public void select(Song song) {
+
+    }
+
+    public Song getSelectedItem() {
+        return null;
+    }
+
+    public Song[] getSelectedItems() {
+        return null;
     }
 
     /* make this class scrollpane

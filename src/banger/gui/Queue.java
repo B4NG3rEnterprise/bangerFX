@@ -23,7 +23,7 @@ public class Queue extends TableView<Song> {
     }
 
     public void init(){
-        getStylesheets().add("banger/gui/library/tableview.css");
+        getStylesheets().add("banger/gui/library/listview.css");
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         setPrefWidth(200);
