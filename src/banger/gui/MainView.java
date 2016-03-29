@@ -12,6 +12,7 @@ import banger.gui.sidebar.viewselector.ViewSelector;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
 import banger.util.InputHandler;
+import banger.util.Option;
 import com.sun.org.apache.xpath.internal.operations.Or;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -48,6 +49,7 @@ public class MainView extends Application {
     StatusBar statusbar;
     Library library;
     BangerBar bangerBar;
+    SearchBar searchBar;
     Queue queue;
     CoverView coverview;
     FileBrowser filebrowser;
@@ -90,10 +92,12 @@ public class MainView extends Application {
         coverview.setMinSize(0, 0);
         coverview = new CoverView(this);
 
+        searchBar = new SearchBar(this);
+
         //Sidebar rechts
         VBox v1 = new VBox();
         v1.setVgrow(queue, Priority.ALWAYS);
-        v1.getChildren().addAll(queue, new Separator(Orientation.HORIZONTAL), coverview, new Separator(Orientation.HORIZONTAL));
+        v1.getChildren().addAll(searchBar, new Separator(Orientation.HORIZONTAL), queue, new Separator(Orientation.HORIZONTAL), coverview, new Separator(Orientation.HORIZONTAL));
 
         lyricsview = new LyricsView(this);
         lyricsview.setMinSize(0, 0);
@@ -171,18 +175,19 @@ public class MainView extends Application {
 
     public void play(Song s) {
         player.play(s);
-        // lyricsview.initLyrics(); // TODO only get lyrics when view is selected (IP block!)
         statusbar.play();
 
-        // popup
-        TextFlow flow = new TextFlow();
-        Text song = new Text(s.getName());
-        Text artist = new Text(" - " + s.getArtist());
-        song.setStyle("-fx-font-weight: bold; -fx-font-size: 120%;");
-        Text album = new Text("\n" + s.getAlbum());
-        album.setStyle("-fx-font-size: 90%;");
-        flow.getChildren().addAll(song, artist, album);
-        showPopupMessage(flow);
+        if (Option.notifications) {
+            // popup
+            TextFlow flow = new TextFlow();
+            Text song = new Text(s.getName());
+            Text artist = new Text(" - " + s.getArtist());
+            song.setStyle("-fx-font-weight: bold; -fx-font-size: 120%;");
+            Text album = new Text("\n" + s.getAlbum());
+            album.setStyle("-fx-font-size: 90%;");
+            flow.getChildren().addAll(song, artist, album);
+            showPopupMessage(flow);
+        }
 
         coverview.updateView(s.getName(), s.getArtist(), s.getAlbum(), null);
     }

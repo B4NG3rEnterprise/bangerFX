@@ -4,6 +4,7 @@ import banger.audio.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
 import banger.util.DeviceItem;
+import banger.util.Option;
 import banger.util.PlaylistManager;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
@@ -58,7 +59,12 @@ public class BangerBar extends MenuBar {
 
         view = new Menu("Ansicht");
         view.getItems().add(new MenuItem("Widget-Ansicht"));
-        view.getItems().add(new MenuItem("Benachrichtigungen"));
+        CheckMenuItem notifications = new CheckMenuItem("Benachrichtigungen");
+        notifications.setSelected(Option.notifications);
+        notifications.setOnAction(event -> {
+            Option.notifications = !Option.notifications;
+        });
+        view.getItems().add(notifications);
         view.getItems().add(new MenuItem("Hintergrundfarbe"));
         view.getItems().add(new MenuItem("Fonts"));
 
