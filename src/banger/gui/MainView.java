@@ -8,9 +8,11 @@ import banger.gui.sidebar.filebrowser.FileBrowser;
 import banger.gui.library.Library;
 import banger.gui.library.LyricsView;
 import banger.gui.menubar.BangerBar;
+import banger.gui.sidebar.viewselector.ViewSelector;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
 import banger.util.InputHandler;
+import com.sun.org.apache.xpath.internal.operations.Or;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -21,10 +23,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Popup;
 import javafx.stage.Screen;
@@ -33,7 +35,7 @@ import javafx.stage.Stage;
 import java.awt.Color;
 import java.util.Iterator;
 
-public class MainView extends Application{
+public class MainView extends Application {
 
     private final boolean TEST_LYRICS = false;
 
@@ -52,6 +54,7 @@ public class MainView extends Application{
     InputHandler handler;
     LyricsView lyricsview;
     PlaylistSelector selector;
+    ViewSelector viewSelector;
 
     public void start(Stage stage) throws Exception {
         stage.setTitle("B4NG3rFX");
@@ -74,29 +77,29 @@ public class MainView extends Application{
         statusbar.setMinSize(0, 40);
 
         library = new Library(this);
-        library.setMinSize(0,0);
+        library.setMinSize(0, 0);
         library.setPrefSize(600, 500);
 
         bangerBar = new BangerBar(this);
-        bangerBar.setMinSize(0,0);
+        bangerBar.setMinSize(0, 0);
 
         queue = new Queue(this);
         queue.setMinSize(0, 0);
 
         coverview = new CoverView(this);
-        coverview.getPane().setMinSize(0,0);
+        coverview.setMinSize(0, 0);
         coverview = new CoverView(this);
 
+        //Sidebar rechts
         VBox v1 = new VBox();
-        v1.getChildren().add(queue);
-        v1.getChildren().add(new Separator(Orientation.HORIZONTAL));
-        v1.getChildren().add(coverview.getPane());
+        v1.setVgrow(queue, Priority.ALWAYS);
+        v1.getChildren().addAll(queue, new Separator(Orientation.HORIZONTAL), coverview, new Separator(Orientation.HORIZONTAL));
 
         lyricsview = new LyricsView(this);
         lyricsview.setMinSize(0, 0);
 
-        // Sidebar
-        VBox v2 = new VBox();
+        // Sidebar links
+        viewSelector = new ViewSelector(this);
         filebrowser = new FileBrowser(this);
         filebrowser.setMinSize(0, 0);
 
@@ -105,11 +108,13 @@ public class MainView extends Application{
 
         selector = new PlaylistSelector(this);
         selector.setMinSize(0, 0);
-        v2.getChildren().addAll(filebrowser, plLabel, selector);
+
+        VBox v2 = new VBox();
+        v2.getChildren().addAll(viewSelector, new Separator(Orientation.HORIZONTAL), filebrowser, new Separator(Orientation.HORIZONTAL), plLabel, selector);
 
         BorderPane bl = new BorderPane();
 
-        if (TEST_LYRICS){
+        if (TEST_LYRICS) {
             library.setMaxWidth(150);
 
             bl.setTop(bangerBar);
@@ -140,17 +145,29 @@ public class MainView extends Application{
         return library;
     }
 
-    public Queue getQueue() { return queue; }
+    public Queue getQueue() {
+        return queue;
+    }
 
-    public StatusBar getStatusbar() { return statusbar; }
+    public StatusBar getStatusbar() {
+        return statusbar;
+    }
 
-    public FileBrowser getFilebrowser(){ return filebrowser; }
+    public FileBrowser getFilebrowser() {
+        return filebrowser;
+    }
 
-    public InputHandler getInputHandler() { return handler; }
+    public InputHandler getInputHandler() {
+        return handler;
+    }
 
-    public PlaylistSelector getPlaylistSelector() { return selector; }
+    public PlaylistSelector getPlaylistSelector() {
+        return selector;
+    }
 
-    public BangerBar getBangerBar() { return bangerBar; }
+    public BangerBar getBangerBar() {
+        return bangerBar;
+    }
 
     public void play(Song s) {
         player.play(s);
@@ -183,19 +200,20 @@ public class MainView extends Application{
     public void skipForward() {
         for (Iterator<Song> iterator = queue.getItems().iterator(); iterator.hasNext(); ) {
             if (iterator.next().equals(player.getNowPlaying())) {
-                if (iterator.hasNext()){
+                if (iterator.hasNext()) {
                     Song next = iterator.next();
                     library.select(next);
                     queue.getSelectionModel().clearSelection();
                     queue.getSelectionModel().select(next);
                     play(next);
-                } else if (getStatusbar().getRepeatType() == BangerVars.RepeatState.LOOP_QUEUE.ordinal()){
+                } else if (getStatusbar().getRepeatType() == BangerVars.RepeatState.LOOP_QUEUE.ordinal()) {
                     Song next = queue.getItems().get(0);
                     library.select(next);
                     queue.getSelectionModel().clearSelection();
                     queue.getSelectionModel().select(next);
                     play(next);
-                } break;
+                }
+                break;
             }
         }
     }
@@ -206,7 +224,7 @@ public class MainView extends Application{
         for (int i = 0; i < s.size(); i++) {
             if (s.get(i).equals(player.getNowPlaying())) {
                 if (i > 0) {
-                    Song next = s.get(i-1);
+                    Song next = s.get(i - 1);
                     library.select(next);
                     queue.getSelectionModel().clearSelection();
                     queue.getSelectionModel().select(next);
@@ -219,18 +237,18 @@ public class MainView extends Application{
         }
     }
 
-    public void setQueueItems(ObservableList<Song> songs){
+    public void setQueueItems(ObservableList<Song> songs) {
         queue.setItems(songs);
         queue.getSelectionModel().clearSelection();
         queue.getSelectionModel().select(songs.get(0));
     }
 
-    public boolean isDark(String color){
+    public boolean isDark(String color) {
         String fontColor = color;
         boolean isDark = false;
 
         // remove hash character from string
-        String rawFontColor = fontColor.substring(1,fontColor.length());
+        String rawFontColor = fontColor.substring(1, fontColor.length());
 
         // convert hex string to int
         int rgb = Integer.parseInt(rawFontColor, 16);
@@ -247,7 +265,7 @@ public class MainView extends Application{
         popup.setOnShown(e -> {
             //Add the popup to the monitor with the application on it.
             Rectangle2D primaryScreenBounds;
-            if(!stage.isIconified()) {
+            if (!stage.isIconified()) {
                 ObservableList<Screen> screens = Screen.getScreensForRectangle(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
                 primaryScreenBounds = screens.get(0).getVisualBounds();
             } else {
@@ -259,7 +277,7 @@ public class MainView extends Application{
         popup.setOpacity(0);
         popup.show(stage);
         new Thread(() -> {
-            for(int i = 0; i <= 17; i++) {
+            for (int i = 0; i <= 17; i++) {
                 double opacity = (double) i / 20;
                 try {
                     Thread.sleep(20);

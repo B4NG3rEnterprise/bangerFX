@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.text.*?>
-<?import javafx.scene.control.*?>
 <?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="152.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="banger.gui.sidebar.ViewSelectorController">
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="152.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label fx:id="background" layoutY="-5.0" prefHeight="116.0" prefWidth="152.0" />
       <Label fx:id="list" layoutX="-1.0" layoutY="14.0" onMouseClicked="#showTable" prefHeight="19.0" prefWidth="152.0" text="Liste" AnchorPane.leftAnchor="-1.0" AnchorPane.topAnchor="20.0">
@@ -35,4 +34,4 @@
          </padding>
       </Label>
    </children>
-</AnchorPane>
+</fx:root>
