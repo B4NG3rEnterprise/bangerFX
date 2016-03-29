@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -84,6 +85,32 @@ public class PlaylistManager {
         } else return null;
     }
 
+    public static PlaylistItem[] getItems(String playlist){
+        ArrayList<PlaylistItem> songs = new ArrayList<>();
+        try (BufferedReader reader
+                     = new BufferedReader(new FileReader(PLAYLIST_DIR + playlist + ".m3u"))){
+            String currentLine;
+            if (reader.readLine().equals("#EXTM3U")) {
+                while ((currentLine = reader.readLine()) != null) {
+                    if(currentLine.startsWith("#EXTINF")){
+                        int length = Integer.parseInt(currentLine.substring(currentLine.indexOf(":") + 1, currentLine.indexOf(",")));
+                        String name = currentLine.substring(currentLine.indexOf(",") + 1);
+                        String fileLocation = reader.readLine();
+                        songs.add(new PlaylistItem(name, fileLocation, length));
+                    }
+                }
+            } else {
+                System.out.println("Thats no music file");
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        PlaylistItem[] result = new PlaylistItem[songs.size()];
+        result = songs.toArray(result);
+
+        return result;
+    }
+
     public static void deletePlaylist(String name){
         File playlist = new File(PLAYLIST_DIR + name + ".m3u");
         deleteFile(playlist);
@@ -93,7 +120,7 @@ public class PlaylistManager {
         StringBuilder sb = new StringBuilder();
         sb.append("#EXTINF:" + s.getLength() + "," + s.getName());
         String loc = s.getFileLocation();
-        sb.append("\n" + loc.substring(loc.lastIndexOf("/") + 1));
+        sb.append("\n" + loc.substring(loc.lastIndexOf("\\") + 1));
         return sb.toString();
     }
 
