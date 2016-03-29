@@ -2,13 +2,12 @@ package banger.util;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import javax.swing.*;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.nio.charset.Charset;
 
 public class CoverGetter {
@@ -16,92 +15,89 @@ public class CoverGetter {
 	public static void main(String[] args) throws IOException {
 		String artist = JOptionPane.showInputDialog("Please provide an artist name");
 		String title = JOptionPane.showInputDialog("Please provide a song name");
-		getLyricsBySearch(artist, title);
+		getCoverMusixMatch(artist, title);
 	}
 
-	public static void getLyricsBySearch(String artist, String title) throws MalformedURLException, IOException {
+	private final static boolean DEBUG = true;
 
-		// prepare url for searchQuery on genius.com
-		String url = artist.replace(" ", "+").toLowerCase() + "+" + title.replace(" ", "+").toLowerCase();
+	private CoverGetter(){}
 
-		// connect to genius.com with the search link
-		URLConnection connection = new URL("http://genius.com/search?q=" + url).openConnection();
-		connection.setRequestProperty("User-Agent",
-				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
-		connection.connect();
 
-		// save result website into a string
-		BufferedReader br = new BufferedReader(
-				new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")));
-		StringBuilder sb = new StringBuilder();
-		String line;
-		while ((line = br.readLine()) != null) {
-			sb.append(line);
-		}
-
-		// get the first result and save its url to a string
-		Document document = Jsoup.parse(sb.toString());
-		Elements results = document.getElementsByClass("song_link");
-		for (int i = 0; i < results.size(); i++) {
-			if (results.get(i).attr("href").contains("Spotify"))
-				continue;
-			else {
-				url = results.get(i).attr("href");
-				break;
-			}
-		}
-
-		// connect to genius.com with the url from the results
-		connection = new URL(url).openConnection();
-		connection.setRequestProperty("User-Agent",
-				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
-		connection.connect();
-
-		// save lyric website into a string
-		br = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")));
-		sb = new StringBuilder();
-		while ((line = br.readLine()) != null) {
-			sb.append(line);
-		}
-
-		// get the lyrics
-		document = Jsoup.parse(sb.toString());
-		Elements lyrics = document.getElementsByAttribute("property");
-		lyrics = lyrics.attr("property", "og:image");
-
-		File f = new File(System.getProperty("user.dir") + "\\image.jpg");
-
+	public static ImageIcon getCoverMusixMatch(String art, String tit) {
 		try {
-			URL link = null;
+			String artist = "";
+			if (!art.isEmpty()) artist = art.replaceAll("\\(.+?\\)", "").replaceAll("\\[.+?\\]", "").replaceAll("[^A-Za-z0-9'.\\s]","");
+			String title = tit.replaceAll("\\(.+?\\)", "").replaceAll("\\[.+?\\]", "").replaceAll("[^A-Za-z0-9'.\\s]","");
 
-			for (int i = 0; i < lyrics.size(); i++) {
-				if (lyrics.get(i).attr("content").startsWith("https://images.rapgenius.com")) {
-					link = new URL(lyrics.get(i).attr("content"));
+			// prepare url for searchQuery on genius.com
+			String url = title.toLowerCase() + " " + artist.toLowerCase();
+			url = url.trim().replaceAll("[^\\S\\r\\n]+", " ").replaceAll(" ", "%20");
 
-					InputStream is = link.openStream();
-					OutputStream os = new FileOutputStream(f);
+			// connect to genius.com with the search link
+			URLConnection connection = new URL("https://www.musixmatch.com/search/" + url + "/tracks").openConnection();
+			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+			connection.setReadTimeout(5000);
+			connection.setConnectTimeout(5000);
+			connection.connect();
 
-					byte[] b = new byte[2048];
-					int length;
-
-					while ((length = is.read(b)) != -1) {
-						os.write(b, 0, length);
-					}
-
-					is.close();
-					os.close();
-
-					// display lyrics
-					JLabel label = new JLabel();
-					label.setIcon(new ImageIcon(f.getAbsolutePath()));
-					JOptionPane.showMessageDialog(null, label, "Cover for " + title + "by " + artist,
-							JOptionPane.INFORMATION_MESSAGE);
-					break;
-				}
+			// save result website into a string
+			BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")));
+			StringBuilder sb = new StringBuilder();
+			String line;
+			while ((line = br.readLine()) != null) {
+				sb.append(line);
 			}
-		} catch (NullPointerException e) {
 
+			// get the first result and save its url to a string
+			Document document = Jsoup.parse(sb.toString());
+			Elements results = document.getElementsByClass("title");
+			url = results.get(0).attr("href");
+
+
+			// connect to genius.com with the url from the results
+			connection = new URL("https://www.musixmatch.com/" + url).openConnection();
+			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+			connection.setReadTimeout(5000);
+			connection.setConnectTimeout(5000);
+			connection.connect();
+
+			// save lyric website into a string
+			br = new BufferedReader(new InputStreamReader(connection.getInputStream(), Charset.forName("UTF-8")));
+			sb = new StringBuilder();
+			while ((line = br.readLine()) != null) {
+				sb.append(line + "<br>");
+			}
+
+			// get the lyrics
+			document = Jsoup.parse(sb.toString());
+			Element cover = document.getElementsByAttributeValue("property", "og:image").first();
+
+            URL link = new URL(cover.attr("content"));
+			InputStream is = link.openStream();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+			byte[] buffer = new byte[2048];
+			int length;
+
+			while ((length = is.read(buffer)) != -1) {
+				bos.write(buffer, 0, length);
+			}
+			is.close();
+
+            ImageIcon result = new ImageIcon(bos.toByteArray());
+
+            JLabel label = new JLabel();
+            label.setIcon(result);
+            JOptionPane.showMessageDialog(null, label, "Cover for " + title + " by " + artist,
+                    JOptionPane.INFORMATION_MESSAGE);
+
+			return result;
+		} catch (SocketTimeoutException e) {
+			return null;
+		} catch(UnknownHostException uhe){
+			return null;
+		} catch (Exception e){
+			return null;
 		}
-
 	}
 }
