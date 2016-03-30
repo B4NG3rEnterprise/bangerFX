@@ -34,8 +34,11 @@ public class InputHandler implements EventHandler<KeyEvent> {
         else if (t.getCode() == KeyCode.RIGHT)
             mainview.getMusicPlayer().skipForward();
         else if (t.getCode() == KeyCode.SPACE) {
-            if (mainview.getMusicPlayer().isPlaying()) mainview.getMusicPlayer().pause();
-            else if (mainview.getMusicPlayer().getNowPlaying() != null && !mainview.getMusicPlayer().isPlaying()) mainview.getMusicPlayer().play();
+            if (!mainview.getSearchBar().getTextField().isFocused()) {
+                if (mainview.getMusicPlayer().isPlaying()) mainview.getMusicPlayer().pause();
+                else if (mainview.getMusicPlayer().getNowPlaying() != null && !mainview.getMusicPlayer().isPlaying())
+                    mainview.getMusicPlayer().play();
+            }
         }
     }
 }

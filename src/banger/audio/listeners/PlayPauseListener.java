@@ -40,7 +40,7 @@ public class PlayPauseListener {
                 new Popup(owner, flow);
             }
 
-            coverView.updateView(now.getName(), now.getArtist(), now.getAlbum(), null);
+            coverView.updateView(now);
         } else {
             statusbar.pause();
         }

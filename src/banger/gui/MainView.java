@@ -165,4 +165,6 @@ public class MainView extends Application{
     }
 
     public BangerBar getBangerBar() { return bangerBar; }
+
+    public SearchBar getSearchBar() { return searchBar; }
 }

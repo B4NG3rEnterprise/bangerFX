@@ -46,4 +46,6 @@ public class SearchBar extends HBox {
 
         getChildren().addAll(tf); // add button!!
     }
+
+    public TextField getTextField() { return tf; }
 }

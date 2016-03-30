@@ -1,5 +1,6 @@
 package banger.util;
 
+import javafx.scene.image.Image;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,7 +27,7 @@ public class CoverGetter {
 	private CoverGetter(){}
 
 
-	public static ImageIcon getCoverMusixMatch(String art, String tit) {
+	public static Image getCoverMusixMatch(String art, String tit) {
 		try {
 			String artist = "";
 			if (!art.isEmpty()) artist = art.replaceAll("\\(.+?\\)", "").replaceAll("\\[.+?\\]", "").replaceAll("[^A-Za-z0-9'.\\s]","");
@@ -87,12 +88,12 @@ public class CoverGetter {
 			}
 			is.close();
 
-            ImageIcon result = new ImageIcon(bos.toByteArray());
+            Image result = new Image(new ByteArrayInputStream(bos.toByteArray()));
 
-            JLabel label = new JLabel();
-            label.setIcon(result);
-            JOptionPane.showMessageDialog(null, label, "Cover for " + title + " by " + artist,
-                    JOptionPane.INFORMATION_MESSAGE);
+//            JLabel label = new JLabel();
+//            label.setIcon(result);
+//            JOptionPane.showMessageDialog(null, label, "Cover for " + title + " by " + artist,
+//                    JOptionPane.INFORMATION_MESSAGE);
 
 			return result;
 		} catch (SocketTimeoutException e) {
