@@ -2,16 +2,12 @@ package banger.gui.sidebar;
 
 import banger.gui.MainView;
 import banger.util.PlaylistManager;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Pane;
 import javafx.stage.StageStyle;
 
 public class PlaylistSelector extends ListView<String> {
