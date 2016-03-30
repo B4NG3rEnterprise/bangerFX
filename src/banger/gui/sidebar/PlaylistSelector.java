@@ -1,9 +1,7 @@
 package banger.gui.sidebar;
 
-import banger.audio.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
-import banger.util.PlaylistItem;
 import banger.util.PlaylistManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

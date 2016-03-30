@@ -5,7 +5,8 @@ import banger.audio.data.Artist;
 import banger.audio.data.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
-import banger.gui.library.views.AlbumView;
+import banger.gui.library.views.ListView;
+import banger.gui.library.views.LyricsView;
 import banger.gui.library.views.TitleView;
 import banger.gui.library.views.View;
 import javafx.collections.ObservableList;
@@ -73,7 +74,7 @@ public class Library extends StackPane {
 
     public void updateQueue(Song selected){
         ArrayList<Song> list = getAllFrom(selected);
-        list.add(0, selected);
+        //list.add(0, selected);
         mainview.getMusicPlayer().updateQueue(list);
     }
 
@@ -100,7 +101,7 @@ public class Library extends StackPane {
         if (currentViewNumber != view) {
             this.getChildren().remove(currentView);
             if (view == this.VIEW_ALBUM) {
-//                currentView = new AlbumView(this.mainview) ;
+//                currentView = new TitleView(this.mainview) ;
             } else if (view == this.VIEW_LIST) {
                 currentView = new ListView(this.mainview, songs);
             } else if (view == this.VIEW_TITLE) {

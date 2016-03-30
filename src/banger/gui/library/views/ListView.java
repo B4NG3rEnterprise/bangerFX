@@ -1,6 +1,6 @@
-package banger.gui.library;
+package banger.gui.library.views;
 
-import banger.audio.Song;
+import banger.audio.data.Song;
 import banger.gui.MainView;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
@@ -18,7 +18,7 @@ public class ListView extends TableView<Song> implements View {
         songs = s;
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-        getStylesheets().add("banger/gui/library/listview.css");
+        getStylesheets().add("banger/gui/library/views/listview.css");
 
         TableColumn song_name = new TableColumn("Name");
         song_name.setCellValueFactory(
@@ -41,7 +41,7 @@ public class ListView extends TableView<Song> implements View {
 
         setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
-                mainview.play(getSelectionModel().getSelectedItem());
+                mainview.getMusicPlayer().play(getSelectionModel().getSelectedItem());
                 mainview.getLibrary().updateQueue(getSelectionModel().getSelectedItem());
             }
         });

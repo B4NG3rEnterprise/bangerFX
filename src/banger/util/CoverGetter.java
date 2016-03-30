@@ -7,7 +7,10 @@ import org.jsoup.select.Elements;
 
 import javax.swing.*;
 import java.io.*;
-import java.net.*;
+import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 
 public class CoverGetter {

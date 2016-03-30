@@ -1,17 +1,12 @@
 package banger.gui;
 
 
-import banger.audio.Song;
+import banger.audio.data.Song;
 import banger.database.DBController;
-import de.jensd.fx.glyphs.GlyphsDude;
-import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 

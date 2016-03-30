@@ -146,6 +146,7 @@ public class MusicPlayer {
 
     public void updateQueue(ArrayList<Song> q) {
         if (shuffle) Collections.shuffle(q, new Random(System.nanoTime()));
+        q.add(0, nowPlaying);
         queue = q;
         fireQueueListeners(queue);
     }
@@ -163,7 +164,9 @@ public class MusicPlayer {
         bass.BASS_ChannelSetAttribute(stream, Bass.BASS_ATTRIB_VOL, x);
     }
 
-    public void setShuffle(boolean shuffle) { this.shuffle = shuffle; }
+    public void setShuffle(boolean shuffle) {
+        this.shuffle = shuffle;
+    }
 
     public boolean isShuffling() { return shuffle; }
 
