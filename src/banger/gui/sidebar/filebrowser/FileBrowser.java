@@ -15,7 +15,7 @@ import java.io.File;
 public class FileBrowser extends TreeView<TreeFile> {
 
     private MainView mainview;
-    private String path = "D:/Musik";
+    private String path = "E:\\musik\\musik";
 
     public FileBrowser(MainView mainview){
         super();
@@ -32,14 +32,15 @@ public class FileBrowser extends TreeView<TreeFile> {
         setMinWidth(150);
         setPrefWidth(200);
         setMaxWidth(300);
-
         getSelectionModel().clearSelection();
 
         findFiles(new File(path), null);
+        this.getRoot().setExpanded(true);
     }
 
     private void findFiles(File dir, TreeItem<TreeFile> parent) {
         TreeItem<TreeFile> root = new TreeItem<>(new TreeFile(dir));
+
         GlyphsDude.setIcon(root, MaterialDesignIcon.FOLDER, "15px");
         try {
             File[] files = dir.listFiles();
