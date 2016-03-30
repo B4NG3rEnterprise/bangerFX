@@ -1,36 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="152.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="banger.gui.sidebar.ViewSelectorController">
+
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="133.0" prefWidth="297.0" spacing="6.0" type="VBox" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="background" layoutY="-5.0" prefHeight="116.0" prefWidth="152.0" />
-      <Label fx:id="list" layoutX="-1.0" layoutY="14.0" onMouseClicked="#showTable" prefHeight="19.0" prefWidth="152.0" text="Liste" AnchorPane.leftAnchor="-1.0" AnchorPane.topAnchor="20.0">
-         <font>
-            <Font size="13.0" />
-         </font>
+      <Label fx:id="list" onMouseClicked="#showList" prefHeight="21.0" prefWidth="346.0" text="Liste">
          <padding>
-            <Insets left="10.0" />
+            <Insets bottom="2.0" left="20.0" top="2.0" />
          </padding>
       </Label>
-      <Label fx:id="song" layoutY="39.0" onMouseClicked="#showTitle" prefHeight="19.0" prefWidth="152.0" text="Titel" AnchorPane.leftAnchor="0.0">
-         <font>
-            <Font size="13.0" />
-         </font>
+      <Label fx:id="song" onMouseClicked="#showTitle" prefHeight="21.0" prefWidth="321.0" text="Titel">
          <padding>
-            <Insets left="10.0" />
+            <Insets bottom="2.0" left="20.0" top="2.0" />
          </padding>
       </Label>
-      <Label fx:id="album" layoutX="-1.0" layoutY="58.0" onMouseClicked="#showAlbum" prefHeight="19.0" prefWidth="152.0" text="Alben" AnchorPane.leftAnchor="-1.0">
-         <font>
-            <Font size="13.0" />
-         </font>
+      <Label fx:id="album" onMouseClicked="#showAlbum" prefHeight="21.0" prefWidth="323.0" text="Alben">
          <padding>
-            <Insets left="10.0" />
+            <Insets bottom="2.0" left="20.0" top="2.0" />
+         </padding>
+      </Label>
+      <Label fx:id="lyrics" onMouseClicked="#showLyrics" prefHeight="21.0" prefWidth="371.0" text="Lyrics">
+         <padding>
+            <Insets bottom="2.0" left="20.0" top="2.0" />
          </padding>
       </Label>
    </children>
-</AnchorPane>
+   <padding>
+      <Insets top="18.0" />
+   </padding>
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+</fx:root>

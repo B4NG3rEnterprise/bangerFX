@@ -5,6 +5,7 @@ import banger.audio.listeners.PlayPauseListener;
 import banger.audio.listeners.QueueListener;
 import banger.audio.listeners.SkipListener;
 import banger.gui.MainView;
+import banger.gui.library.Library;
 import banger.util.DeviceItem;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
@@ -73,6 +74,9 @@ public class MusicPlayer {
 
         stream = bass.BASS_StreamCreateFile(false, p, 0, 0, Bass.BASS_UNICODE);
         System.out.println(bass.BASS_ErrorGetCode());
+
+        if (mainview.getLibrary().getCurrentView() == Library.VIEW_LYRICS)
+            mainview.getLibrary().refreshData();
 
         if(muted) {
             unmute();

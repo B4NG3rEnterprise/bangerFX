@@ -5,6 +5,8 @@ import banger.audio.data.Album;
 import banger.audio.data.Artist;
 import banger.audio.data.Song;
 import banger.util.BangerVars;
+import banger.util.PlaylistItem;
+import banger.util.PlaylistManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.jaudiotagger.audio.AudioFile;
@@ -538,6 +540,83 @@ public class DBController {
 
             connection.close();
             return albums;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ObservableList<Song> getSongsFromPlaylist(String playlist){
+        try {
+            initDBConnection();
+            PlaylistItem[] items = PlaylistManager.getItems(playlist);
+
+            ObservableList<Song> songs = FXCollections.observableArrayList();
+
+            PreparedStatement s = connection.prepareStatement("SELECT *, album.album_name, artist.artist_name " +
+                    "FROM song " +
+                    "INNER JOIN album ON (song.album = album.id) " +
+                    "INNER JOIN artist ON (song.artist = artist.id) " +
+                    "WHERE (song.song_name = ?) " +
+                    "AND (song.length = ?)");
+            ResultSet rs;
+
+            for (int i = 0; i < items.length; i++) {
+                s.setString(1, items[i].getName());
+                s.setInt(2, items[i].getLength());
+
+                rs = s.executeQuery();
+                int id = rs.getInt("id");
+                String name = rs.getString("song_name");
+                String artist = rs.getString("artist_name");
+                String album = rs.getString("album_name");
+                String genre = rs.getString("genre");
+                byte rating = rs.getByte("rating");
+                String fileLocation = rs.getString("fileLocation");
+                int length = rs.getInt("length");
+
+                songs.add(new Song(id, name, artist, album, genre, rating, fileLocation, length));
+            }
+
+            connection.close();
+            return songs;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ObservableList<Song> searchFor(String key){
+        try {
+            initDBConnection();
+
+            ObservableList<Song> songs = FXCollections.observableArrayList();
+            Statement s = connection.createStatement();
+            ResultSet rs;
+
+            rs = s.executeQuery("SELECT *, album.album_name, artist.artist_name " +
+                    "FROM song " +
+                    "INNER JOIN album ON (song.album = album.id) " +
+                    "INNER JOIN artist ON (song.artist = artist.id) " +
+                    "WHERE (song.song_name LIKE '%" + key + "%') " +
+                    "OR (album.album_name LIKE '%" + key + "%')" +
+                    "OR (artist.artist_name LIKE '%" + key + "%')");
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("song_name");
+                String artist = rs.getString("artist_name");
+                String album = rs.getString("album_name");
+                String genre = rs.getString("genre");
+                byte rating = rs.getByte("rating");
+                String fileLocation = rs.getString("fileLocation");
+                int length = rs.getInt("length");
+
+                songs.add(new Song(id, name, artist, album, genre, rating, fileLocation, length));
+            }
+
+            connection.close();
+            return songs;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;

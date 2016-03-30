@@ -22,10 +22,19 @@ public class Library extends StackPane {
     private ObservableList<Album> albums;
     private ObservableList<Song> songs;
 
-    //title: album -> songs; album: cover, table: table ._.
+    //TITLE: alben links, songliste rechts
     public static final int VIEW_TITLE = 0;
+
+    //ALBUM: nur Albumcover mit Artist/Name angezeigt
     public static final int VIEW_ALBUM = 1;
-    public static final int VIEW_TABLE = 2;
+
+    //LIST: klassisch, ausschließlich Liste/Tabelle;   AUSGANGSANSICHT
+    public static final int VIEW_LIST = 2;
+
+    //LYRICS: lyrics
+    public static final int VIEW_LYRICS = 3;
+
+    private int currentViewNumber = 2;
 
     View currentView;
 
@@ -36,8 +45,8 @@ public class Library extends StackPane {
         albums = DBController.getAllAlbums();
         songs = DBController.getAllSongs();
 
-        AlbumView a = new AlbumView(mainview, artists);
-        TitleView t = new TitleView(mainview, songs);
+        TitleView a = new TitleView(mainview, artists);
+        ListView t = new ListView(mainview, songs);
 
         currentView = t;
 
@@ -53,6 +62,8 @@ public class Library extends StackPane {
 
         getChildren().add(v);
     }
+
+    public int getCurrentView() { return currentViewNumber; }
 
 
     public void refreshData() {
@@ -86,8 +97,23 @@ public class Library extends StackPane {
     }
 
     public void setView(int view) {
-        //TODO
+        if (currentViewNumber != view) {
+            this.getChildren().remove(currentView);
+            if (view == this.VIEW_ALBUM) {
+//                currentView = new AlbumView(this.mainview) ;
+            } else if (view == this.VIEW_LIST) {
+                currentView = new ListView(this.mainview, songs);
+            } else if (view == this.VIEW_TITLE) {
+                currentView = new TitleView(this.mainview,artists);
+            } else if (view == this.VIEW_LYRICS) {
+                currentView =  new LyricsView(this.mainview);
+            }
+            this.getChildren().add((Node) currentView);
+            currentViewNumber = view;
+        }
     }
 
-    public Song[] getSelectedItems() { return currentView.getSelectedItems(); }
+    public Song[] getSelectedItems() {
+        return currentView.getSelectedItems();
+    }
 }

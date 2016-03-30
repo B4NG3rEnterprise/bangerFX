@@ -8,11 +8,12 @@ import banger.gui.coverview.CoverView;
 import banger.gui.library.Library;
 import banger.gui.library.views.LyricsView;
 import banger.gui.menubar.BangerBar;
-import banger.gui.sidebar.PlaylistSelector;
-import banger.gui.sidebar.filebrowser.FileBrowser;
+import banger.gui.sidebar.viewselector.ViewSelector;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
 import banger.util.InputHandler;
+import banger.util.Option;
+import com.sun.org.apache.xpath.internal.operations.Or;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -21,6 +22,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
@@ -38,12 +40,14 @@ public class MainView extends Application{
     StatusBar statusbar;
     Library library;
     BangerBar bangerBar;
+    SearchBar searchBar;
     Queue queue;
     CoverView coverview;
     FileBrowser filebrowser;
     InputHandler handler;
     LyricsView lyricsview;
     PlaylistSelector selector;
+    ViewSelector viewSelector;
 
     public void start(Stage stage) throws Exception {
         stage.setTitle("B4NG3rFX");
@@ -66,29 +70,31 @@ public class MainView extends Application{
         statusbar.setMinSize(0, 40);
 
         library = new Library(this);
-        library.setMinSize(0,0);
+        library.setMinSize(0, 0);
         library.setPrefSize(600, 500);
 
         bangerBar = new BangerBar(this);
-        bangerBar.setMinSize(0,0);
+        bangerBar.setMinSize(0, 0);
 
         queue = new Queue(this);
         queue.setMinSize(0, 0);
 
         coverview = new CoverView(this);
-        coverview.getPane().setMinSize(0,0);
+        coverview.setMinSize(0, 0);
         coverview = new CoverView(this);
 
+        searchBar = new SearchBar(this);
+
+        //Sidebar rechts
         VBox v1 = new VBox();
-        v1.getChildren().add(queue);
-        v1.getChildren().add(new Separator(Orientation.HORIZONTAL));
-        v1.getChildren().add(coverview.getPane());
+        v1.setVgrow(queue, Priority.ALWAYS);
+        v1.getChildren().addAll(searchBar, new Separator(Orientation.HORIZONTAL), queue, new Separator(Orientation.HORIZONTAL), coverview, new Separator(Orientation.HORIZONTAL));
 
         lyricsview = new LyricsView(this);
         lyricsview.setMinSize(0, 0);
 
-        // Sidebar
-        VBox v2 = new VBox();
+        // Sidebar links
+        viewSelector = new ViewSelector(this);
         filebrowser = new FileBrowser(this);
         filebrowser.setMinSize(0, 0);
 
@@ -97,11 +103,13 @@ public class MainView extends Application{
 
         selector = new PlaylistSelector(this);
         selector.setMinSize(0, 0);
-        v2.getChildren().addAll(filebrowser, plLabel, selector);
+
+        VBox v2 = new VBox();
+        v2.getChildren().addAll(viewSelector, new Separator(Orientation.HORIZONTAL), filebrowser, new Separator(Orientation.HORIZONTAL), plLabel, selector);
 
         BorderPane bl = new BorderPane();
 
-        if (TEST_LYRICS){
+        if (TEST_LYRICS) {
             library.setMaxWidth(150);
 
             bl.setTop(bangerBar);
@@ -136,15 +144,25 @@ public class MainView extends Application{
         return library;
     }
 
-    public Queue getQueue() { return queue; }
+    public Queue getQueue() {
+        return queue;
+    }
 
-    public StatusBar getStatusbar() { return statusbar; }
+    public StatusBar getStatusbar() {
+        return statusbar;
+    }
 
-    public FileBrowser getFilebrowser(){ return filebrowser; }
+    public FileBrowser getFilebrowser() {
+        return filebrowser;
+    }
 
-    public InputHandler getInputHandler() { return handler; }
+    public InputHandler getInputHandler() {
+        return handler;
+    }
 
-    public PlaylistSelector getPlaylistSelector() { return selector; }
+    public PlaylistSelector getPlaylistSelector() {
+        return selector;
+    }
 
     public BangerBar getBangerBar() { return bangerBar; }
 }
