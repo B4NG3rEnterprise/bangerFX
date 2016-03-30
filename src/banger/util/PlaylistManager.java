@@ -1,6 +1,6 @@
 package banger.util;
 
-import banger.audio.Song;
+import banger.audio.data.Song;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.StageStyle;

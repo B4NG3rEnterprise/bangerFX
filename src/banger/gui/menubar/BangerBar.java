@@ -1,6 +1,6 @@
 package banger.gui.menubar;
 
-import banger.audio.Song;
+import banger.audio.data.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
 import banger.util.DeviceItem;

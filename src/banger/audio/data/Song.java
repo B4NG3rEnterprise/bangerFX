@@ -1,4 +1,4 @@
-package banger.audio;
+package banger.audio.data;
 
 
 public class Song {

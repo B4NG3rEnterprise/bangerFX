@@ -1,9 +1,9 @@
 package banger.database;
 
 
-import banger.audio.Album;
-import banger.audio.Artist;
-import banger.audio.Song;
+import banger.audio.data.Album;
+import banger.audio.data.Artist;
+import banger.audio.data.Song;
 import banger.util.BangerVars;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

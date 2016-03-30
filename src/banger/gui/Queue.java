@@ -1,6 +1,6 @@
 package banger.gui;
 
-import banger.audio.Song;
+import banger.audio.data.Song;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.SelectionMode;
@@ -23,7 +23,7 @@ public class Queue extends TableView<Song> {
     }
 
     public void init(){
-        getStylesheets().add("banger/gui/library/tableview.css");
+        getStylesheets().add("banger/gui/library/views/titleview.css");
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         setPrefWidth(200);
@@ -46,7 +46,7 @@ public class Queue extends TableView<Song> {
             public void handle(MouseEvent event) {
                 if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
                     Song current = getSelectionModel().getSelectedItem();
-                    mainview.play(current);
+                    mainview.getMusicPlayer().play(current);
                     mainview.getLibrary().select(current);
                 }
             }

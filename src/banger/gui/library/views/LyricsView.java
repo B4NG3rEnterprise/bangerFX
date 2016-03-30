@@ -1,6 +1,6 @@
-package banger.gui.library;
+package banger.gui.library.views;
 
-import banger.audio.Song;
+import banger.audio.data.Song;
 import banger.gui.MainView;
 import banger.util.BangerVars;
 import banger.util.LyricsGetter;
@@ -49,7 +49,7 @@ public class LyricsView extends VBox {
         songtexts = new String[4];
 
         setSpacing(2);
-        getStylesheets().add("banger/gui/library/lyricsview.css");
+        getStylesheets().add("banger/gui/library/views/lyricsview.css");
 
         lyrics = new Text();
         lyrics.setTextAlignment(TextAlignment.CENTER);

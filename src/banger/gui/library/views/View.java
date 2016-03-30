@@ -1,6 +1,6 @@
-package banger.gui.library;
+package banger.gui.library.views;
 
-import banger.audio.Song;
+import banger.audio.data.Song;
 import javafx.collections.ObservableList;
 
 public interface View {

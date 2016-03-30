@@ -1,4 +1,4 @@
-package banger.audio;
+package banger.audio.data;
 
 import banger.database.DBController;
 import javafx.collections.ObservableList;

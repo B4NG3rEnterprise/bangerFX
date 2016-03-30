@@ -5,9 +5,7 @@ import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-/**
- * Created by Merlin on 21.03.2016.
- */
+
 public class InputHandler implements EventHandler<KeyEvent> {
 
     private MainView mainview;
@@ -21,7 +19,7 @@ public class InputHandler implements EventHandler<KeyEvent> {
             System.out.println(t.getCode());
         else if (t.getCode() == KeyCode.ENTER){
             if (mainview.getLibrary().isInFocus()) {
-                mainview.play(mainview.getLibrary().getSelectedItem());
+                mainview.getMusicPlayer().play(mainview.getLibrary().getSelectedItem());
                 mainview.getLibrary().updateQueue(mainview.getLibrary().getSelectedItem());
             } else if (mainview.getFilebrowser().isFocused()){
                 System.out.println(mainview.getFilebrowser().getSelectionModel().getSelectedItem());
@@ -32,12 +30,12 @@ public class InputHandler implements EventHandler<KeyEvent> {
         else if (t.getCode() == KeyCode.DOWN)
             System.out.println("DOWN");
         else if (t.getCode() == KeyCode.LEFT)
-            mainview.skipBackward();
+            mainview.getMusicPlayer().skipBackward();
         else if (t.getCode() == KeyCode.RIGHT)
-            mainview.skipForward();
+            mainview.getMusicPlayer().skipForward();
         else if (t.getCode() == KeyCode.SPACE) {
-            if (mainview.getMusicPlayer().isPlaying()) mainview.pause();
-            else if (mainview.getMusicPlayer().getNowPlaying() != null && !mainview.getMusicPlayer().isPlaying()) mainview.play();
+            if (mainview.getMusicPlayer().isPlaying()) mainview.getMusicPlayer().pause();
+            else if (mainview.getMusicPlayer().getNowPlaying() != null && !mainview.getMusicPlayer().isPlaying()) mainview.getMusicPlayer().play();
         }
     }
 }
