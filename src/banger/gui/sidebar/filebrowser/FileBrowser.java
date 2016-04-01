@@ -1,8 +1,9 @@
 package banger.gui.sidebar.filebrowser;
 
 import banger.gui.MainView;
+import banger.gui.options.Options;
 import banger.util.BangerVars;
-import banger.util.Option;
+
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.scene.control.TreeItem;
@@ -13,7 +14,7 @@ import java.io.File;
 public class FileBrowser extends TreeView<TreeFile> {
 
     private MainView mainview;
-    private String path = Option.fileBrowserPath;
+    private String path = Options.fileBrowserPath;
 
     public FileBrowser(MainView mainview){
         super();

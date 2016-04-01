@@ -3,9 +3,10 @@ package banger.audio.listeners;
 import banger.audio.data.Song;
 import banger.gui.coverview.CoverView;
 import banger.gui.library.views.LyricsView;
+import banger.gui.options.Options;
 import banger.gui.popup.Popup;
 import banger.gui.statusbar.StatusBar;
-import banger.util.Option;
+
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
@@ -26,7 +27,7 @@ public class PlayPauseListener {
         if (playing) {
             statusbar.play();
 
-            if (Option.notifications && owner.isIconified()) {
+            if (Options.notifications && owner.isIconified()) {
                 TextFlow flow = new TextFlow();
                 Text song = new Text(now.getName());
                 Text artist = new Text(" - " + now.getArtist());
@@ -36,8 +37,11 @@ public class PlayPauseListener {
                 flow.getChildren().addAll(song, artist, album);
                 new Popup(owner, flow);
             }
-
-            coverView.updateView(now);
+            try {
+                coverView.updateView(now);
+            } catch (NullPointerException e) {
+                //Nothing
+            }
         } else {
             statusbar.pause();
         }

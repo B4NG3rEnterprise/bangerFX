@@ -6,6 +6,7 @@ import banger.audio.listeners.QueueListener;
 import banger.gui.coverview.CoverView;
 import banger.gui.library.Library;
 import banger.gui.menubar.BangerBar;
+import banger.gui.options.Options;
 import banger.gui.sidebar.PlaylistSelector;
 import banger.gui.sidebar.filebrowser.FileBrowser;
 import banger.gui.sidebar.viewselector.ViewSelector;
@@ -13,8 +14,10 @@ import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
 import banger.util.InputHandler;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -23,7 +26,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class MainView extends Application{
 
@@ -31,20 +36,21 @@ public class MainView extends Application{
 
     private MusicPlayer player;
     static Stage stage;
-    private Scene scene;
-    private final int MIN_WIDTH = 1200;
-    private final int MIN_HEIGHT = MIN_WIDTH / 16 * 9;
+    Scene scene;
+    final int MIN_WIDTH = 1200;
+    final int MIN_HEIGHT = MIN_WIDTH / 16 * 9;
 
-    private StatusBar statusbar;
-    private Library library;
-    private BangerBar bangerBar;
-    private SearchBar searchBar;
-    private Queue queue;
-    private CoverView coverview;
-    private FileBrowser filebrowser;
-    private InputHandler handler;
-    private PlaylistSelector selector;
-    private ViewSelector viewSelector;
+    StatusBar statusbar;
+    Library library;
+    BangerBar bangerBar;
+    SearchBar searchBar;
+    Queue queue;
+    CoverView coverview;
+    FileBrowser filebrowser;
+    InputHandler handler;
+    PlaylistSelector selector;
+    ViewSelector viewSelector;
+
 
     public void start(Stage stage) throws Exception {
         stage.setTitle("B4NG3rFX");
@@ -57,6 +63,8 @@ public class MainView extends Application{
             System.exit(0);
         });
         this.stage = stage;
+
+        Options.init();
 
         handler = new InputHandler(this);
 
@@ -110,13 +118,17 @@ public class MainView extends Application{
         bl.setLeft(v2);
 
         scene = new Scene(bl);
-        scene.addEventHandler(KeyEvent.ANY, handler);
+
+        scene.addEventHandler(KeyEvent.KEY_RELEASED, handler);
 
         player.addPlayPauseListener(new PlayPauseListener(stage, statusbar, coverview));
         player.addQueueListener(new QueueListener(queue));
 
         stage.setScene(scene);
         stage.show();
+
+
+
     }
 
     public MusicPlayer getMusicPlayer() {
@@ -150,4 +162,5 @@ public class MainView extends Application{
     public BangerBar getBangerBar() { return bangerBar; }
 
     public SearchBar getSearchBar() { return searchBar; }
+
 }

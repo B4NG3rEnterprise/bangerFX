@@ -5,15 +5,14 @@ import banger.audio.data.Artist;
 import banger.audio.data.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
-import banger.gui.library.views.ListView;
-import banger.gui.library.views.LyricsView;
-import banger.gui.library.views.TitleView;
-import banger.gui.library.views.View;
+import banger.gui.library.views.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.StackPane;
+
+import java.util.ArrayList;
 
 public class Library extends StackPane {
 
@@ -21,6 +20,12 @@ public class Library extends StackPane {
     private ObservableList<Artist> artists;
     private ObservableList<Album> albums;
     private ObservableList<Song> songs;
+
+    //views
+    private TitleView titleView;
+    private ListView listView;
+    private LyricsView lyricsView;
+    private AlbumView albumView;
 
     //TITLE: alben links, songliste rechts
     public static final int VIEW_TITLE = 0;
@@ -45,9 +50,12 @@ public class Library extends StackPane {
         albums = DBController.getAllAlbums();
         songs = DBController.getAllSongs();
 
-        ListView t = new ListView(mainview, songs);
+        titleView = new TitleView(mainview, artists);
+        listView = new ListView(mainview, songs);
+        lyricsView = new LyricsView(mainview);
+        albumView = new AlbumView();
 
-        currentView = t;
+        currentView = listView;
 
         Node v = (Node) currentView;
 
@@ -103,13 +111,13 @@ public class Library extends StackPane {
         if (currentViewNumber != view) {
             this.getChildren().remove(currentView);
             if (view == this.VIEW_ALBUM) {
-//                currentView = new TitleView(this.mainview) ;
+//                currentView = albumView ;
             } else if (view == this.VIEW_LIST) {
-                currentView = new ListView(this.mainview, songs);
+                currentView = listView;
             } else if (view == this.VIEW_TITLE) {
-                currentView = new TitleView(this.mainview,artists);
+                currentView = titleView;
             } else if (view == this.VIEW_LYRICS) {
-                currentView =  new LyricsView(this.mainview);
+                currentView =  lyricsView;
             }
             this.getChildren().add((Node) currentView);
             currentViewNumber = view;

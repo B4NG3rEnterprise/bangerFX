@@ -3,12 +3,15 @@ package banger.gui.menubar;
 import banger.audio.data.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
+import banger.gui.options.Options;
 import banger.util.DeviceItem;
-import banger.util.Option;
+
 import banger.util.PlaylistManager;
 import javafx.collections.ObservableList;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -82,15 +85,27 @@ public class BangerBar extends MenuBar {
         playlistMenu = initPlaylistMenu();
         edit.getItems().add(playlistMenu);
         edit.getItems().add(new MenuItem("Playlist löschen"));
-        edit.getItems().add(new MenuItem("Optionen..."));
+        MenuItem options = new MenuItem("Optionen");
+        options.setOnAction(event -> {
+            Stage optionsStage = new Stage();
+            Options optionPane = new Options(mainview);
+            Scene sce = new Scene(optionPane);
+            optionsStage.setTitle("Options");
+            optionsStage.setScene(sce);
+            optionsStage.initModality(Modality.APPLICATION_MODAL);
+            optionsStage.setResizable(false);
+            optionsStage.show();
+            optionPane.requestFocus();
+        });
+        edit.getItems().add(options);
         edit.getItems().add(new MenuItem("Equalizer"));
 
         view = new Menu("Ansicht");
         view.getItems().add(new MenuItem("Widget-Ansicht"));
         CheckMenuItem notifications = new CheckMenuItem("Benachrichtigungen");
-        notifications.setSelected(Option.notifications);
+        notifications.setSelected(Options.notifications);
         notifications.setOnAction(event -> {
-            Option.notifications = !Option.notifications;
+            Options.notifications = !Options.notifications;
         });
         view.getItems().add(notifications);
         view.getItems().add(new MenuItem("Hintergrundfarbe"));
