@@ -36,12 +36,40 @@ public class BangerBar extends MenuBar {
             DirectoryChooser dc = new DirectoryChooser();
             // dc.setInitialDirectory(new File("F:/Musik"));
             File directory = dc.showDialog(stage);
-            DBController.setContent(directory.toString());
+            DBController.createFromDirectory(directory.toString());
             mainview.getLibrary().refreshData();
         });
 
         file = new Menu("Datei");
-        file.getItems().add(new MenuItem("Importieren..."));
+        MenuItem deleteSelected = new MenuItem("Songs löschen...");
+        deleteSelected.setOnAction(event -> {
+            Song[] songs = mainview.getLibrary().getSelectedItems();
+            if (songs != null) {
+                DBController.deleteSongs(mainview.getLibrary().getSelectedItems());
+                mainview.getLibrary().refreshData();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Keine Dateien ausgewählt");
+                alert.setContentText("Bitte wählen Sie zuerst Dateien aus!");
+                alert.setHeaderText("");
+                alert.setGraphic(null);
+                alert.initStyle(StageStyle.UNDECORATED);
+                alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
+                alert.show();
+            }
+        });
+        file.getItems().add(deleteSelected);
+        MenuItem imp = new MenuItem("Importieren...");
+        imp.setOnAction(event -> {
+            Stage stage = new Stage();
+            stage.centerOnScreen();
+            DirectoryChooser dc = new DirectoryChooser();
+            // dc.setInitialDirectory(new File("F:/Musik"));
+            File directory = dc.showDialog(stage);
+            DBController.addFromDirectory(directory.toString());
+            mainview.getLibrary().refreshData();
+        });
+        file.getItems().add(imp);
         file.getItems().add(new MenuItem("Exportieren..."));
         MenuItem close = new MenuItem("Schließen");
         close.setOnAction(event -> {
@@ -120,14 +148,14 @@ public class BangerBar extends MenuBar {
 
                 PlaylistManager.createPlaylist(name, songs);
             } else { // show alert
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Keine Dateien ausgewählt");
                 alert.setContentText("Bitte wählen Sie zuerst Dateien aus!");
                 alert.setHeaderText("");
                 alert.setGraphic(null);
                 alert.initStyle(StageStyle.UNDECORATED);
                 alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
-                alert.showAndWait();
+                alert.show();
             }
 
             // update PlaylistSelector

@@ -5,6 +5,7 @@ import banger.gui.coverview.CoverView;
 import banger.gui.library.views.LyricsView;
 import banger.gui.popup.Popup;
 import banger.gui.statusbar.StatusBar;
+import banger.util.Option;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
@@ -13,13 +14,11 @@ public class PlayPauseListener {
 
     private Stage owner;
     private StatusBar statusbar;
-    private LyricsView lyricsView;
     private CoverView coverView;
 
-    public PlayPauseListener(Stage owner, StatusBar statusbar, LyricsView lyricsView, CoverView coverView) {
+    public PlayPauseListener(Stage owner, StatusBar statusbar, CoverView coverView) {
         this.owner = owner;
         this.statusbar = statusbar;
-        this.lyricsView = lyricsView;
         this.coverView = coverView;
     }
 
@@ -27,9 +26,7 @@ public class PlayPauseListener {
         if (playing) {
             statusbar.play();
 
-            // lyricsview.initLyrics(); // TODO only get lyrics when view is selected (IP block!)
-
-            if (owner.isIconified()) {
+            if (Option.notifications && owner.isIconified()) {
                 TextFlow flow = new TextFlow();
                 Text song = new Text(now.getName());
                 Text artist = new Text(" - " + now.getArtist());

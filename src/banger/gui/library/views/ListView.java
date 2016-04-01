@@ -67,6 +67,7 @@ public class ListView extends TableView<Song> implements View {
         Song[] result = new Song[songs.size()];
         for (int i = 0; i < songs.size(); i++)
             result[i] = songs.get(i);
+        if (result.length == 0) result = null;
         return result;
     }
 }

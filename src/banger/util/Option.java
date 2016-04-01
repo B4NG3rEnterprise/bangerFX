@@ -12,6 +12,7 @@ public class Option {
     public static String audio_device = "-1";
     public static String backgroundColor = "#FA7D38";
     public static boolean notifications = true;
+    public static String fileBrowserPath = "C:\\Users\\Merlin\\Music";
 
     private Option(){}
 

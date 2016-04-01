@@ -9,6 +9,10 @@ import banger.util.PlaylistItem;
 import banger.util.PlaylistManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.stage.StageStyle;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.AudioHeader;
@@ -20,6 +24,7 @@ import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class DBController {
 
@@ -67,6 +72,10 @@ public class DBController {
 
     private static void createDB() {
         try {
+            File f = new File(DB_PATH);
+            if (f.exists()) f.delete();
+            else f.createNewFile();
+
             initDBConnection();
             Statement stmt = connection.createStatement(); // new Statement for queries
 
@@ -105,34 +114,37 @@ public class DBController {
                     " FOREIGN KEY (album) REFERENCES album (id)" +
                     ")");
 
-            System.out.println("Database setup successfull.");
-            connection.close();
-        } catch (SQLException e) {
-            System.err.println("Couldn't handle DB-Query");
-            e.printStackTrace();
-        }
-    }
-
-    public static void setContent(String path) {
-        try {
-            System.out.println("\nLoading songs...\n");
-
-            createDB();
-
-            initDBConnection();
-            Statement stmt = connection.createStatement();
-            ArrayList<String> list = getAllFiles(path);
-
             /* Fill artist table with default value */
             stmt.executeUpdate("INSERT INTO artist (artist_name) values('Unknown Artist')");
 
             /* Fill album table with default value */
             stmt.executeUpdate("INSERT INTO album (album_name, artist, release) values('Unknown Album', 1, 0)");
 
+            System.out.println("Database setup successfull.");
+            connection.close();
+        } catch (SQLException e) {
+            System.err.println("Couldn't handle DB-Query");
+            e.printStackTrace();
+        } catch (java.io.IOException ex){
+            ex.printStackTrace();
+        }
+    }
+
+    public static void createFromDirectory(String path){
+        createDB();
+        addFromDirectory(path);
+    }
+
+    public static void addFromDirectory(String path) {
+        try {
+            System.out.println("\nLoading songs...\n");
+            initDBConnection();
+            ArrayList<String> list = getAllFiles(path);
+
+            Statement stmt = connection.createStatement();
             PreparedStatement ps = connection.prepareStatement("INSERT OR IGNORE INTO artist (artist_name) values(?)");
             PreparedStatement ps2 = connection.prepareStatement("INSERT OR IGNORE INTO album (album_name, artist, release) values(?, ?, ?)");
             PreparedStatement ps3 = connection.prepareStatement("INSERT INTO song (song_name, artist, album, genre, rating, fileLocation, length) values (?, ?, ?, ?, ?, ?, ?)");
-
 /*
             // single artists
             for (int i = 0; i < list.size(); i++) {
@@ -223,49 +235,61 @@ public class DBController {
 
 
             for (int i = 0; i < list.size(); i++) {
-                try{
-                    String filePath = list.get(i);
+                String filePath = list.get(i);
+                PreparedStatement test = connection.prepareStatement("SELECT id FROM song WHERE (fileLocation='" + filePath.replace("'", "''") + "')");
+                ResultSet testRes = test.executeQuery();
 
+                if (!testRes.next()) { // no duplicates
+                    try {
+                        AudioFile f = AudioFileIO.read(new File(filePath));
+                        Tag tag = f.getTag();
 
-                    AudioFile f = AudioFileIO.read(new File(filePath));
-                    Tag tag = f.getTag();
+                        if (!f.getFile().getName().endsWith(".wav")) {
+                            AudioHeader audioheader = f.getAudioHeader();
+                            String albumName = null;
+                            String artistName = null;
+                            String songTitle = null;
+                            String genre = null;
+                            int length = 0;
 
-                    if(!f.getFile().getName().endsWith(".wav")) {
-                        AudioHeader audioheader = f.getAudioHeader();
-                        String albumName = null;
-                        String artistName = null;
-                        String songTitle = null;
-                        String genre = null;
-                        int length = 0;
+                            if (tag != null) albumName = tag.getFirst(FieldKey.ALBUM).replace("'", "''");
+                            if (albumName == null || albumName.isEmpty()) albumName = "Unknown Album";
+                            if (tag != null) artistName = tag.getFirst(FieldKey.ALBUM_ARTIST).replace("'", "''");
+                            if ((artistName == null || artistName.isEmpty()) && tag != null)
+                                artistName = tag.getFirst(FieldKey.ARTIST).replace("'", "''");
+                            if (artistName == null || artistName.isEmpty()) artistName = "Unknown Artist";
+                            int artistID = stmt.executeQuery("SELECT id FROM artist WHERE (artist_name = '" + artistName + "')").getInt("id");
+                            int albumID = stmt.executeQuery("SELECT id FROM album WHERE (album_name = '" + albumName + "')").getInt("id");
 
-                        if (tag != null) albumName = tag.getFirst(FieldKey.ALBUM).replace("'", "''");
-                        if (albumName == null || albumName.isEmpty()) albumName = "Unknown Album";
-                        if (tag != null) artistName = tag.getFirst(FieldKey.ALBUM_ARTIST).replace("'", "''");
-                        if ((artistName == null || artistName.isEmpty()) && tag != null)
-                            artistName = tag.getFirst(FieldKey.ARTIST).replace("'", "''");
-                        if (artistName == null || artistName.isEmpty()) artistName = "Unknown Artist";
-                        int artistID = stmt.executeQuery("SELECT id FROM artist WHERE (artist_name = '" + artistName + "')").getInt("id");
-                        int albumID = stmt.executeQuery("SELECT id FROM album WHERE (album_name = '" + albumName + "')").getInt("id");
+                            if (tag != null) songTitle = tag.getFirst(FieldKey.TITLE);
+                            if (tag != null) genre = tag.getFirst(FieldKey.GENRE);
+                            if (audioheader != null) length = audioheader.getTrackLength();
 
-                        if (tag != null) songTitle = tag.getFirst(FieldKey.TITLE);
-                        if (tag != null) genre = tag.getFirst(FieldKey.GENRE);
-                        if (audioheader != null) length = audioheader.getTrackLength();
+                            if (songTitle == null || songTitle.isEmpty()) songTitle = f.getFile().getName();
 
-                        if (songTitle == null || songTitle.isEmpty()) songTitle = f.getFile().getName();
+                            // add song to song table
+                            ps3.setString(1, songTitle);
+                            ps3.setInt(2, artistID);
+                            ps3.setInt(3, albumID);
+                            ps3.setString(4, genre);
+                            ps3.setInt(5, 5);
+                            ps3.setString(6, filePath);
+                            ps3.setInt(7, length);
+                            ps3.addBatch();
 
-                        // add song to song table
-                        ps3.setString(1, songTitle);
-                        ps3.setInt(2, artistID);
-                        ps3.setInt(3, albumID);
-                        ps3.setString(4, genre);
-                        ps3.setInt(5, 5);
-                        ps3.setString(6, filePath);
-                        ps3.setInt(7, length);
-                        ps3.addBatch();
-
-                        // System.out.println(songTitle + ", " + artistName);
-                    } else {
-                        ps3.setString(1, f.getFile().getName());
+                            // System.out.println(songTitle + ", " + artistName);
+                        } else {
+                            ps3.setString(1, f.getFile().getName());
+                            ps3.setInt(2, 1);
+                            ps3.setInt(3, 1);
+                            ps3.setString(4, "Unknown");
+                            ps3.setInt(5, 5);
+                            ps3.setString(6, filePath);
+                            ps3.setInt(7, 0);
+                            ps3.addBatch();
+                        }
+                    } catch (InvalidAudioFrameException e) { // only wav
+                        ps3.setString(1, new File(filePath).getName());
                         ps3.setInt(2, 1);
                         ps3.setInt(3, 1);
                         ps3.setString(4, "Unknown");
@@ -274,22 +298,15 @@ public class DBController {
                         ps3.setInt(7, 0);
                         ps3.addBatch();
                     }
-                } catch (InvalidAudioFrameException e){ // only wav
-                    String filePath = list.get(i);
-                    ps3.setString(1, new File(filePath).getName());
-                    ps3.setInt(2, 1);
-                    ps3.setInt(3, 1);
-                    ps3.setString(4, "Unknown");
-                    ps3.setInt(5, 5);
-                    ps3.setString(6, filePath);
-                    ps3.setInt(7, 0);
-                    ps3.addBatch();
+                } else {
+                    System.out.println("Duplicate detected: " + filePath);
                 }
             }
             ps3.executeBatch();
             ps3.close();
 
             System.out.println("Loaded " + list.size() + " songs.");
+            stmt.close();
             connection.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -620,6 +637,71 @@ public class DBController {
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static void deleteSongs(Song[] songs){
+        try {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Wirklich löschen?");
+            alert.setContentText("Wollen Sie die ausgewählten Dateien nur aus dem MusicPlayer entfernen oder auch von der Festplatte?");
+            alert.setHeaderText("");
+            alert.setGraphic(null);
+            alert.initStyle(StageStyle.UNDECORATED);
+            alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
+            ButtonType library = new ButtonType("MusicPlayer");
+            ButtonType disc = new ButtonType("Festplatte");
+            ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+            alert.getButtonTypes().setAll(library, disc, buttonTypeCancel);
+
+            Optional<ButtonType> result = alert.showAndWait();
+            alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText("");
+            alert.setGraphic(null);
+            alert.initStyle(StageStyle.UNDECORATED);
+            alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
+            if (result.get() == library){
+                int counter = deleteDatabaseEntries(songs);
+                alert.setTitle("Songs entfernt");
+                alert.setContentText(counter + " Song[s] aus dem MusicPlayer entfernt.");
+                alert.show();
+            } else if (result.get() == disc) {
+                int counter = deleteDatabaseEntries(songs);
+                deleteFiles(songs);
+                alert.setTitle("Songs gelöscht");
+                alert.setContentText(counter + " Song[s] von der Festplatte gelöscht.");
+                alert.show();
+            } else {
+                alert.setTitle("Abgebrochen");
+                alert.setContentText("Keine Dateien gelöscht.");
+                alert.show();
+            }
+        } catch (SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+    private static int deleteDatabaseEntries(Song[] songs) throws SQLException {
+        initDBConnection();
+        int counter = 0;
+        PreparedStatement ps = connection.prepareStatement("DELETE FROM song WHERE id = ?");
+        for (int i = 0; i < songs.length; i++){
+            ps.setInt(1, songs[i].getId());
+            ps.addBatch();
+            counter++;
+        }
+        ps.executeBatch();
+        ps.close();
+        connection.close();
+        return counter;
+    }
+
+    private static void deleteFiles(Song[] songs){
+        for(int i = 0; i < songs.length; i++){
+            File f = new File(songs[i].getFileLocation());
+            System.out.println(f.getName());
+            f.delete();
         }
     }
 }

@@ -6,7 +6,6 @@ import banger.audio.listeners.QueueListener;
 import banger.audio.listeners.SkipListener;
 import banger.gui.coverview.CoverView;
 import banger.gui.library.Library;
-import banger.gui.library.views.LyricsView;
 import banger.gui.menubar.BangerBar;
 import banger.gui.sidebar.PlaylistSelector;
 import banger.gui.sidebar.filebrowser.FileBrowser;
@@ -31,23 +30,22 @@ public class MainView extends Application{
 
     private final boolean TEST_LYRICS = false;
 
-    MusicPlayer player;
+    private MusicPlayer player;
     static Stage stage;
-    Scene scene;
-    final int MIN_WIDTH = 1200;
-    final int MIN_HEIGHT = MIN_WIDTH / 16 * 9;
+    private Scene scene;
+    private final int MIN_WIDTH = 1200;
+    private final int MIN_HEIGHT = MIN_WIDTH / 16 * 9;
 
-    StatusBar statusbar;
-    Library library;
-    BangerBar bangerBar;
-    SearchBar searchBar;
-    Queue queue;
-    CoverView coverview;
-    FileBrowser filebrowser;
-    InputHandler handler;
-    LyricsView lyricsview;
-    PlaylistSelector selector;
-    ViewSelector viewSelector;
+    private StatusBar statusbar;
+    private Library library;
+    private BangerBar bangerBar;
+    private SearchBar searchBar;
+    private Queue queue;
+    private CoverView coverview;
+    private FileBrowser filebrowser;
+    private InputHandler handler;
+    private PlaylistSelector selector;
+    private ViewSelector viewSelector;
 
     public void start(Stage stage) throws Exception {
         stage.setTitle("B4NG3rFX");
@@ -90,9 +88,6 @@ public class MainView extends Application{
         v1.setVgrow(queue, Priority.ALWAYS);
         v1.getChildren().addAll(searchBar, new Separator(Orientation.HORIZONTAL), queue, new Separator(Orientation.HORIZONTAL), coverview, new Separator(Orientation.HORIZONTAL));
 
-        lyricsview = new LyricsView(this);
-        lyricsview.setMinSize(0, 0);
-
         // Sidebar links
         viewSelector = new ViewSelector(this);
         filebrowser = new FileBrowser(this);
@@ -109,26 +104,16 @@ public class MainView extends Application{
 
         BorderPane bl = new BorderPane();
 
-        if (TEST_LYRICS) {
-            library.setMaxWidth(150);
-
-            bl.setTop(bangerBar);
-            bl.setCenter(lyricsview);
-            bl.setRight(v1);
-            bl.setBottom(statusbar);
-            bl.setLeft(library);
-        } else {
-            bl.setTop(bangerBar);
-            bl.setCenter(library);
-            bl.setRight(v1);
-            bl.setBottom(statusbar);
-            bl.setLeft(v2);
-        }
+        bl.setTop(bangerBar);
+        bl.setCenter(library);
+        bl.setRight(v1);
+        bl.setBottom(statusbar);
+        bl.setLeft(v2);
 
         scene = new Scene(bl);
         scene.addEventHandler(KeyEvent.ANY, handler);
 
-        player.addPlayPauseListener(new PlayPauseListener(stage, statusbar, lyricsview, coverview));
+        player.addPlayPauseListener(new PlayPauseListener(stage, statusbar, coverview));
         player.addQueueListener(new QueueListener(queue));
         player.addSkipListener(new SkipListener(library, queue));
 

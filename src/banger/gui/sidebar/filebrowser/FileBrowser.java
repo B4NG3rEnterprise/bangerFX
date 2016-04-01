@@ -2,6 +2,7 @@ package banger.gui.sidebar.filebrowser;
 
 import banger.gui.MainView;
 import banger.util.BangerVars;
+import banger.util.Option;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.scene.control.TreeItem;
@@ -9,13 +10,10 @@ import javafx.scene.control.TreeView;
 
 import java.io.File;
 
-/**
- * Created by Merlin on 22.03.2016.
- */
 public class FileBrowser extends TreeView<TreeFile> {
 
     private MainView mainview;
-    private String path = "E:\\musik\\musik";
+    private String path = Option.fileBrowserPath;
 
     public FileBrowser(MainView mainview){
         super();
@@ -36,6 +34,10 @@ public class FileBrowser extends TreeView<TreeFile> {
 
         findFiles(new File(path), null);
         this.getRoot().setExpanded(true);
+    }
+
+    public void setPath(String path){
+        this.path = path;
     }
 
     private void findFiles(File dir, TreeItem<TreeFile> parent) {
