@@ -75,11 +75,6 @@ public class MainView extends Application{
     public void start(final Stage initStage) throws Exception {
         Thread t = new Thread(()->{
             try {
-                // init Library to save time
-                library = new Library(this);
-                library.setMinSize(0, 0);
-                library.setPrefSize(600, 500);
-
                 Thread.sleep(1500);
                 Platform.runLater(() -> hideSplash(initStage, () -> showMainStage()));
             } catch (Exception e){
@@ -111,6 +106,10 @@ public class MainView extends Application{
         handler = new InputHandler(this);
 
         player = new MusicPlayer(this);
+
+        library = new Library(this);
+        library.setMinSize(0, 0);
+        library.setPrefSize(600, 500);
 
         statusbar = new StatusBar(this);
         statusbar.setCustomBackground(Paint.valueOf(BangerVars.STATUSBAR_COLOR));
