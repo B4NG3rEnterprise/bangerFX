@@ -264,7 +264,7 @@ public class StatusBar extends HBox {
 			mainview.getMusicPlayer().setShuffle(false);
 			shuffle.setEffect(null);
 		}
-		mainview.getLibrary().updateQueue(mainview.getLibrary().getSelectedItem());
+		mainview.getLibrary().updateQueue();
 	}
 
 	private void handleRepeatButton(MouseEvent event) {

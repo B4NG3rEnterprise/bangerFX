@@ -20,7 +20,7 @@ public class InputHandler implements EventHandler<KeyEvent> {
         else if (t.getCode() == KeyCode.ENTER){
             if (mainview.getLibrary().isInFocus()) {
                 mainview.getMusicPlayer().play(mainview.getLibrary().getSelectedItem());
-                mainview.getLibrary().updateQueue(mainview.getLibrary().getSelectedItem());
+                mainview.getLibrary().updateQueue();
             } else if (mainview.getFilebrowser().isFocused()){
                 System.out.println(mainview.getFilebrowser().getSelectionModel().getSelectedItem());
             }

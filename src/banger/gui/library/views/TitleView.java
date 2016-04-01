@@ -80,7 +80,7 @@ public class TitleView extends ScrollPane implements View {
                         if (album.getSongs().size() > 0) {
                             ObservableList<Song> songs = album.getSongs();
 
-                            ImageView cover = new ImageView(i);
+                            ImageView cover = new ImageView(songs.get(0).getCover());
                             cover.setFitWidth(100);
                             cover.setPreserveRatio(true);
                             cover.setSmooth(true);
@@ -132,10 +132,12 @@ public class TitleView extends ScrollPane implements View {
 
                             table.getColumns().addAll(numberCol, song_name, genre, length);
 
+                            table.setId("" + album.getId());
+
                             table.setOnMousePressed(event -> {
                                 if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
                                     mainview.getMusicPlayer().play(table.getSelectionModel().getSelectedItem());
-                                    mainview.getLibrary().updateQueue(table.getSelectionModel().getSelectedItem());
+                                    mainview.getLibrary().updateQueue(album, table.getSelectionModel().getSelectedItem());
                                 }
                             });
                             GridPane.setHgrow(table, Priority.ALWAYS);

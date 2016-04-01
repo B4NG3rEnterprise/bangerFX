@@ -3,7 +3,6 @@ package banger.gui;
 import banger.audio.MusicPlayer;
 import banger.audio.listeners.PlayPauseListener;
 import banger.audio.listeners.QueueListener;
-import banger.audio.listeners.SkipListener;
 import banger.gui.coverview.CoverView;
 import banger.gui.library.Library;
 import banger.gui.menubar.BangerBar;
@@ -115,7 +114,6 @@ public class MainView extends Application{
 
         player.addPlayPauseListener(new PlayPauseListener(stage, statusbar, coverview));
         player.addQueueListener(new QueueListener(queue));
-        player.addSkipListener(new SkipListener(library, queue));
 
         stage.setScene(scene);
         stage.show();

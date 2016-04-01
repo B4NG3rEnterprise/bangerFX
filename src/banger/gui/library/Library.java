@@ -9,12 +9,11 @@ import banger.gui.library.views.ListView;
 import banger.gui.library.views.LyricsView;
 import banger.gui.library.views.TitleView;
 import banger.gui.library.views.View;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.StackPane;
-
-import java.util.ArrayList;
 
 public class Library extends StackPane {
 
@@ -46,7 +45,6 @@ public class Library extends StackPane {
         albums = DBController.getAllAlbums();
         songs = DBController.getAllSongs();
 
-        TitleView a = new TitleView(mainview, artists);
         ListView t = new ListView(mainview, songs);
 
         currentView = t;
@@ -72,14 +70,18 @@ public class Library extends StackPane {
         currentView.refreshData(songs);
     }
 
-    public void updateQueue(Song selected){
-        ArrayList<Song> list = getAllFrom(selected);
-        //list.add(0, selected);
-        mainview.getMusicPlayer().updateQueue(list);
+    public void updateQueue() {
+        //send a copy to the player so it wont be able to change the list in the view.
+        mainview.getMusicPlayer().updateQueue(FXCollections.observableArrayList(songs));
     }
 
-    public ArrayList<Song> getAllFrom(Song s){
-        ArrayList<Song> list = new ArrayList<>();
+    public void updateQueue(Album album, Song selected) {
+        ObservableList<Song> songs = album.getSongs();
+        mainview.getMusicPlayer().updateQueue(songs);
+    }
+
+    public ObservableList<Song> getAllFrom(Song s){
+        ObservableList<Song> list = FXCollections.observableArrayList();
         for (int i = songs.indexOf(s) + 1; i < songs.size(); i++)
             list.add(songs.get(i));
         return list;

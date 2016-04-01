@@ -42,7 +42,7 @@ public class ListView extends TableView<Song> implements View {
         setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
                 mainview.getMusicPlayer().play(getSelectionModel().getSelectedItem());
-                mainview.getLibrary().updateQueue(getSelectionModel().getSelectedItem());
+                mainview.getLibrary().updateQueue();
             }
         });
     }
