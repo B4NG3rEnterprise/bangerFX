@@ -11,11 +11,13 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 
 public class BangerBar extends MenuBar {
@@ -62,18 +64,39 @@ public class BangerBar extends MenuBar {
             }
         });
         file.getItems().add(deleteSelected);
-        MenuItem imp = new MenuItem("Importieren...");
+        MenuItem imp = new MenuItem("Songs Importieren...");
         imp.setOnAction(event -> {
-            Stage stage = new Stage();
-            stage.centerOnScreen();
             DirectoryChooser dc = new DirectoryChooser();
             // dc.setInitialDirectory(new File("F:/Musik"));
-            File directory = dc.showDialog(stage);
+            dc.setTitle("Wähle einen Ordner aus");
+            File directory = dc.showDialog(mainview.stage);
             DBController.addFromDirectory(directory.toString());
             mainview.getLibrary().refreshData();
         });
         file.getItems().add(imp);
-        file.getItems().add(new MenuItem("Exportieren..."));
+        MenuItem impPL = new MenuItem("Playlists Importieren...");
+        impPL.setOnAction(event -> {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Wähle die Playlists aus");
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Playlist Files (*.m3u)", "*.m3u");
+            fc.getExtensionFilters().add(extFilter);
+            List<File> list =
+            fc.showOpenMultipleDialog(mainview.stage);
+            if (list != null) {
+                PlaylistManager.importPlaylists(list);
+                mainview.getPlaylistSelector().updatePlaylists();
+            }
+        });
+        file.getItems().add(impPL);
+        MenuItem exp = new MenuItem("Playlists Exportieren...");
+        exp.setOnAction(event -> {
+            DirectoryChooser dc = new DirectoryChooser();
+            // dc.setInitialDirectory(new File("F:/Musik"));
+            dc.setTitle("Wähle den Speicherort aus");
+            File directory = dc.showDialog(mainview.stage);
+            PlaylistManager.exportPlaylists(directory.toString());
+        });
+        file.getItems().add(exp);
         MenuItem close = new MenuItem("Schließen");
         close.setOnAction(event -> {
             mainview.getMusicPlayer().kill();

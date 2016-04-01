@@ -1,5 +1,6 @@
 package banger.gui;
 
+import banger.Test;
 import banger.audio.MusicPlayer;
 import banger.audio.listeners.PlayPauseListener;
 import banger.audio.listeners.QueueListener;
@@ -13,56 +14,97 @@ import banger.gui.sidebar.viewselector.ViewSelector;
 import banger.gui.statusbar.StatusBar;
 import banger.util.BangerVars;
 import banger.util.InputHandler;
+import javafx.animation.FadeTransition;
 import javafx.application.Application;
-import javafx.event.EventHandler;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.Parent;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.stage.Modality;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 
 public class MainView extends Application{
 
-    private final boolean TEST_LYRICS = false;
-
     private MusicPlayer player;
-    static Stage stage;
-    Scene scene;
-    final int MIN_WIDTH = 1200;
-    final int MIN_HEIGHT = MIN_WIDTH / 16 * 9;
+    public static Stage stage;
+    private Scene scene;
+    private final int MIN_WIDTH = 1200;
+    private final int MIN_HEIGHT = MIN_WIDTH / 16 * 9;
 
-    StatusBar statusbar;
-    Library library;
-    BangerBar bangerBar;
-    SearchBar searchBar;
-    Queue queue;
-    CoverView coverview;
-    FileBrowser filebrowser;
-    InputHandler handler;
-    PlaylistSelector selector;
-    ViewSelector viewSelector;
+    private StatusBar statusbar;
+    private Library library;
+    private BangerBar bangerBar;
+    private SearchBar searchBar;
+    private Queue queue;
+    private CoverView coverview;
+    private FileBrowser filebrowser;
+    private InputHandler handler;
+    private PlaylistSelector selector;
+    private ViewSelector viewSelector;
 
+    private BorderPane splashLayout;
+    private Stage mainStage;
+    private static final int SPLASH_WIDTH = 800;
+    private static final int SPLASH_HEIGHT = 500;
 
-    public void start(Stage stage) throws Exception {
-        stage.setTitle("B4NG3rFX");
-        stage.setMinWidth(MIN_WIDTH);
-        stage.setMaxWidth(1800);
-        stage.setMinHeight(MIN_HEIGHT);
-        stage.setMaxHeight(1800 / 16 * 9);
-        stage.setOnCloseRequest(e -> {
+    public void init() {
+        Image banger = new Image(Test.class.getResourceAsStream("/png/banger.png"));
+        ImageView splash = new ImageView();
+        splash.setImage(banger);
+        splash.setStyle("-fx-background-color: rgba(0, 0, 0, 0)");
+        splash.setFitWidth(SPLASH_WIDTH);
+        splash.setFitHeight(SPLASH_HEIGHT);
+        splashLayout = new BorderPane();
+        splashLayout.setStyle("-fx-background-color: rgba(0, 0, 0, 0)");
+        splashLayout.setCenter(splash);
+    }
+
+    public void start(final Stage initStage) throws Exception {
+        Thread t = new Thread(()->{
+            try {
+                // init Library to save time
+                library = new Library(this);
+                library.setMinSize(0, 0);
+                library.setPrefSize(600, 500);
+
+                Thread.sleep(1500);
+                Platform.runLater(() -> hideSplash(initStage, () -> showMainStage()));
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+        showSplash(initStage);
+        t.start();
+    }
+
+    public void showMainStage() {
+        long start = System.currentTimeMillis();
+        mainStage = new Stage(StageStyle.DECORATED);
+        // showLoadingScreen();
+
+        mainStage.setTitle("B4NG3rFX");
+        mainStage.setMinWidth(MIN_WIDTH);
+        mainStage.setMaxWidth(1800);
+        mainStage.setMinHeight(MIN_HEIGHT);
+        mainStage.setMaxHeight(1800 / 16 * 9);
+        mainStage.setOnCloseRequest(e -> {
             player.kill();
             System.exit(0);
         });
-        this.stage = stage;
+        this.stage = mainStage;
 
         Options.init();
 
@@ -73,10 +115,6 @@ public class MainView extends Application{
         statusbar = new StatusBar(this);
         statusbar.setCustomBackground(Paint.valueOf(BangerVars.STATUSBAR_COLOR));
         statusbar.setMinSize(0, 40);
-
-        library = new Library(this);
-        library.setMinSize(0, 0);
-        library.setPrefSize(600, 500);
 
         bangerBar = new BangerBar(this);
         bangerBar.setMinSize(0, 0);
@@ -121,14 +159,39 @@ public class MainView extends Application{
 
         scene.addEventHandler(KeyEvent.KEY_RELEASED, handler);
 
-        player.addPlayPauseListener(new PlayPauseListener(stage, statusbar, coverview));
+        player.addPlayPauseListener(new PlayPauseListener(mainStage, statusbar, coverview));
         player.addQueueListener(new QueueListener(queue));
 
-        stage.setScene(scene);
-        stage.show();
+        long elapsed = System.currentTimeMillis() - start;
+        System.out.println("Built stage in " + elapsed + "ms");
 
+        mainStage.setScene(scene);
+        mainStage.show();
+    }
 
+    private void showSplash(final Stage initStage) {
+        Scene splashScene = new Scene(splashLayout);
+        splashScene.setFill(Color.TRANSPARENT);
+        initStage.initStyle(StageStyle.TRANSPARENT);
+        final Rectangle2D bounds = Screen.getPrimary().getBounds();
+        initStage.setScene(splashScene);
+        initStage.setX(bounds.getMinX() + bounds.getWidth() / 2 - SPLASH_WIDTH / 2);
+        initStage.setY(bounds.getMinY() + bounds.getHeight() / 2 - SPLASH_HEIGHT / 2);
+        initStage.show();
+    }
 
+    private void hideSplash(final Stage initStage, InitCompletionHandler initCompletionHandler){
+        initStage.toFront();
+        FadeTransition fadeSplash = new FadeTransition(Duration.seconds(1.2), splashLayout);
+        fadeSplash.setFromValue(1.0);
+        fadeSplash.setToValue(0.0);
+        fadeSplash.setOnFinished(actionEvent -> initStage.hide());
+        fadeSplash.play();
+        initCompletionHandler.complete();
+    }
+
+    public interface InitCompletionHandler {
+        public void complete();
     }
 
     public MusicPlayer getMusicPlayer() {

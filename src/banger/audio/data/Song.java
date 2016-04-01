@@ -122,4 +122,32 @@ public class Song {
         }
         return res;
     }
+
+    /*
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(id);
+        out.writeObject(name);
+        out.writeObject(artist);
+        out.writeObject(album);
+        out.writeObject(genre);
+        out.writeInt(rating);
+        out.writeObject(fileLocation);
+        out.writeInt(length);
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException,
+            ClassNotFoundException {
+        id = in.readInt();
+        name = (String) in.readObject();
+        artist = (String) in.readObject();
+        album = (String) in.readObject();
+        genre = (String) in.readObject();
+        rating = in.readInt();
+        fileLocation = (String) in.readObject();
+        length = in.readInt();
+
+    }
+    */
 }

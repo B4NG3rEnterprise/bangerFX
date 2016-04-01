@@ -7,12 +7,13 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 
 public class Queue extends TableView<Song> {
 
     private MainView mainview;
     private ObservableList<Song> songs;
+    private DataFormat songFormat = new DataFormat("Song");
 
     public Queue(MainView mainview) {
         super();
@@ -49,6 +50,50 @@ public class Queue extends TableView<Song> {
                     mainview.getMusicPlayer().play(current);
                     mainview.getLibrary().select(current);
                 }
+            }
+        });
+
+        setOnDragDetected(new EventHandler<MouseEvent>() { //drag
+            @Override
+            public void handle(MouseEvent event) {
+                // drag was detected, start drag-and-drop gesture
+                Song selected = getSelectionModel().getSelectedItem();
+                if(selected !=null){
+                    Dragboard db = startDragAndDrop(TransferMode.ANY);
+                    ClipboardContent content = new ClipboardContent();
+                    content.put(songFormat, selected);
+                    db.setContent(content);
+                    event.consume();
+                }
+            }
+        });
+
+        setOnDragOver(new EventHandler<DragEvent>() {
+            @Override
+            public void handle(DragEvent event) {
+                // data is dragged over the target
+                Dragboard db = event.getDragboard();
+                if (event.getDragboard().hasString()){
+                    event.acceptTransferModes(TransferMode.ANY);
+                }
+                event.consume();
+            }
+        });
+
+        setOnDragDropped(new EventHandler<DragEvent>() {
+            @Override
+            public void handle(DragEvent event) {
+                Dragboard db = event.getDragboard();
+                boolean success = false;
+                if (event.getDragboard().hasString()) {
+                    Song s = (Song) db.getContent(songFormat);
+                    // getItems().add(s);
+                    // setItems(tableContent);
+                    System.out.println(s.getName());
+                    success = true;
+                }
+                event.setDropCompleted(success);
+                event.consume();
             }
         });
     }

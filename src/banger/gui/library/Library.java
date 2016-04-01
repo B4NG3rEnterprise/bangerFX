@@ -118,6 +118,7 @@ public class Library extends StackPane {
                 currentView = titleView;
             } else if (view == this.VIEW_LYRICS) {
                 currentView =  lyricsView;
+                lyricsView.initLyrics();
             }
             this.getChildren().add((Node) currentView);
             currentViewNumber = view;

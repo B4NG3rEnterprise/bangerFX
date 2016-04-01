@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 
 public class PlaylistManager {
 
     private static final String PLAYLIST_DIR = "res/playlists/";
-    private final static Charset ENCODING = StandardCharsets.UTF_8;
-
 
     private PlaylistManager(){}
 
@@ -140,6 +140,33 @@ public class PlaylistManager {
                 f.delete();
             }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void exportPlaylists(String destination){
+        try {
+            String[] playlists = getPlaylists();
+
+            for (int i = 0; i < playlists.length; i++) {
+                File source = new File(PLAYLIST_DIR + playlists[i] + ".m3u");
+                File target = new File(destination + "/playlists/" + playlists[i] + ".m3u");
+                target.mkdirs();
+                Files.copy(source.toPath(), target.toPath(), REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void importPlaylists(List<File> lists){
+        try {
+            for (int i = 0; i < lists.size(); i++) {
+                File source = lists.get(i);
+                File target = new File(PLAYLIST_DIR + lists.get(i).getName());
+                Files.copy(source.toPath(), target.toPath(), REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

@@ -133,8 +133,6 @@ public class LyricsView extends VBox implements View {
                 }
             }
         );
-
-        initLyrics();
     }
 
     public void initLyrics() {

@@ -15,9 +15,9 @@ import javafx.scene.layout.Priority;
 
 public class SearchBar extends HBox {
 
-    MainView mainview;
-    TextField tf;
-    Button clear;
+    private MainView mainview;
+    private TextField tf;
+    private Button clear;
 
     public SearchBar(MainView mainview){
         super();
