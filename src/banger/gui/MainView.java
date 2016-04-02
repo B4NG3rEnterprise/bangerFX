@@ -36,7 +36,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 
-public class MainView extends Application{
+public class MainView extends Application {
 
     private MusicPlayer player;
     public static Stage stage;

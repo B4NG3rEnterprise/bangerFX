@@ -376,8 +376,4 @@ public interface Bass extends Library {
         }
     }
     //endregion
-
-    interface BASSFlac extends Library {
-        int BASS_FLAC_StreamCreateFile(boolean mem, Pointer file, long offset, long length, int flags);
-    }
 }

@@ -2,11 +2,9 @@ package banger.audio.listeners;
 
 import banger.audio.data.Song;
 import banger.gui.coverview.CoverView;
-import banger.gui.library.views.LyricsView;
 import banger.gui.options.Options;
 import banger.gui.popup.Popup;
 import banger.gui.statusbar.StatusBar;
-
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;

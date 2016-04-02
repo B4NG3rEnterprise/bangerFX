@@ -9,26 +9,22 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.scene.paint.Color;
 import javafx.util.Callback;
-import org.ini4j.Ini;
 import org.ini4j.Wini;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
-/**
- * Created by Nick on 30.03.2016.
- */
 public class Options extends VBox {
 
     private final static String PATH = "res/options.ini";
@@ -37,7 +33,7 @@ public class Options extends VBox {
     public static String backgroundColor;
     public static boolean notifications;
     public static String fileBrowserPath;
-    public static double crossfade;
+    public static float crossfade;
 
     @FXML
     TableView<KeyBinding> table;
@@ -49,7 +45,6 @@ public class Options extends VBox {
 
     private MainView mv;
 
-
     public static void init() {
         try {
             wini = new Wini(new File(PATH));
@@ -60,7 +55,7 @@ public class Options extends VBox {
         backgroundColor = wini.get("Options","BackgroundColor").replace('.','#');
         notifications = Boolean.parseBoolean(wini.get("Options", "Notifications"));
         fileBrowserPath = wini.get("Options","FilePath");
-        crossfade = Double.parseDouble(wini.get("Options", "Crossfade"));
+        crossfade = Float.parseFloat(wini.get("Options", "Crossfade"));
     }
 
     public Options(MainView mv) {

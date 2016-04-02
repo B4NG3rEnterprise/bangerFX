@@ -5,16 +5,11 @@ import banger.database.DBController;
 import banger.gui.MainView;
 import banger.gui.options.Options;
 import banger.util.DeviceItem;
-
 import banger.util.PlaylistManager;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import javafx.stage.*;
 
 import java.io.File;
 import java.util.List;
@@ -118,6 +113,10 @@ public class BangerBar extends MenuBar {
             optionsStage.initModality(Modality.APPLICATION_MODAL);
             optionsStage.setResizable(false);
             optionsStage.show();
+            optionsStage.setOnCloseRequest((e) -> {
+                Options.init();
+                optionsStage.close();
+            });
             optionPane.requestFocus();
         });
         edit.getItems().add(options);

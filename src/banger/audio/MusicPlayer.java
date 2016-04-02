@@ -5,12 +5,14 @@ import banger.audio.listeners.PlayPauseListener;
 import banger.audio.listeners.QueueListener;
 import banger.gui.MainView;
 import banger.gui.library.Library;
+import banger.gui.options.Options;
 import banger.util.DeviceItem;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,7 +22,6 @@ import java.util.Random;
 public class MusicPlayer {
 
     private Bass bass;
-    private Bass.BASSFlac bassflac;
 
     private int stream;
     private float volume;
@@ -31,6 +32,7 @@ public class MusicPlayer {
     private RepeatState repeatState;
     private ObservableList<Song> queue;
     private int queueIndex;
+    private Task fader;
 
     //Listeners
     private ArrayList<QueueListener> queueListeners;
@@ -70,6 +72,7 @@ public class MusicPlayer {
 
     public void play(Song s) {
         if (isPlaying()) stop();
+
         nowPlaying = s;
 
         String path = s.getFileLocation();
@@ -83,7 +86,7 @@ public class MusicPlayer {
         if (mainview.getLibrary().getCurrentView() == Library.VIEW_LYRICS)
             mainview.getLibrary().refreshData();
 
-        if(muted) {
+        if (muted) {
             unmute();
             mute();
         } else
@@ -92,6 +95,75 @@ public class MusicPlayer {
         queueIndex = queue.indexOf(nowPlaying);
 
         play();
+    }
+
+    public void crossfade() {
+        int i = queue.indexOf(getNowPlaying());
+        Song next = null;
+        switch (repeatState) {
+            case REPEAT_SINGLE:
+                next = queue.get(i);
+                break;
+            case REPEAT_ALL:
+                if (!(i+1 < queue.size())) {
+                    next = queue.get(0);
+                    break;
+                }
+            case REPEAT_OFF:
+                if (i+1 < queue.size() && queue.get(i+1) != null) {
+                    next = queue.get(i + 1);
+                }
+                break;
+        }
+        fireQueueListeners(queue, queue.indexOf(next));
+
+        final int old = stream;
+        nowPlaying = next;
+
+        String path = next.getFileLocation();
+        Pointer p = new Memory(Native.WCHAR_SIZE * (path.length() + 1));
+        p.setWideString(0, path);
+
+        stream = bass.BASS_StreamCreateFile(false, p, 0, 0, Bass.BASS_UNICODE);
+        int error;
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+
+        if (mainview.getLibrary().getCurrentView() == Library.VIEW_LYRICS)
+            mainview.getLibrary().refreshData();
+
+        if (muted) {
+            unmute();
+            mute();
+        } else
+            setVolume(volume);
+
+        queueIndex = queue.indexOf(nowPlaying);
+
+        play();
+        fader = new Task<Void>() {
+            @Override
+            public Void call() {
+                int delay = 100;
+                float stepCount = Options.crossfade * 1000 / delay;
+                float stepSize = volume / stepCount;
+                float curVol = 0;
+                for (int i = 0; i < stepCount; i++) {
+                    long now = System.currentTimeMillis();
+                    while (System.currentTimeMillis() - now < 100) Thread.yield();
+
+                    //Linearer Crossfade
+                    curVol += stepSize;
+                    //System.out.println(curVol);
+                    bass.BASS_ChannelSetAttribute(old, Bass.BASS_ATTRIB_VOL, volume - curVol);
+                    bass.BASS_ChannelSetAttribute(stream, Bass.BASS_ATTRIB_VOL,  curVol);
+                }
+                bass.BASS_ChannelStop(old);
+                return null;
+            }
+        };
+        Thread t = new Thread(fader);
+        t.setDaemon(true);
+        t.start();
     }
 
     public void setRepeatState(RepeatState repeatState) {
@@ -129,7 +201,9 @@ public class MusicPlayer {
                 break;
         }
         fireQueueListeners(queue, queue.indexOf(next));
+
         play(next);
+
     }
 
     public void skipBackward() {
@@ -149,9 +223,11 @@ public class MusicPlayer {
 
     public void updateQueue(ObservableList<Song> q) {
         if (isShuffling()) {
-            q.remove(nowPlaying);
-            Collections.shuffle(q, new Random(System.nanoTime()));
-            q.add(0, nowPlaying);
+            int index = q.indexOf(nowPlaying);
+            List shuffle = FXCollections.observableArrayList(q.subList(index + 1, q.size()));
+            q.removeAll(shuffle);
+            Collections.shuffle(shuffle, new Random(System.nanoTime()));
+            q.addAll(shuffle);
         }
         queueIndex = q.indexOf(nowPlaying);
         queue = q;

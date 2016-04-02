@@ -2,6 +2,7 @@ package banger.gui.statusbar;
 
 import banger.audio.MusicPlayer;
 import banger.gui.MainView;
+import banger.gui.options.Options;
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.application.Platform;
@@ -164,6 +165,7 @@ public class StatusBar extends HBox {
 		songLength = new Label("--:--");
 
 		time = new Thread(() -> {
+			boolean called = false;
 			while(true) {
 				if(!mainview.getMusicPlayer().isPlaying()) {
 					Thread.yield();
@@ -177,12 +179,17 @@ public class StatusBar extends HBox {
 						currentPos.setText(asMinutes(pos));
 						songPosition.setValue(pos);
 					});
-					if (pos >= mainview.getMusicPlayer().getLength()) {
-						now = System.currentTimeMillis();
-						while (System.currentTimeMillis() - now < 1000) {
-							Thread.yield();
+
+					if (pos >= mainview.getMusicPlayer().getLength() - Options.crossfade) {
+						if (Options.crossfade <= 0) {
+							now = System.currentTimeMillis();
+							while (System.currentTimeMillis() - now < 1000) {
+								Thread.yield();
+							}
+							Platform.runLater(() -> mainview.getMusicPlayer().skipForward());
+						} else {
+							Platform.runLater(() -> mainview.getMusicPlayer().crossfade());
 						}
-						Platform.runLater(() -> mainview.getMusicPlayer().skipForward());
 					}
 				}
 			}
