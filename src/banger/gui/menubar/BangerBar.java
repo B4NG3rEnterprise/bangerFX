@@ -102,7 +102,16 @@ public class BangerBar extends MenuBar {
         edit = new Menu("Bearbeiten");
         playlistMenu = initPlaylistMenu();
         edit.getItems().add(playlistMenu);
-        edit.getItems().add(new MenuItem("Playlist löschen"));
+        MenuItem deletePL = new MenuItem("Playlist löschen");
+        deletePL.setOnAction(event -> {
+            String selected = mainview.getPlaylistSelector().getSelectionModel().getSelectedItem();
+            if (selected != null){
+                PlaylistManager.deletePlaylist(selected);
+                mainview.getPlaylistSelector().updatePlaylists();
+                updatePlaylistMenu();
+            }
+        });
+        edit.getItems().add(deletePL);
         MenuItem options = new MenuItem("Optionen");
         options.setOnAction(event -> {
             Stage optionsStage = new Stage();

@@ -5,10 +5,11 @@ import banger.gui.MainView;
 import banger.util.PlaylistManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ListView;
+import javafx.event.EventHandler;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.StageStyle;
 
 public class PlaylistSelector extends ListView<String> {
@@ -30,28 +31,34 @@ public class PlaylistSelector extends ListView<String> {
         setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
                 // TODO add playlist songs to titleview and display it there instead of the queue
-                System.out.println("Playlist selected: " + getSelectionModel().getSelectedItem());
+                // System.out.println("Playlist selected: " + getSelectionModel().getSelectedItem());
                 mainview.getQueue().setItems(DBController.getSongsFromPlaylist(getSelectionModel().getSelectedItem()));
             }
         });
 
+        ContextMenu cm = new ContextMenu();
+        MenuItem delete = new MenuItem("Delete");
+        delete.setOnAction(event -> {
+            String selected = getSelectionModel().getSelectedItem();
+            PlaylistManager.deletePlaylist(selected);
+            updatePlaylists();
+            mainview.getBangerBar().updatePlaylistMenu();
+        });
+        cm.getItems().add(delete);
+
+        addEventHandler(MouseEvent.MOUSE_CLICKED,
+            new EventHandler<MouseEvent>() {
+                @Override public void handle(MouseEvent e) {
+                    if (e.getButton() == MouseButton.SECONDARY)
+                        cm.show(mainview.stage, e.getScreenX(), e.getScreenY());
+                }
+            });
+
         setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.DELETE && getItems().size() > 0) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Playlist löschen?");
-                alert.setContentText("Wollen Sie die Playlist wirklich löschen?");
-                alert.setHeaderText("");
-                alert.setGraphic(null);
-                alert.initStyle(StageStyle.UNDECORATED);
-                alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
-                alert.showAndWait().ifPresent(response -> {
-                    if (response == ButtonType.OK) {
-                        PlaylistManager.deletePlaylist(getSelectionModel().getSelectedItem());
-                        updatePlaylists();
-                        getSelectionModel().selectFirst();
-                        mainview.getBangerBar().updatePlaylistMenu();
-                    }
-                });
+                PlaylistManager.deletePlaylist(getSelectionModel().getSelectedItem());
+                updatePlaylists();
+                mainview.getBangerBar().updatePlaylistMenu();
             }
         });
     }

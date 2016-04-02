@@ -1,8 +1,13 @@
 package banger.util;
 
 import banger.audio.data.Song;
+import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.StageStyle;
 
 import java.io.*;
@@ -112,8 +117,37 @@ public class PlaylistManager {
     }
 
     public static void deletePlaylist(String name){
-        File playlist = new File(PLAYLIST_DIR + name + ".m3u");
-        deleteFile(playlist);
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Playlist löschen?");
+        alert.setContentText("Wollen Sie die Playlist wirklich löschen?");
+        alert.setHeaderText("");
+        alert.setGraphic(null);
+        alert.initStyle(StageStyle.UNDECORATED);
+        alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
+        Button okButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+        okButton.setDefaultButton(false);
+        EventHandler<KeyEvent> fireOnEnter = event -> {
+            if (KeyCode.ENTER.equals(event.getCode())
+                    && event.getTarget() instanceof Button) {
+                ((Button) event.getTarget()).fire();
+            }
+        };
+        DialogPane dialogPane = alert.getDialogPane();
+        dialogPane.getButtonTypes().stream()
+                .map(dialogPane::lookupButton)
+                .forEach(button ->
+                        button.addEventHandler(
+                                KeyEvent.KEY_PRESSED,
+                                fireOnEnter
+                        )
+                );
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                File playlist = new File(PLAYLIST_DIR + name + ".m3u");
+                deleteFile(playlist);
+            }
+        });
     }
 
     private static String format(Song s){
