@@ -384,7 +384,8 @@ public class DBController {
             rs = stmt.executeQuery("SELECT *, album.album_name, artist.artist_name " +
                     "FROM song " +
                     "INNER JOIN album ON (song.album = album.id) " +
-                    "INNER JOIN artist ON (song.artist = artist.id)");
+                    "INNER JOIN artist ON (song.artist = artist.id) " +
+                    "ORDER BY artist_name");
 
             int total = 0;
             while (rs.next()) {
@@ -418,7 +419,8 @@ public class DBController {
             ResultSet rs;
 
             rs = s.executeQuery("SELECT * FROM album " +
-                                "INNER JOIN artist ON (album.artist = artist.id)");
+                                "INNER JOIN artist ON (album.artist = artist.id) " +
+                                "ORDER BY artist_name");
 
             while(rs.next()) {
                 albums.add(new Album(
@@ -446,7 +448,8 @@ public class DBController {
             Statement s = connection.createStatement();
             ResultSet rs;
 
-            rs = s.executeQuery("SELECT * FROM artist");
+            rs = s.executeQuery("SELECT * FROM artist " +
+                                "ORDER BY artist_name");
 
             while(rs.next()) {
                 artists.add(new Artist(
@@ -475,7 +478,8 @@ public class DBController {
             rs = s.executeQuery("select * from song " +
                     "inner join album on song.album = album.id " +
                     "inner join artist on song.artist = artist.id " +
-                    "where artist.id = " + artist.getId());
+                    "where artist.id = " + artist.getId() + " " +
+                    "order by artist_name");
 
             while(rs.next()) {
                 songs.add(new Song(
@@ -510,7 +514,8 @@ public class DBController {
             rs = s.executeQuery("select * from song " +
                                 "inner join album on song.album = album.id " +
                                 "inner join artist on song.artist = artist.id " +
-                                "where album.id = " + album.getId());
+                                "where album.id = " + album.getId() + " " +
+                                "order by artist_name");
 
             while(rs.next()) {
                 songs.add(new Song(
@@ -544,7 +549,8 @@ public class DBController {
 
             rs = s.executeQuery("select * from album " +
                                 "inner join artist on album.artist = artist.id " +
-                                "where artist.id = " + artist.getId());
+                                "where artist.id = " + artist.getId() + " " +
+                                "order by artist_name");
 
             while(rs.next()) {
                 albums.add(new Album(

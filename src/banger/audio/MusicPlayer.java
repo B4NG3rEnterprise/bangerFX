@@ -38,6 +38,8 @@ public class MusicPlayer {
     private ArrayList<QueueListener> queueListeners;
     private ArrayList<PlayPauseListener> playPauseListeners;
 
+    //Equalizer
+    int[] fxEQ = new int[5];
 
     public enum RepeatState {
         REPEAT_OFF, REPEAT_SINGLE, REPEAT_ALL
@@ -49,6 +51,7 @@ public class MusicPlayer {
         bass = (Bass) Native.loadLibrary("bass.dll", Bass.class);
         bass.BASS_PluginLoad("res/bassflac.dll", 0);
         bass.BASS_PluginLoad("res/bass_aac.dll", 0);
+        //bass.BASS_PluginLoad("res/bass_fx.dll", 0);
 
         bass.BASS_Init(-1, 44100, 0, null, null);
 
@@ -82,6 +85,8 @@ public class MusicPlayer {
         stream = bass.BASS_StreamCreateFile(false, p, 0, 0, Bass.BASS_UNICODE);
         int error;
         if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+
+        initEQ();
 
         if (mainview.getLibrary().getCurrentView() == Library.VIEW_LYRICS)
             mainview.getLibrary().refreshData();
@@ -128,6 +133,8 @@ public class MusicPlayer {
         int error;
         if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
 
+        initEQ();
+
         if (mainview.getLibrary().getCurrentView() == Library.VIEW_LYRICS)
             mainview.getLibrary().refreshData();
 
@@ -164,6 +171,75 @@ public class MusicPlayer {
         Thread t = new Thread(fader);
         t.setDaemon(true);
         t.start();
+    }
+
+    public void initEQ() {
+        int error;
+
+        Bass.BASS_DX8_PARAMEQ eq = new Bass.BASS_DX8_PARAMEQ();
+
+        fxEQ[0] = bass.BASS_ChannelSetFX(stream, Bass.BASSFXType.BASS_FX_DX8_PARAMEQ, 0);
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println(error);
+        fxEQ[1] = bass.BASS_ChannelSetFX(stream, Bass.BASSFXType.BASS_FX_DX8_PARAMEQ, 0);
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println(error);
+        fxEQ[2] = bass.BASS_ChannelSetFX(stream, Bass.BASSFXType.BASS_FX_DX8_PARAMEQ, 0);
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println(error);
+        fxEQ[3] = bass.BASS_ChannelSetFX(stream, Bass.BASSFXType.BASS_FX_DX8_PARAMEQ, 0);
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println(error);
+        fxEQ[4] = bass.BASS_ChannelSetFX(stream, Bass.BASSFXType.BASS_FX_DX8_PARAMEQ, 0);
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println(error);
+
+        eq.fBandwidth = 18;
+
+        eq.fCenter = 80f;
+        eq.fGain = 0;
+        eq.write();
+
+        bass.BASS_FXSetParameters(fxEQ[0], eq.getPointer());
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+
+        eq.fCenter = 240f;
+        eq.fGain = 0;
+        eq.write();
+
+        bass.BASS_FXSetParameters(fxEQ[1], eq.getPointer());
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+
+        eq.fCenter = 750f;
+        eq.fGain = 0;
+        eq.write();
+
+        bass.BASS_FXSetParameters(fxEQ[2], eq.getPointer());
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+
+        eq.fCenter = 2200f;
+        eq.fGain = 0;
+        eq.write();
+
+        bass.BASS_FXSetParameters(fxEQ[3], eq.getPointer());
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+
+        eq.fCenter = 6600f;
+        eq.fGain = 0;
+        eq.write();
+
+        bass.BASS_FXSetParameters(fxEQ[4], eq.getPointer());
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+    }
+
+    public void updateEQ(int band, float gain) {
+        int error;
+
+        Bass.BASS_DX8_PARAMEQ eq = new Bass.BASS_DX8_PARAMEQ();
+        eq.autoWrite();
+
+        if (bass.BASS_FXGetParameters(fxEQ[band], eq.getPointer()))
+        {
+            eq.fGain = gain;
+            eq.writeField("fGain");
+            bass.BASS_FXSetParameters(fxEQ[band], eq.getPointer());
+            if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+        }
     }
 
     public void setRepeatState(RepeatState repeatState) {

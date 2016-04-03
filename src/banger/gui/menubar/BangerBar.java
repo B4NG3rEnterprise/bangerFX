@@ -2,6 +2,7 @@ package banger.gui.menubar;
 
 import banger.audio.data.Song;
 import banger.database.DBController;
+import banger.gui.Equalizer;
 import banger.gui.MainView;
 import banger.gui.options.Options;
 import banger.util.DeviceItem;
@@ -65,8 +66,10 @@ public class BangerBar extends MenuBar {
             // dc.setInitialDirectory(new File("F:/Musik"));
             dc.setTitle("Wähle einen Ordner aus");
             File directory = dc.showDialog(mainview.stage);
-            DBController.addFromDirectory(directory.toString());
-            mainview.getLibrary().refreshData();
+            if (directory != null) {
+                DBController.addFromDirectory(directory.toString());
+                mainview.getLibrary().refreshData();
+            }
         });
         file.getItems().add(imp);
         MenuItem impPL = new MenuItem("Playlists Importieren...");
@@ -120,7 +123,20 @@ public class BangerBar extends MenuBar {
             optionPane.requestFocus();
         });
         edit.getItems().add(options);
-        edit.getItems().add(new MenuItem("Equalizer"));
+
+        MenuItem equalizer = new MenuItem("Equalizer");
+        edit.getItems().add(equalizer);
+        equalizer.setOnAction(event -> {
+            Stage eqStage = new Stage();
+            Equalizer eq = new Equalizer(mainview);
+            Scene sce = new Scene(eq);
+            eqStage.setTitle("Equalizer");
+            eqStage.setScene(sce);
+            eqStage.initModality(Modality.APPLICATION_MODAL);
+            eqStage.setResizable(false);
+            eqStage.show();
+            eq.requestFocus();
+        });
 
         view = new Menu("Ansicht");
         view.getItems().add(new MenuItem("Widget-Ansicht"));

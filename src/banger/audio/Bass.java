@@ -314,6 +314,20 @@ public interface Bass extends Library {
     final int BASS_POS_SCAN         = 0x40000000; // flag: scan to the position
     //endregion
     
+    //region DX8 effect types, use with BASS_ChannelSetFX
+    interface BASSFXType {
+        int BASS_FX_DX8_CHORUS = 0;
+        int BASS_FX_DX8_COMPRESSOR = 1;
+        int BASS_FX_DX8_DISTORTION = 2;
+        int BASS_FX_DX8_ECHO = 3;
+        int BASS_FX_DX8_FLANGER = 4;
+        int BASS_FX_DX8_GARGLE = 5;
+        int BASS_FX_DX8_I3DL2REVERB = 6;
+        int BASS_FX_DX8_PARAMEQ = 7;
+        int BASS_FX_DX8_REVERB = 8;
+    }
+    //endregion
+
     //Callbacks
     interface DSPPROC extends Callback {
         void DSPPROC(int handle, int channel, Pointer buffer, int length, Pointer user);
@@ -373,6 +387,46 @@ public interface Bass extends Library {
 
         protected List getFieldOrder() {
             return Arrays.asList(new String[] {"id", "title", "artist", "album", "year", "comment", "genre"});
+        }
+    }
+    //endregion
+
+    //region Effects
+    boolean BASS_FXGetParameters(int handle, Pointer params);
+    boolean BASS_FXReset(int handle);
+    boolean BASS_FXSetParameters(int handle, Pointer params);
+    boolean BASS_FXSetPriority(int handle, int priority);
+
+    //Structures
+    class BASS_DX8_PARAMEQ extends Structure {
+        public float fCenter;
+        public float fBandwidth;
+        public float fGain;
+
+        protected List getFieldOrder() {
+            return Arrays.asList("fCenter", "fBandwidth", "fGain");
+        }
+    }
+
+    class BASS_DX8_CHORUS extends Structure {
+        public float fWetDryMix;
+        public float fDepth;
+        public float fFeedback;
+        public float fFrequency;
+        public int lWaveform;	// 0=triangle, 1=sine
+        public float fDelay;
+        public int lPhase;		// BASS_DX8_PHASE_xxx
+
+        public BASS_DX8_CHORUS() {
+            super();
+        }
+
+        public BASS_DX8_CHORUS(Pointer p) {
+            useMemory(p);
+        }
+
+        protected List getFieldOrder() {
+            return Arrays.asList("fWetDryMix", "fDepth", "fFeedback", "fFrequency", "lWaveform", "fDelay", "lPhase");
         }
     }
     //endregion
