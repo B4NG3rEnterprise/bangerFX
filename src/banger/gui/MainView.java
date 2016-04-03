@@ -88,13 +88,12 @@ public class MainView extends Application {
     public void showMainStage() {
         long start = System.currentTimeMillis();
         mainStage = new Stage(StageStyle.DECORATED);
-        // showLoadingScreen();
 
         mainStage.setTitle("B4NG3rFX");
         mainStage.setMinWidth(MIN_WIDTH);
-        mainStage.setMaxWidth(1800);
+        mainStage.setMaxWidth(1700);
         mainStage.setMinHeight(MIN_HEIGHT);
-        mainStage.setMaxHeight(1800 / 16 * 9);
+        mainStage.setMaxHeight(1700 / 16 * 9);
         mainStage.setOnCloseRequest(e -> {
             player.kill();
             System.exit(0);
