@@ -54,7 +54,7 @@ public class LyricsView extends VBox implements View {
 
         lyrics = new Text();
         lyrics.setTextAlignment(TextAlignment.CENTER);
-        lyrics.setStyle("-fx-font-size: 12;");
+        lyrics.setStyle("-fx-font-size: 16;");
 
         Pane overlay = new Pane();
         Stop[] stops = new Stop[] { new Stop(0.0, Color.WHITE), new Stop(0.1, Color.TRANSPARENT), new Stop(0.9, Color.TRANSPARENT), new Stop(1, Color.WHITE) };

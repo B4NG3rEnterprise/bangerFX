@@ -1,6 +1,6 @@
 package banger.gui;
 
-import banger.Test;
+import banger.Main;
 import banger.audio.MusicPlayer;
 import banger.audio.listeners.PlayPauseListener;
 import banger.audio.listeners.QueueListener;
@@ -57,11 +57,11 @@ public class MainView extends Application {
 
     private BorderPane splashLayout;
     private Stage mainStage;
-    private static final int SPLASH_WIDTH = 800;
-    private static final int SPLASH_HEIGHT = 500;
+    private static final int SPLASH_WIDTH = 1000;
+    private static final int SPLASH_HEIGHT = 480;
 
     public void init() {
-        Image banger = new Image(Test.class.getResourceAsStream("/png/banger.png"));
+        Image banger = new Image(Main.class.getResourceAsStream("/png/bangernew.png"));
         ImageView splash = new ImageView();
         splash.setImage(banger);
         splash.setStyle("-fx-background-color: rgba(0, 0, 0, 0)");

@@ -1,6 +1,6 @@
 package banger.gui.library.views;
 
-import banger.Test;
+import banger.Main;
 import banger.audio.data.Album;
 import banger.audio.data.Artist;
 import banger.audio.data.Song;
@@ -58,7 +58,7 @@ public class TitleView extends ScrollPane implements View {
                 g.getColumnConstraints().addAll(covercol, infocol, songcol);
 
                 //region Creation
-                Image i = new Image(Test.class.getResourceAsStream("/png/Cover0.jpg"));
+                Image i = new Image(Main.class.getResourceAsStream("/png/Cover0.jpg"));
 
                 int row = 0;
                 for(Artist artist : artists) {

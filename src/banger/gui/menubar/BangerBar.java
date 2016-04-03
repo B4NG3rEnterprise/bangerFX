@@ -164,7 +164,6 @@ public class BangerBar extends MenuBar {
         help.getItems().add(new MenuItem("Get Premium"));
 
         extra = new Menu("Extra");
-        extra.getItems().add(initDeviceMenu());
         extra.getItems().add(changeDir);
 
         getMenus().addAll(file, edit, view, help, extra);
@@ -231,30 +230,9 @@ public class BangerBar extends MenuBar {
         return playlistMenu;
     }
 
-    public void updatePlaylistMenu(){
+    public void updatePlaylistMenu() {
         playlistMenu = initPlaylistMenu();
         edit.getItems().remove(0); // remove menu
         edit.getItems().add(0, playlistMenu); // add menu again
-    }
-
-    private Menu initDeviceMenu(){
-        Menu deviceMenu = new Menu("Devices");
-        ObservableList<DeviceItem> deviceList = mainview.getMusicPlayer().getDevices();
-        for (int i = 0; i < deviceList.size(); i++) {
-            int deviceNum = deviceList.get(i).getDeviceInt();
-            MenuItem m = new MenuItem(deviceList.get(i).toString());
-            m.setOnAction(e -> mainview.getMusicPlayer().setOutputDevice(deviceNum));
-            deviceMenu.getItems().add(m);
-        }
-        return deviceMenu;
-    }
-
-    private Menu initSettingsMenu(){
-        Menu settingsMenu = new Menu("Settings");
-
-        MenuItem mi = new MenuItem("Fun");
-
-        settingsMenu.getItems().add(mi);
-        return settingsMenu;
     }
 }
