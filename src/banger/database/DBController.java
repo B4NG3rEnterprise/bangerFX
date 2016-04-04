@@ -688,6 +688,35 @@ public class DBController {
         }
     }
 
+    public static Song getSongFromPath(String path){
+        Song result = null;
+        try {
+            initDBConnection();
+            Statement s = connection.createStatement();
+            ResultSet rs;
+
+            rs = s.executeQuery("SELECT *, album.album_name, artist.artist_name " +
+                    "FROM song " +
+                    "INNER JOIN album ON (song.album = album.id) " +
+                    "INNER JOIN artist ON (song.artist = artist.id) " +
+                    "WHERE (song.fileLocation = '" + path.replace("'", "''") + "')");
+
+            int id = rs.getInt("id");
+            String name = rs.getString("song_name");
+            String artist = rs.getString("artist_name");
+            String album = rs.getString("album_name");
+            String genre = rs.getString("genre");
+            byte rating = rs.getByte("rating");
+            String fileLocation = rs.getString("fileLocation");
+            int length = rs.getInt("length");
+
+            result = new Song(id, name, artist, album, genre, rating, fileLocation, length);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     private static int deleteDatabaseEntries(Song[] songs) throws SQLException {
         initDBConnection();
         int counter = 0;

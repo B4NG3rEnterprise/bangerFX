@@ -14,6 +14,10 @@ public class TreeFile {
         this.name = f.getName();
     }
 
+    public File getFile(){
+        return file;
+    }
+
     public String toString() {
         return name;
     }

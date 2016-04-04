@@ -1,13 +1,21 @@
 package banger.gui.sidebar.filebrowser;
 
+import banger.audio.MusicPlayer;
+import banger.audio.data.Song;
+import banger.database.DBController;
 import banger.gui.MainView;
 import banger.gui.options.Options;
 import banger.util.BangerVars;
 
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
+import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 
 import java.io.File;
 
@@ -33,6 +41,12 @@ public class FileBrowser extends TreeView<TreeFile> {
         setMaxWidth(300);
         getSelectionModel().clearSelection();
 
+        EventHandler<MouseEvent> mouseEventHandle = (MouseEvent event) -> {
+                handleMouseClicked(event);
+        };
+
+        addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEventHandle);
+
         findFiles(new File(path), null);
         this.getRoot().setExpanded(true);
     }
@@ -55,7 +69,7 @@ public class FileBrowser extends TreeView<TreeFile> {
                     // System.out.println("     file:" + file.getCanonicalPath());
                     for (int x = 0; x < BangerVars.FILE_EXTENSIONS.length; x++)
                         if (file.getAbsolutePath().endsWith(BangerVars.FILE_EXTENSIONS[x])) {
-                            TreeItem<TreeFile> item = new TreeItem<>(new TreeFile(file)); // add icon
+                            TreeItem<TreeFile> item = new TreeItem<>(new TreeFile(file));
                             GlyphsDude.setIcon(item, MaterialDesignIcon.MUSIC_NOTE, "15px");
                             root.getChildren().add(item);
                         }
@@ -70,6 +84,23 @@ public class FileBrowser extends TreeView<TreeFile> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void handleMouseClicked(MouseEvent event) {
+        Node node = event.getPickResult().getIntersectedNode();
+        if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)) {
+            TreeFile name = getSelectionModel().getSelectedItem().getValue();
+            // System.out.println("Node click: " + name.getFile().toString());
+            if (event.getClickCount() == 2) {
+                for (String ext : BangerVars.FILE_EXTENSIONS)
+                    if (name.getFile().toString().endsWith(ext)){
+                        Song s = DBController.getSongFromPath(name.getFile().getPath());
+                        mainview.getMusicPlayer().play(s);
+                        mainview.getLibrary().select(s);
+                    }
+            }
+        }
+
     }
 }
 
