@@ -30,6 +30,7 @@ public class Options extends VBox {
     private final static String PATH = "res/options.ini";
     private static Wini wini;
 
+    public static String resetColor = "#FA7D38";
     public static String backgroundColor;
     public static boolean notifications;
     public static String fileBrowserPath;
@@ -41,20 +42,21 @@ public class Options extends VBox {
     Spinner crossfadeSpinner;
     @FXML
     ChoiceBox<String> devices;
-    @FXML ColorPicker colorPicker;
+    @FXML
+    ColorPicker colorPicker;
 
     private MainView mv;
 
     public static void init() {
         try {
             wini = new Wini(new File(PATH));
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
             System.out.println("unable to load options.ini");
         }
-        backgroundColor = wini.get("Options","BackgroundColor").replace('.','#');
+        backgroundColor = wini.get("Options", "BackgroundColor").replace('.', '#');
         notifications = Boolean.parseBoolean(wini.get("Options", "Notifications"));
-        fileBrowserPath = wini.get("Options","FilePath");
+        fileBrowserPath = wini.get("Options", "FilePath");
         crossfade = Float.parseFloat(wini.get("Options", "Crossfade"));
     }
 
@@ -75,8 +77,8 @@ public class Options extends VBox {
             @Override
             public void handle(ActionEvent event) {
                 backgroundColor = colorPicker.getValue().toString();
-                System.out.println(colorPicker.getValue().toString());
-                wini.put("Options","BackgroundColor",backgroundColor);
+                updateColors();
+                wini.put("Options", "BackgroundColor", backgroundColor);
                 try {
                     wini.store();
                 } catch (IOException ex) {
@@ -89,6 +91,7 @@ public class Options extends VBox {
         crossfadeSpinner.setEditable(true);
         crossfadeSpinner.valueProperty().addListener((obs, oldValue, newValue) -> {
             if (oldValue != newValue) {
+                crossfade = Float.parseFloat(newValue.toString());
                 wini.put("Options", "Crossfade", newValue.toString());
                 try {
                     wini.store();
@@ -126,7 +129,7 @@ public class Options extends VBox {
         while (it.hasNext()) {
             DeviceItem di;
             devices.getItems().add((di = it.next()).toString());
-            if (di.toString().equals(wini.get("Options","AudioDevice"))){
+            if (di.toString().equals(wini.get("Options", "AudioDevice"))) {
                 devices.setValue(di.toString());
             }
         }
@@ -137,9 +140,9 @@ public class Options extends VBox {
             Iterator<DeviceItem> iter = mv.getMusicPlayer().getDevices().listIterator();
             while (iter.hasNext()) {
                 DeviceItem temp = null;
-                if ((temp = iter.next()).toString().equals(devices.getValue().toString())){
+                if ((temp = iter.next()).toString().equals(devices.getValue().toString())) {
                     item = temp;
-                    wini.put("Options","AudioDevice",temp.toString());
+                    wini.put("Options", "AudioDevice", temp.toString());
                     try {
                         wini.store();
                     } catch (IOException f) {
@@ -267,6 +270,8 @@ public class Options extends VBox {
         });
         combination.setStyle("-fx-alignment: CENTER-RIGHT;");
 
+        command.setMinWidth(this.getWidth()/2);
+        combination.setMinWidth(this.getWidth()/2);
         table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         table.getSelectionModel().setCellSelectionEnabled(true);
         table.getColumns().addAll(command, combination);
@@ -283,7 +288,12 @@ public class Options extends VBox {
         return crossfade;
     }
 
-    public Wini getIni() { return this.wini; }
+    public Wini getIni() {
+        return this.wini;
+    }
 
+    public void updateColors() {
+        mv.getViewSelector().updateColor();
+    }
 
 }

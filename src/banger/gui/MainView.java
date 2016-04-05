@@ -224,4 +224,7 @@ public class MainView extends Application {
 
     public SearchBar getSearchBar() { return searchBar; }
 
+    public ViewSelector getViewSelector() {
+        return this.viewSelector;
+    }
 }

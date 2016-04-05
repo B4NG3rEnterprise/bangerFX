@@ -2,6 +2,7 @@ package banger.gui.sidebar.viewselector;
 
 import banger.gui.MainView;
 import banger.gui.library.Library;
+import banger.gui.options.Options;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -13,6 +14,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 public class ViewSelector extends VBox {
+
+    private Label current;
 
     @FXML
     Label song;
@@ -36,48 +39,48 @@ public class ViewSelector extends VBox {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        list.setBackground(new Background(new BackgroundFill(Color.web("#FA7D38"), CornerRadii.EMPTY, Insets.EMPTY)));
+        current = list;
     }
 
 
     @FXML
     protected void showTitle() {
+        current = song;
         resizeContainer();
-        clearLabels();
-        song.setBackground(new Background(new BackgroundFill(Color.web("#FA7D38"), CornerRadii.EMPTY, Insets.EMPTY)));
+        updateColor();
         mv.getLibrary().setView(Library.VIEW_TITLE);
     }
 
     @FXML
     protected void showList() {
+        current = list;
         resizeContainer();
-        clearLabels();
-        list.setBackground(new Background(new BackgroundFill(Color.web("#FA7D38"), CornerRadii.EMPTY, Insets.EMPTY)));
+        updateColor();
         mv.getLibrary().setView(Library.VIEW_LIST);
     }
 
     @FXML
     protected void showAlbum() {
+        current = album;
         resizeContainer();
-        clearLabels();
-        album.setBackground(new Background(new BackgroundFill(Color.web("#FA7D38"), CornerRadii.EMPTY, Insets.EMPTY)));
+        updateColor();
         mv.getLibrary().setView(Library.VIEW_ALBUM);
     }
 
     @FXML
     protected  void showLyrics() {
+        current = lyrics;
         resizeContainer();
-        clearLabels();
-        lyrics.setBackground(new Background(new BackgroundFill(Color.web("#FA7D38"), CornerRadii.EMPTY, Insets.EMPTY)));
+        updateColor();
         mv.getLibrary().setView(Library.VIEW_LYRICS);
     }
 
-    private void clearLabels() {
+    public void updateColor() {
         song.setBackground(null);
         list.setBackground(null);
         album.setBackground(null);
         lyrics.setBackground(null);
+        current.setBackground(new Background(new BackgroundFill(Color.valueOf(Options.backgroundColor), CornerRadii.EMPTY, Insets.EMPTY)));
     }
 
     public void resizeContainer() {
@@ -86,5 +89,6 @@ public class ViewSelector extends VBox {
         list.setMinWidth(this.getWidth());
         lyrics.setMinWidth(this.getWidth());
     }
+
 
 }

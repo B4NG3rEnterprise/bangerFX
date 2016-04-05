@@ -42,13 +42,13 @@ public class CoverView extends HBox {
     }
 
     public void updateView(Song currentlyPlaying) {
-
         title.setText(currentlyPlaying.getName());
         artist.setText(currentlyPlaying.getArtist());
         album.setText(currentlyPlaying.getAlbum());
-
-
         cover.setImage(currentlyPlaying.getCover());
     }
+     public void updateColor() {
+
+     }
 
 }
