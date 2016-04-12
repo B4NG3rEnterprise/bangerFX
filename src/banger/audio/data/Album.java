@@ -10,7 +10,6 @@ public class Album {
     private String albumName;
     private String artist;
     private int release;
-    private Image cover = new Image("file:/D:/Data/Programming/bangerFX/res/png/Cover0.jpg");
 
     public Album(int id, String albumName, String artist, int release) {
         this.id = id;
@@ -40,7 +39,7 @@ public class Album {
     }
 
     public Image getCover() {
-        return cover;
+        return getSongs().get(0).getCover();
     }
 
 

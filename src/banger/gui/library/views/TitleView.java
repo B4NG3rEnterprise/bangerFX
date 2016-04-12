@@ -4,11 +4,11 @@ import banger.Main;
 import banger.audio.data.Album;
 import banger.audio.data.Artist;
 import banger.audio.data.Song;
+import banger.database.DBController;
 import banger.gui.MainView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -23,7 +23,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.util.Callback;
 
@@ -33,10 +32,10 @@ public class TitleView extends ScrollPane implements View {
     MainView mainview;
     private ObservableList<Artist> artists;
 
-    public TitleView(MainView m, ObservableList<Artist> ar) {
+    public TitleView(MainView m) {
         super();
         mainview = m;
-        artists = ar;
+        artists = DBController.getAllArtists();
 
         getStyleClass().add("scrollpane");
         getStylesheets().add("/banger/gui/library/views/titleview.css");
@@ -85,6 +84,7 @@ public class TitleView extends ScrollPane implements View {
                             cover.setPreserveRatio(true);
                             cover.setSmooth(true);
                             cover.setCache(true);
+                            cover.getStyleClass().add("album_cover");
                             g.setConstraints(cover, 0, row, 1, songs.size() > 1 ? songs.size() : 2, HPos.CENTER, VPos.TOP);
 
                             Label albumName = new Label(album.getAlbumName());
@@ -100,46 +100,37 @@ public class TitleView extends ScrollPane implements View {
 
                             TableColumn numberCol = new TableColumn("#");
                             numberCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Song, Number>, ObservableValue<Number>>() {
-                                @Override
                                 public ObservableValue<Number> call(TableColumn.CellDataFeatures<Song, Number> p) {
                                     return new ReadOnlyObjectWrapper(table.getItems().indexOf(p.getValue()) + 1);
                                 }
                             });
                             TableColumn song_name = new TableColumn("Name");
                             song_name.setCellValueFactory(new PropertyValueFactory<Song, String>("name"));
-                            TableColumn genre = new TableColumn("Genre");
-                            genre.setCellValueFactory(new PropertyValueFactory<Song, String>("genre"));
                             TableColumn length = new TableColumn("Length");
                             length.setCellValueFactory(new PropertyValueFactory<Song, Integer>("length"));
 
-                            table.widthProperty().addListener(new ChangeListener<Number>()
-                            {
-                                @Override
-                                public void changed(ObservableValue<? extends Number> source, Number oldWidth, Number newWidth)
-                                {
-                                    //Don't show header
-                                    Pane header = (Pane) table.lookup("TableHeaderRow");
-                                    if (header.isVisible()){
-                                        header.setMaxHeight(0);
-                                        header.setMinHeight(0);
-                                        header.setPrefHeight(0);
-                                        header.setVisible(false);
-                                    }
-                                }
-                            });
-
                             table.prefHeightProperty().bind(table.fixedCellSizeProperty().multiply(Bindings.size(table.getItems())).add(1.01));
 
-                            table.getColumns().addAll(numberCol, song_name, genre, length);
-
-                            table.setId("" + album.getId());
+                            table.getColumns().addAll(numberCol, song_name, length);
 
                             table.setOnMousePressed(event -> {
                                 if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
                                     mainview.getMusicPlayer().play(table.getSelectionModel().getSelectedItem());
-                                    mainview.getLibrary().updateQueue(album, table.getSelectionModel().getSelectedItem());
+
+                                    //update queue in musicplayer
+                                    mainview.getMusicPlayer().updateQueue(songs);
                                 }
                             });
+
+                            cover.setOnMousePressed(event -> {
+                                if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
+                                    mainview.getMusicPlayer().play(songs.get(0));
+
+                                    //update queue in musicplayer
+                                    mainview.getMusicPlayer().updateQueue(songs);
+                                }
+                            });
+
                             GridPane.setHgrow(table, Priority.ALWAYS);
                             g.setConstraints(table, 2, row, 1, songs.size() > 1 ? songs.size() : 2, HPos.CENTER, VPos.TOP, Priority.ALWAYS, Priority.ALWAYS);
 
@@ -147,7 +138,6 @@ public class TitleView extends ScrollPane implements View {
 
                             row += songs.size() > 1 ? songs.size() : 2;
                         }
-                        updateValue(g);
                     }
                 }
 
@@ -162,7 +152,7 @@ public class TitleView extends ScrollPane implements View {
 
         task.setOnFailed(event -> {
             System.out.println("FAILED");
-            System.out.println(task.getException());
+            task.getException().printStackTrace();
         });
 
         task.setOnCancelled(event -> {
@@ -176,7 +166,7 @@ public class TitleView extends ScrollPane implements View {
 
     }
 
-    public void refreshData(ObservableList<Song> songs) {
+    public void refreshData() {
 
     }
 

@@ -1,6 +1,6 @@
 package banger.gui.popup;
 
-import banger.util.BangerVars;
+import banger.gui.options.Options;
 import banger.util.Utility;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -13,7 +13,7 @@ public class Popup extends javafx.stage.Popup {
 
     public Popup(Stage owner, TextFlow message) {
         super();
-        String color = BangerVars.POPUP_COLOR;
+        String color = Options.backgroundColor;
         TextFlow label = message;
         if (Utility.isDark(color)) label.getStylesheets().add("banger/gui/popup/darkpopup.css");
         else label.getStylesheets().add("banger/gui/popup/popup.css");

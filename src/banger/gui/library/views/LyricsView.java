@@ -6,7 +6,6 @@ import banger.util.BangerVars;
 import banger.util.LyricsGetter;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -200,7 +199,7 @@ public class LyricsView extends VBox implements View {
         next.setDisable(nextDisabled);
     }
 
-    public void refreshData(ObservableList<Song> songs) {
+    public void refreshData() {
         initLyrics();
     }
 

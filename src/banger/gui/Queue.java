@@ -1,7 +1,6 @@
 package banger.gui;
 
 import banger.audio.data.Song;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -12,7 +11,6 @@ import javafx.scene.input.*;
 public class Queue extends TableView<Song> {
 
     private MainView mainview;
-    private ObservableList<Song> songs;
     private DataFormat songFormat = new DataFormat("Song");
 
     public Queue(MainView mainview) {
@@ -31,42 +29,35 @@ public class Queue extends TableView<Song> {
         setMaxWidth(400);
 
         TableColumn song_name = new TableColumn("Queue");
-        song_name.setCellValueFactory(
-                new PropertyValueFactory<Song, String>("name"));
+        song_name.setCellValueFactory(new PropertyValueFactory<Song, String>("name"));
+
         TableColumn artist_name = new TableColumn("");
-        artist_name.setCellValueFactory(
-                new PropertyValueFactory<Song, String>("artist"));
+        artist_name.setCellValueFactory(new PropertyValueFactory<Song, String>("artist"));
 
         song_name.prefWidthProperty().bind(this.widthProperty().divide(2));
         artist_name.prefWidthProperty().bind(this.widthProperty().divide(2));
 
         getColumns().addAll(song_name, artist_name);
 
-        setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
+        setOnMousePressed(event -> {
                 if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
                     Song current = getSelectionModel().getSelectedItem();
                     mainview.getMusicPlayer().play(current);
                     mainview.getLibrary().select(current);
                 }
-            }
-        });
+            });
 
-        setOnDragDetected(new EventHandler<MouseEvent>() { //drag
-            @Override
-            public void handle(MouseEvent event) {
+        setOnDragDetected(event -> {
                 // drag was detected, start drag-and-drop gesture
                 Song selected = getSelectionModel().getSelectedItem();
-                if(selected !=null){
+                if (selected != null) {
                     Dragboard db = startDragAndDrop(TransferMode.ANY);
                     ClipboardContent content = new ClipboardContent();
                     content.put(songFormat, selected);
                     db.setContent(content);
                     event.consume();
                 }
-            }
-        });
+            });
 
         setOnDragOver(new EventHandler<DragEvent>() {
             @Override

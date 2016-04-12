@@ -1,6 +1,7 @@
 package banger.util;
 
 import java.awt.*;
+import java.util.Locale;
 
 public class Utility {
 
@@ -21,6 +22,14 @@ public class Utility {
         if (brightness < 0.5) isDark = true;
 
         return isDark;
+    }
+
+    public static String withSuffix(long count) {
+        if (count < 1000) return "" + count;
+        int exp = (int) (Math.log(count) / Math.log(1000));
+        return String.format(Locale.US, "%f%c",
+                count / Math.pow(1000, exp),
+                "kMGTPE".charAt(exp-1));
     }
 
 }

@@ -48,16 +48,45 @@ public class Options extends VBox {
     private MainView mv;
 
     public static void init() {
+        File f = new File(PATH);
+        if(!f.exists())
+            createOptions();
+
         try {
             wini = new Wini(new File(PATH));
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("unable to load options.ini");
         }
         backgroundColor = wini.get("Options", "BackgroundColor").replace('.', '#');
         notifications = Boolean.parseBoolean(wini.get("Options", "Notifications"));
         fileBrowserPath = wini.get("Options", "FilePath");
         crossfade = Float.parseFloat(wini.get("Options", "Crossfade"));
+    }
+
+    private static void createOptions() {
+        File f = new File(PATH);
+        try {
+            f.createNewFile();
+            wini = new Wini(new File(PATH));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        wini.put("Options", "AudioDevice", -1);
+        wini.put("Options", "BackgroundColor", "0xffb366ff");
+        wini.put("Options", "Crossfade", 0);
+        wini.put("Options", "Notifications", true);
+        wini.put("Options", "FilePath", "D:/Musik"); //TODO: Implement dialog to fill this on fist startup!
+
+        wini.put("KeyBindings", "0", "SPACE");
+        wini.put("KeyBindings", "1", "ENTER");
+        wini.put("KeyBindings", "2", "RIGHT");
+        wini.put("KeyBindings", "3", "LEFT");
+
+        try {
+            wini.store();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Options(MainView mv) {

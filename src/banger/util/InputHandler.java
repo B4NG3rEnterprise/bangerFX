@@ -10,15 +10,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
-import org.ini4j.Ini;
-import org.ini4j.IniPreferences;
 import org.ini4j.Wini;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
-import java.util.prefs.Preferences;
-
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class InputHandler implements EventHandler<KeyEvent> {
 
@@ -51,7 +48,6 @@ public class InputHandler implements EventHandler<KeyEvent> {
                         System.out.println("Executed PlaySelected");
                         if (mainview.getLibrary().isInFocus()) {
                             mainview.getMusicPlayer().play(mainview.getLibrary().getSelectedItem());
-                            mainview.getLibrary().updateQueue();
                         } else if (mainview.getFilebrowser().isFocused()) {
                             System.out.println(mainview.getFilebrowser().getSelectionModel().getSelectedItem());
                         }

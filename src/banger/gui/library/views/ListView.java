@@ -1,7 +1,9 @@
 package banger.gui.library.views;
 
 import banger.audio.data.Song;
+import banger.database.DBController;
 import banger.gui.MainView;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
@@ -13,9 +15,9 @@ public class ListView extends TableView<Song> implements View {
     private MainView mainview;
     private ObservableList<Song> songs;
 
-    public ListView(MainView m, ObservableList<Song> s) {
+    public ListView(MainView m) {
         mainview = m;
-        songs = s;
+        songs = DBController.getAllSongs();
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         getStylesheets().add("banger/gui/library/views/listview.css");
@@ -42,7 +44,9 @@ public class ListView extends TableView<Song> implements View {
         setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
                 mainview.getMusicPlayer().play(getSelectionModel().getSelectedItem());
-                mainview.getLibrary().updateQueue();
+
+                //update queue in musicplayer
+                mainview.getMusicPlayer().updateQueue(FXCollections.observableArrayList(songs));
             }
         });
     }
@@ -56,8 +60,8 @@ public class ListView extends TableView<Song> implements View {
         return getSelectionModel().getSelectedItem();
     }
 
-    public void refreshData(ObservableList<Song> songs) {
-        this.songs = songs;
+    public void refreshData() {
+        this.songs = DBController.getAllSongs();
         setItems(songs);
         updateBounds();
     }

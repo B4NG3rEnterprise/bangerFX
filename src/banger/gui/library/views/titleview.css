@@ -32,8 +32,14 @@
     -fx-font-weight: bold;
 }
 
-
 .song_table {
     -fx-fixed-cell-size: 2em;
+}
+
+.song_table .column-header-background {
+    -fx-min-height: 0;
+    -fx-pref-height: 0;
+    -fx-max-height: 0;
+    visibility: hidden;
 }
 

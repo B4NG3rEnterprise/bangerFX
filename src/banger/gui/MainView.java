@@ -12,7 +12,6 @@ import banger.gui.sidebar.PlaylistSelector;
 import banger.gui.sidebar.filebrowser.FileBrowser;
 import banger.gui.sidebar.viewselector.ViewSelector;
 import banger.gui.statusbar.StatusBar;
-import banger.util.BangerVars;
 import banger.util.InputHandler;
 import javafx.animation.FadeTransition;
 import javafx.application.Application;
@@ -108,10 +107,10 @@ public class MainView extends Application {
 
         library = new Library(this);
         library.setMinSize(0, 0);
-        library.setPrefSize(600, 500);
+        library.setPrefSize(500, 600);
 
         statusbar = new StatusBar(this);
-        statusbar.setCustomBackground(Paint.valueOf(BangerVars.STATUSBAR_COLOR));
+        statusbar.setCustomBackground(Paint.valueOf(Options.backgroundColor));
         statusbar.setMinSize(0, 40);
 
         bangerBar = new BangerBar(this);
@@ -122,14 +121,13 @@ public class MainView extends Application {
 
         coverview = new CoverView(this);
         coverview.setMinSize(0, 0);
-        coverview = new CoverView(this);
 
         searchBar = new SearchBar(this);
 
         //Sidebar rechts
-        VBox v1 = new VBox();
-        v1.setVgrow(queue, Priority.ALWAYS);
-        v1.getChildren().addAll(searchBar, new Separator(Orientation.HORIZONTAL), queue, new Separator(Orientation.HORIZONTAL), coverview, new Separator(Orientation.HORIZONTAL));
+        VBox right = new VBox();
+        right.setVgrow(queue, Priority.ALWAYS);
+        right.getChildren().addAll(searchBar, new Separator(Orientation.HORIZONTAL), queue, new Separator(Orientation.HORIZONTAL), coverview, new Separator(Orientation.HORIZONTAL));
 
         // Sidebar links
         viewSelector = new ViewSelector(this);
@@ -142,22 +140,22 @@ public class MainView extends Application {
         selector = new PlaylistSelector(this);
         selector.setMinSize(0, 0);
 
-        VBox v2 = new VBox();
-        v2.getChildren().addAll(viewSelector, new Separator(Orientation.HORIZONTAL), filebrowser, new Separator(Orientation.HORIZONTAL), plLabel, selector);
+        VBox left = new VBox();
+        left.getChildren().addAll(viewSelector, new Separator(Orientation.HORIZONTAL), filebrowser, new Separator(Orientation.HORIZONTAL), plLabel, selector);
 
-        BorderPane bl = new BorderPane();
+        BorderPane root = new BorderPane();
 
-        bl.setTop(bangerBar);
-        bl.setCenter(library);
-        bl.setRight(v1);
-        bl.setBottom(statusbar);
-        bl.setLeft(v2);
+        root.setTop(bangerBar);
+        root.setRight(right);
+        root.setCenter(library);
+        root.setBottom(statusbar);
+        root.setLeft(left);
 
-        scene = new Scene(bl);
+        scene = new Scene(root);
 
         scene.addEventHandler(KeyEvent.KEY_RELEASED, handler);
 
-        player.addPlayPauseListener(new PlayPauseListener(mainStage, statusbar, coverview));
+        player.addPlayPauseListener(new PlayPauseListener(mainStage, statusbar, library, coverview));
         player.addQueueListener(new QueueListener(queue));
 
         long elapsed = System.currentTimeMillis() - start;
@@ -189,8 +187,9 @@ public class MainView extends Application {
     }
 
     public interface InitCompletionHandler {
-        public void complete();
+        void complete();
     }
+
 
     public MusicPlayer getMusicPlayer() {
         return player;

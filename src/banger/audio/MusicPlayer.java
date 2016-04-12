@@ -4,12 +4,15 @@ import banger.audio.data.Song;
 import banger.audio.listeners.PlayPauseListener;
 import banger.audio.listeners.QueueListener;
 import banger.gui.MainView;
-import banger.gui.library.Library;
 import banger.gui.options.Options;
 import banger.util.DeviceItem;
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.FloatProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleFloatProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -22,24 +25,31 @@ import java.util.Random;
 public class MusicPlayer {
 
     private Bass bass;
+    private int bassflacHandle;
+    private int bassaacHandle;
 
     private int stream;
     private float volume;
     private boolean muted;
     private boolean shuffle;
-    private boolean played;
+    private BooleanProperty eqState;
     private Song nowPlaying;
     private RepeatState repeatState;
     private ObservableList<Song> queue;
+    private ObservableList<Song> queueBackup;
     private int queueIndex;
     private Task fader;
+
+    private int error;
 
     //Listeners
     private ArrayList<QueueListener> queueListeners;
     private ArrayList<PlayPauseListener> playPauseListeners;
 
     //Equalizer
-    int[] fxEQ = new int[5];
+    int[] fxEQ = new int[10];
+    float[] freq = {80, 150, 300, 500, 1000, 2000, 4000, 8000, 12000, 14000};
+    FloatProperty[] gain = new FloatProperty[10];
 
     public enum RepeatState {
         REPEAT_OFF, REPEAT_SINGLE, REPEAT_ALL
@@ -49,9 +59,11 @@ public class MusicPlayer {
 
     public MusicPlayer(MainView m) {
         bass = (Bass) Native.loadLibrary("bass.dll", Bass.class);
-        bass.BASS_PluginLoad("res/bassflac.dll", 0);
-        bass.BASS_PluginLoad("res/bass_aac.dll", 0);
-        //bass.BASS_PluginLoad("res/bass_fx.dll", 0);
+
+        bassflacHandle = bass.BASS_PluginLoad("res/bassflac.dll", 0);
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+        bassaacHandle = bass.BASS_PluginLoad("res/bass_aac.dll", 0);
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
 
         bass.BASS_Init(-1, 44100, 0, null, null);
 
@@ -61,6 +73,19 @@ public class MusicPlayer {
         repeatState = RepeatState.REPEAT_OFF;
         queue = FXCollections.observableArrayList();
         queueIndex = 0;
+
+        //EQ
+        eqState = new SimpleBooleanProperty(false);
+        eqState.addListener((observable, oldValue, newValue) -> {
+            if(newValue)
+                initEQ();
+            else
+                clearEQ();
+        });
+        for (int i = 0; i < gain.length; i++) {
+            gain[i] = new SimpleFloatProperty(0.0f);
+            gain[i].addListener((observable, oldValue, newValue) -> updateEQ());
+        }
 
         queueListeners = new ArrayList<QueueListener>();
         playPauseListeners = new ArrayList<PlayPauseListener>();
@@ -83,19 +108,15 @@ public class MusicPlayer {
         p.setWideString(0, path);
 
         stream = bass.BASS_StreamCreateFile(false, p, 0, 0, Bass.BASS_UNICODE);
-        int error;
-        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println("ReplayError: " + error);
 
-        initEQ();
-
-        if (mainview.getLibrary().getCurrentView() == Library.VIEW_LYRICS)
-            mainview.getLibrary().refreshData();
-
-        if (muted) {
-            unmute();
-            mute();
-        } else
+        if (muted)
+            bass.BASS_ChannelSetAttribute(stream, Bass.BASS_ATTRIB_VOL, 0);
+        else
             setVolume(volume);
+
+        if (eqState.getValue())
+            initEQ();
 
         queueIndex = queue.indexOf(nowPlaying);
 
@@ -130,23 +151,20 @@ public class MusicPlayer {
         p.setWideString(0, path);
 
         stream = bass.BASS_StreamCreateFile(false, p, 0, 0, Bass.BASS_UNICODE);
-        int error;
         if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
 
-        initEQ();
-
-        if (mainview.getLibrary().getCurrentView() == Library.VIEW_LYRICS)
-            mainview.getLibrary().refreshData();
-
-        if (muted) {
-            unmute();
-            mute();
-        } else
+        if (muted)
+            bass.BASS_ChannelSetAttribute(stream, Bass.BASS_ATTRIB_VOL, 0);
+        else
             setVolume(volume);
+
 
         queueIndex = queue.indexOf(nowPlaying);
 
+        //Set start volume to 0
+        bass.BASS_ChannelSetAttribute(stream, Bass.BASS_ATTRIB_VOL, 0);
         play();
+
         fader = new Task<Void>() {
             @Override
             public Void call() {
@@ -173,74 +191,89 @@ public class MusicPlayer {
         t.start();
     }
 
+    //region Equalizer
     public void initEQ() {
-        int error;
-
         Bass.BASS_DX8_PARAMEQ eq = new Bass.BASS_DX8_PARAMEQ();
 
-        fxEQ[0] = bass.BASS_ChannelSetFX(stream, Bass.BASSFXType.BASS_FX_DX8_PARAMEQ, 0);
-        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println(error);
-        fxEQ[1] = bass.BASS_ChannelSetFX(stream, Bass.BASSFXType.BASS_FX_DX8_PARAMEQ, 0);
-        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println(error);
-        fxEQ[2] = bass.BASS_ChannelSetFX(stream, Bass.BASSFXType.BASS_FX_DX8_PARAMEQ, 0);
-        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println(error);
-        fxEQ[3] = bass.BASS_ChannelSetFX(stream, Bass.BASSFXType.BASS_FX_DX8_PARAMEQ, 0);
-        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println(error);
-        fxEQ[4] = bass.BASS_ChannelSetFX(stream, Bass.BASSFXType.BASS_FX_DX8_PARAMEQ, 0);
-        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println(error);
+        for (int i = 0; i < fxEQ.length; i++) {
+            fxEQ[i] = bass.BASS_ChannelSetFX(stream, Bass.BASSFXType.BASS_FX_DX8_PARAMEQ, 0);
+            if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK)
+                System.err.println("ERROR: " + error + " at 0." + i);
+        }
 
-        eq.fBandwidth = 18;
+        for (int i = 0; i < fxEQ.length; i++) {
+            eq.fBandwidth = 12;
+            eq.fCenter = freq[i];
+            eq.fGain = gain[i].getValue();
+            eq.write();
 
-        eq.fCenter = 80f;
-        eq.fGain = 0;
-        eq.write();
+            bass.BASS_FXSetParameters(fxEQ[i], eq.getPointer());
+            if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println("ERROR: " + error + " at 2." + i);
+        }
 
-        bass.BASS_FXSetParameters(fxEQ[0], eq.getPointer());
-        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+        eqState.setValue(true);
+    }
 
-        eq.fCenter = 240f;
-        eq.fGain = 0;
-        eq.write();
+    public void clearEQ() {
+        Bass.BASS_DX8_PARAMEQ eq = new Bass.BASS_DX8_PARAMEQ();
+        for (int i = 0; i < fxEQ.length; i++) {
+            eq.fBandwidth = 12;
+            eq.fCenter = freq[i];
+            eq.fGain = 0;
+            eq.write();
 
-        bass.BASS_FXSetParameters(fxEQ[1], eq.getPointer());
-        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+            bass.BASS_FXSetParameters(fxEQ[i], eq.getPointer());
+            if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println("ERROR: " + error + " at " + i);
 
-        eq.fCenter = 750f;
-        eq.fGain = 0;
-        eq.write();
+            bass.BASS_ChannelRemoveFX(fxEQ[i], Bass.BASSFXType.BASS_FX_DX8_PARAMEQ);
+        }
 
-        bass.BASS_FXSetParameters(fxEQ[2], eq.getPointer());
-        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+        eqState.setValue(false);
+    }
 
-        eq.fCenter = 2200f;
-        eq.fGain = 0;
-        eq.write();
+    public void updateEQ() {
+        Bass.BASS_DX8_PARAMEQ eq = new Bass.BASS_DX8_PARAMEQ();
 
-        bass.BASS_FXSetParameters(fxEQ[3], eq.getPointer());
-        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+        for (int i = 0; i < fxEQ.length; i++) {
+            if (bass.BASS_FXGetParameters(fxEQ[i], eq.getPointer()))
+            {
+                eq.read();
+                eq.fGain = gain[i].getValue();
+                eq.write();
 
-        eq.fCenter = 6600f;
-        eq.fGain = 0;
-        eq.write();
-
-        bass.BASS_FXSetParameters(fxEQ[4], eq.getPointer());
-        if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+                bass.BASS_FXSetParameters(fxEQ[i], eq.getPointer());
+                if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println("ERROR: " + error + " at " + i);
+            }
+        }
     }
 
     public void updateEQ(int band, float gain) {
-        int error;
-
         Bass.BASS_DX8_PARAMEQ eq = new Bass.BASS_DX8_PARAMEQ();
-        eq.autoWrite();
 
         if (bass.BASS_FXGetParameters(fxEQ[band], eq.getPointer()))
         {
+            eq.read();
+            this.gain[band].setValue(gain);
             eq.fGain = gain;
-            eq.writeField("fGain");
+            eq.write();
+
             bass.BASS_FXSetParameters(fxEQ[band], eq.getPointer());
-            if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.out.println(error);
+            if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println("ERROR: " + error + " at " + band);
         }
     }
+
+    public BooleanProperty isEQActive() {
+        return eqState;
+    }
+
+    public FloatProperty getEQBandGain(int band) {
+        return gain[band];
+    }
+
+    public float[] getEQFrequencies() {
+        return freq;
+    }
+    //endregion
 
     public void setRepeatState(RepeatState repeatState) {
         this.repeatState = repeatState;
@@ -248,8 +281,11 @@ public class MusicPlayer {
 
     public RepeatState getRepeatState() { return repeatState; }
 
+
+
     public void stop() {
         bass.BASS_ChannelStop(stream);
+        bass.BASS_StreamFree(stream);
         firePlayPauseListeners(false, null);
     }
 
@@ -279,7 +315,6 @@ public class MusicPlayer {
         fireQueueListeners(queue, queue.indexOf(next));
 
         play(next);
-
     }
 
     public void skipBackward() {
@@ -299,11 +334,12 @@ public class MusicPlayer {
 
     public void updateQueue(ObservableList<Song> q) {
         if (isShuffling()) {
-            int index = q.indexOf(nowPlaying);
-            List shuffle = FXCollections.observableArrayList(q.subList(index + 1, q.size()));
-            q.removeAll(shuffle);
-            Collections.shuffle(shuffle, new Random(System.nanoTime()));
-            q.addAll(shuffle);
+            queueBackup = FXCollections.observableArrayList(q);
+            q.remove(nowPlaying);
+            Collections.shuffle(q, new Random(System.nanoTime()));
+            q.add(0, nowPlaying);
+        } else {
+            queueBackup = null;
         }
         queueIndex = q.indexOf(nowPlaying);
         queue = q;
@@ -325,6 +361,7 @@ public class MusicPlayer {
 
     public void setShuffle(boolean shuffle) {
         this.shuffle = shuffle;
+        updateQueue(shuffle ? queue : queueBackup);
     }
 
     public boolean isShuffling() { return shuffle; }
@@ -337,10 +374,8 @@ public class MusicPlayer {
     }
 
     public void unmute() {
-        if (muted) {
-            muted = false;
-            setVolume(volume);
-        }
+        muted = false;
+        setVolume(volume);
     }
 
     public void fft() {
@@ -400,7 +435,14 @@ public class MusicPlayer {
     }
 
     public void kill() {
-        bass.BASS_Free();
+        bass.BASS_PluginFree(bassflacHandle);
+        bass.BASS_PluginFree(bassaacHandle);
+        //bass.BASS_PluginFree(bassHandle);
+
+        for (DeviceItem d : getDevices()) {
+            setOutputDevice(d.getDeviceInt());
+            bass.BASS_Free();
+        }
     }
 
     //Listeners
@@ -423,3 +465,4 @@ public class MusicPlayer {
             listener.statusChanged(playing, now);
     }
 }
+

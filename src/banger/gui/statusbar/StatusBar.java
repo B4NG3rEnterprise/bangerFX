@@ -165,35 +165,36 @@ public class StatusBar extends HBox {
 		songLength = new Label("--:--");
 
 		time = new Thread(() -> {
-			boolean called = false;
+			MusicPlayer player = mainview.getMusicPlayer();
 			while(true) {
-				if(!mainview.getMusicPlayer().isPlaying()) {
+				if(!player.isPlaying()) {
 					Thread.yield();
 				} else {
 					long now = System.currentTimeMillis();
 					while (System.currentTimeMillis() - now < 333) {
 						Thread.yield();
 					}
-					double pos = mainview.getMusicPlayer().getPosition();
+					double pos = player.getPosition();
 					Platform.runLater(() -> {
 						currentPos.setText(asMinutes(pos));
 						songPosition.setValue(pos);
 					});
 
-					if (pos >= mainview.getMusicPlayer().getLength() - Options.crossfade) {
+					if (pos >= player.getLength() - Options.crossfade) {
 						if (Options.crossfade <= 0) {
 							now = System.currentTimeMillis();
 							while (System.currentTimeMillis() - now < 1000) {
 								Thread.yield();
 							}
-							Platform.runLater(() -> mainview.getMusicPlayer().skipForward());
+							Platform.runLater(() -> player.skipForward());
 						} else {
-							Platform.runLater(() -> mainview.getMusicPlayer().crossfade());
+							Platform.runLater(() -> player.crossfade());
 						}
 					}
 				}
 			}
 		});
+		time.setDaemon(true);
 		time.start();
 
 		getChildren().addAll(prev, play, next, mute, volume, currentPos, progress, songLength, shuffle, repeat);
@@ -271,7 +272,6 @@ public class StatusBar extends HBox {
 			mainview.getMusicPlayer().setShuffle(false);
 			shuffle.setEffect(null);
 		}
-		mainview.getLibrary().updateQueue();
 	}
 
 	private void handleRepeatButton(MouseEvent event) {
