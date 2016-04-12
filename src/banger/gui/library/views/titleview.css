@@ -1,4 +1,5 @@
-.scrollpane {
+.scrollpane, .scrollpane:focused {
+    -fx-background-insets: 0;
     -fx-padding: 5 0 5 5;
     -fx-hbar-policy: never;
     -fx-vbar-policy: as-needed;
@@ -8,16 +9,13 @@
     -fx-background-color: transparent;
 }
 
-.scrollpane .scroll-bar:vertical .corner {
-    -fx-background-color: red;
-}
-
 .scrollpane .scroll-bar:vertical .decrement-button, .scrollpane .scroll-bar:vertical .decrement-button > *,
 .scrollpane .scroll-bar:vertical .increment-button, .scrollpane .scroll-bar:vertical .increment-button > * {
     -fx-background-color: transparent;
     -fx-min-height: 0;
     -fx-pref-height: 0;
     -fx-max-height: 0;
+    -fx-padding: 0;
 }
 
 .scrollpane .scroll-bar .thumb {
@@ -41,5 +39,29 @@
     -fx-pref-height: 0;
     -fx-max-height: 0;
     visibility: hidden;
+}
+
+.song_table, .song_table:focused{
+   -fx-background-color: transparent;
+}
+
+.song_table .table-row-cell:selected, .table-cell:selected, .table-row-cell:focused {
+    -fx-background-color: #FA7D38;
+}
+
+.song_table .table-row-cell:filled:selected, .table-cell:selected, .table-row-cell:focused {
+    -fx-background: -fx-control-inner-background;
+    -fx-background-color: #FA7D38;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-table-cell-border-color: #FA7D38;
+}
+
+.song_table .table-row-cell:odd{
+    -fx-background-color: -fx-table-cell-border-color, -fx-control-inner-background;
+    -fx-background-insets: 0, 0 0 1 0;
+}
+
+.song_table.table-row-cell:odd:filled:selected {
+    -fx-background-color: #FA7D38;
 }
 

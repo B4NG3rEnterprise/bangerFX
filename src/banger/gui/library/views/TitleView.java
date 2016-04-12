@@ -104,14 +104,20 @@ public class TitleView extends ScrollPane implements View {
                                     return new ReadOnlyObjectWrapper(table.getItems().indexOf(p.getValue()) + 1);
                                 }
                             });
-                            TableColumn song_name = new TableColumn("Name");
-                            song_name.setCellValueFactory(new PropertyValueFactory<Song, String>("name"));
-                            TableColumn length = new TableColumn("Length");
-                            length.setCellValueFactory(new PropertyValueFactory<Song, Integer>("length"));
+                            TableColumn songNameCol = new TableColumn("Name");
+                            songNameCol.setCellValueFactory(new PropertyValueFactory<Song, String>("name"));
+
+                            TableColumn lengthCol = new TableColumn("Length");
+                            lengthCol.setCellValueFactory(new PropertyValueFactory<Song, Integer>("length"));
 
                             table.prefHeightProperty().bind(table.fixedCellSizeProperty().multiply(Bindings.size(table.getItems())).add(1.01));
 
-                            table.getColumns().addAll(numberCol, song_name, length);
+                            numberCol.prefWidthProperty().bind(table.widthProperty().multiply(0.15));
+                            songNameCol.prefWidthProperty().bind(table.widthProperty().multiply(0.7));
+                            lengthCol.prefWidthProperty().bind(table.widthProperty().multiply(0.15));
+                            table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+                            table.getColumns().addAll(numberCol, songNameCol, lengthCol);
 
                             table.setOnMousePressed(event -> {
                                 if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
