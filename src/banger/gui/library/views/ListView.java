@@ -55,7 +55,7 @@ public class ListView extends TableView<Song> implements View {
                     @Override
                     protected void updateItem(Integer item, boolean emtpy) {
                         if (item != null) {
-                            setText(item/60+":"+item%60);
+                            setText(item/60+":"+((item%60)<10 ? 0:"") + item%60);
                         }
                     }
                 };
