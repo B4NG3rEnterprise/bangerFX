@@ -10,6 +10,7 @@ import banger.util.Rating;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -106,14 +107,24 @@ public class TitleView extends ScrollPane implements View {
                             songNameCol.setCellValueFactory(new PropertyValueFactory<Song, String>("name"));
 
                             TableColumn ratingCol = new TableColumn("Rating");
-                            ratingCol.setCellValueFactory(new PropertyValueFactory<Song, Integer>("rating"));
-                            ratingCol.setCellFactory(new Callback<TableColumn<Song, Integer>, TableCell<Song, Integer>>() {
-                                public TableCell<Song, Integer> call(TableColumn<Song, Integer> param) {
-                                    return new TableCell<Song, Integer>() {
-                                      public void updateItem(Integer item, boolean empty) {
+                            ratingCol.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Song, String>, ObservableValue<String>>() {
+                                @Override
+                                public ObservableValue<String> call (TableColumn.CellDataFeatures<Song, String> p) {
+                                    return new SimpleStringProperty(p.getValue().getRating()+"\n"+p.getValue().getName()+"\n"+p.getValue().getArtist()+"\n"+p.getValue().getAlbum()+ "\n"+ p.getValue().getId());
+                                }
+                            });
+                            ratingCol.setCellFactory(new Callback<TableColumn<Song, String>, TableCell<Song, String>>() {
+                                public TableCell<Song, String> call(TableColumn<Song, String> param) {
+                                    return new TableCell<Song, String>() {
+                                      public void updateItem(String item, boolean empty) {
                                           if (item != null) {
-                                              Rating r = new Rating(mainview, item);
-                                              setGraphic(r);
+                                              String[] temp = item.split("\n");
+                                              try {
+                                                  setGraphic(new Rating(mainview, Integer.parseInt(temp[0]), Integer.parseInt(temp[4])));
+                                              } catch (Exception e) {
+                                                  e.printStackTrace();
+                                                  System.out.println("wrong String");
+                                              }
                                           }
                                       }
                                     };
@@ -122,6 +133,7 @@ public class TitleView extends ScrollPane implements View {
 
                             TableColumn lengthCol = new TableColumn("Length");
                             lengthCol.setCellValueFactory(new PropertyValueFactory<Song, Integer>("length"));
+
 
                             table.prefHeightProperty().bind(table.fixedCellSizeProperty().multiply(Bindings.size(table.getItems())).add(1.01));
 

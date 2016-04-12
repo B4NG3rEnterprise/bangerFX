@@ -33,6 +33,7 @@ public class Song {
 
     public void rate(int rating){
         DBController.rate(this.id, rating);
+        System.out.println("rated");
         this.rating = rating;
     }
 
@@ -83,7 +84,6 @@ public class Song {
         try {
             img = SwingFXUtils.toFXImage((BufferedImage) f.getTag().getFirstArtwork().getImage(), null);
         } catch (Exception e) {
-            System.out.println("Failed to catch artwork from songfile.");
         }
         return img;
     }

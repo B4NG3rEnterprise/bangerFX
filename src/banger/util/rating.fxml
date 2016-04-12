@@ -25,7 +25,7 @@
          </image></RatingStar>
       <RatingStar fx:id="five" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#clickedView" onMouseEntered="#enteredView" onMouseExited="#exitedView" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="file:/C:/Users/Nick/IdeaProjects/bangerFX/res/png/star_empty.png" />
+            <Image url="file:/C:/Users/Nick/IdeaProjects/bangerFX/res/png/star_filled.png" />
          </image></RatingStar>
        <RatingStar fx:id="empty" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#clickedEmpty" onMouseEntered="#enteredEmpty" onMouseExited="#exitedEmpty" pickOnBounds="true" preserveRatio="true">
            </RatingStar>

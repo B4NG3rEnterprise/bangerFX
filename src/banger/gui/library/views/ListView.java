@@ -3,7 +3,11 @@ package banger.gui.library.views;
 import banger.audio.data.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
+import banger.gui.options.KeyBinding;
 import banger.util.PlaylistManager;
+import banger.util.Rating;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -12,6 +16,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.StageStyle;
+import javafx.util.Callback;
 
 import java.util.Optional;
 
@@ -43,9 +48,53 @@ public class ListView extends TableView<Song> implements View {
         TableColumn length = new TableColumn("Length");
         length.setCellValueFactory(
                 new PropertyValueFactory<Song, Integer>("length"));
+        length.setCellFactory(new Callback<TableColumn<Song,Integer>,TableCell<Song,Integer>>() {
+            @Override
+            public TableCell<Song, Integer> call(TableColumn<Song, Integer> param) {
+                TableCell<Song,Integer> tempCell = new TableCell<Song,Integer> () {
+                    @Override
+                    protected void updateItem(Integer item, boolean emtpy) {
+                        if (item != null) {
+                            setText(item/60+":"+item%60);
+                        }
+                    }
+                };
+                return tempCell;
+            }
+        });
+
+        TableColumn rating = new TableColumn("Rating");
+        rating.setCellValueFactory(new PropertyValueFactory<Song, Integer>("rating"));
+        rating.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<Song, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call (TableColumn.CellDataFeatures<Song, String> p) {
+                return new SimpleStringProperty(p.getValue().getRating()+"\n"+p.getValue().getName()+"\n"+p.getValue().getArtist()+"\n"+p.getValue().getAlbum()+ "\n"+ p.getValue().getId());
+            }
+        });
+        rating.setCellFactory(new Callback<TableColumn<Song, String>, TableCell<Song, String>>() {
+            @Override
+            public TableCell<Song, String> call(TableColumn<Song, String> param) {
+                TableCell<Song, String> tempCell = new TableCell<Song, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        if (item != null) {
+                            String[] temp = item.split("\n");
+                            try {
+                                setGraphic(new Rating(mainview, Integer.parseInt(temp[0]), Integer.parseInt(temp[4])));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                System.out.println("wrong String");
+                            }
+                        }
+                    }
+                };
+                return tempCell;
+            }
+        });
+
 
         setItems(songs);
-        getColumns().addAll(song_name, artist_name, album_name, genre, length);
+        getColumns().addAll(song_name, artist_name, album_name, genre, length, rating);
 
         setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
@@ -67,12 +116,13 @@ public class ListView extends TableView<Song> implements View {
 
         addEventHandler(MouseEvent.MOUSE_CLICKED,
                 new EventHandler<MouseEvent>() {
-                    @Override public void handle(MouseEvent e) {
+                    @Override
+                    public void handle(MouseEvent e) {
                         if (e.getButton() == MouseButton.SECONDARY)
                             cm.show(mainview.stage, e.getScreenX(), e.getScreenY());
-                            playlistMenu = initPlaylistMenu();
-                            cm.getItems().remove(1); // remove menu
-                            cm.getItems().add(1, playlistMenu); // add menu again
+                        playlistMenu = initPlaylistMenu();
+                        cm.getItems().remove(1); // remove menu
+                        cm.getItems().add(1, playlistMenu); // add menu again
                     }
                 });
     }
@@ -92,7 +142,7 @@ public class ListView extends TableView<Song> implements View {
         updateBounds();
     }
 
-    public Song[] getSelectedItems(){
+    public Song[] getSelectedItems() {
         ObservableList<Song> songs = getSelectionModel().getSelectedItems();
         Song[] result = new Song[songs.size()];
         for (int i = 0; i < songs.size(); i++)
@@ -101,7 +151,7 @@ public class ListView extends TableView<Song> implements View {
         return result;
     }
 
-    public Menu initPlaylistMenu(){
+    public Menu initPlaylistMenu() {
         playlistMenu = new Menu("Hinzufügen zu...");
 
         // just examples, loop through playlists and add them to the menu
