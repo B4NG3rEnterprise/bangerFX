@@ -82,7 +82,7 @@ public class Options extends VBox {
             e.printStackTrace();
         }
         wini.put("Options", "AudioDevice", -1/*mv.getMusicPlayer().getDevices().get(0).toString()*/);
-        wini.put("Options", "BackgroundColor", "0xffb366ff");
+        wini.put("Options", "BackgroundColor", ".FA7D38");
         wini.put("Options", "Crossfade", 0);
         wini.put("Options", "Notifications", true);
         wini.put("Options", "FilePath", "null");
