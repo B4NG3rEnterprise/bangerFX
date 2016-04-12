@@ -3,6 +3,7 @@ package banger.audio;
 import banger.audio.data.Song;
 import banger.audio.listeners.PlayPauseListener;
 import banger.audio.listeners.QueueListener;
+import banger.database.DBController;
 import banger.gui.MainView;
 import banger.gui.options.Options;
 import banger.util.DeviceItem;
@@ -71,7 +72,7 @@ public class MusicPlayer {
         muted = false;
         shuffle = false;
         repeatState = RepeatState.REPEAT_OFF;
-        queue = FXCollections.observableArrayList();
+        queue = DBController.getAllSongs();
         queueIndex = 0;
 
         //EQ
@@ -94,8 +95,12 @@ public class MusicPlayer {
     }
 
     public void play() {
-        bass.BASS_ChannelPlay(stream, false);
-        firePlayPauseListeners(true, nowPlaying);
+        if (stream != 0 && nowPlaying != null) {
+            bass.BASS_ChannelPlay(stream, false);
+            firePlayPauseListeners(true, nowPlaying);
+        } else {
+            play(queue.get(0));
+        }
     }
 
     public void play(Song s) {
@@ -119,6 +124,7 @@ public class MusicPlayer {
             initEQ();
 
         queueIndex = queue.indexOf(nowPlaying);
+        fireQueueListeners(queue, queueIndex);
 
         play();
     }
@@ -286,8 +292,6 @@ public class MusicPlayer {
     }
 
     public RepeatState getRepeatState() { return repeatState; }
-
-
 
     public void stop() {
         bass.BASS_ChannelStop(stream);
