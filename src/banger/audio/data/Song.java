@@ -1,6 +1,7 @@
 package banger.audio.data;
 
 
+import banger.database.DBController;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import org.jaudiotagger.audio.AudioFile;
@@ -30,6 +31,11 @@ public class Song {
         this.length = length;
     }
 
+    public void rate(int rating){
+        DBController.rate(this.id, rating);
+        this.rating = rating;
+    }
+
     public String toString(){
         return id + ": " + name + " - " + artist;
     }
@@ -38,61 +44,31 @@ public class Song {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getArtist() {
         return artist;
     }
 
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
     public String getAlbum() {
         return album;
-    }
-
-    public void setAlbum(String album) {
-        this.album = album;
     }
 
     public String getGenre() {
         return genre;
     }
 
-    public void setGenre(String genre) {
-        this.genre = genre;
-    }
-
     public int getRating() {
         return rating;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
     }
 
     public String getFileLocation() {
         return fileLocation;
     }
 
-    public void setFileLocation(String fileLocation) {
-        this.fileLocation = fileLocation;
-    }
-
     public int getLength() { return length; }
-
-    public void setLength(int length) { this.length = length; }
 
     public Image getCover() {
         AudioFile f = null;

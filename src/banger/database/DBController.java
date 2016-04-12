@@ -743,6 +743,19 @@ public class DBController {
         return counter;
     }
 
+    public static void rate(int id, int rating){
+        try {
+            initDBConnection();
+            Statement stmt = connection.createStatement();
+
+            stmt.execute("UPDATE song SET rating = " + rating + " WHERE id = " + id);
+
+            connection.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     private static void deleteFiles(Song[] songs){
         for(int i = 0; i < songs.length; i++){
             File f = new File(songs[i].getFileLocation());

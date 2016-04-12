@@ -30,7 +30,7 @@ public class BangerBar extends MenuBar {
 
     public void init() {
         getStylesheets().add("banger/gui/menubar/bangerbar.css");
-        MenuItem changeDir = new MenuItem("Choose Directory...");
+        MenuItem changeDir = new MenuItem("Verzeichnis wählen...");
         changeDir.setOnAction(e -> {
             DirectoryChooser dc = new DirectoryChooser();
             // dc.setInitialDirectory(new File("F:/Musik"));
@@ -142,8 +142,8 @@ public class BangerBar extends MenuBar {
             Options.notifications = !Options.notifications;
         });
         view.getItems().add(notifications);
-        view.getItems().add(new MenuItem("Hintergrundfarbe"));
-        view.getItems().add(new MenuItem("Fonts"));
+        // view.getItems().add(new MenuItem("Hintergrundfarbe"));
+        // view.getItems().add(new MenuItem("Fonts"));
 
         help = new Menu("Hilfe");
         help.getItems().add(new MenuItem("Hilfe..."));
