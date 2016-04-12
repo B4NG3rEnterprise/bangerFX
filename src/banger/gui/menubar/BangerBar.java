@@ -33,10 +33,11 @@ public class BangerBar extends MenuBar {
         MenuItem changeDir = new MenuItem("Verzeichnis wählen...");
         changeDir.setOnAction(e -> {
             DirectoryChooser dc = new DirectoryChooser();
-            // dc.setInitialDirectory(new File("F:/Musik"));
             File directory = dc.showDialog(mainview.stage);
             DBController.createFromDirectory(directory.toString());
             mainview.getLibrary().refreshData();
+            Options.setDirectory(directory.getPath());
+            mainview.getFilebrowser().setPath(directory.toString());
         });
 
         file = new Menu("Datei");
@@ -148,7 +149,6 @@ public class BangerBar extends MenuBar {
         help = new Menu("Hilfe");
         help.getItems().add(new MenuItem("Hilfe..."));
         help.getItems().add(new MenuItem("Über"));
-        help.getItems().add(new MenuItem("Get Premium"));
 
         getMenus().addAll(file, edit, view, help);
     }

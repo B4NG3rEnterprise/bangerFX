@@ -106,7 +106,7 @@ public class ListView extends TableView<Song> implements View {
         });
 
         cm = new ContextMenu();
-        MenuItem delete = new MenuItem("Delete");
+        MenuItem delete = new MenuItem("Löschen...");
         delete.setOnAction(event -> {
             DBController.deleteSongs(getSelectedItems());
             refreshData();

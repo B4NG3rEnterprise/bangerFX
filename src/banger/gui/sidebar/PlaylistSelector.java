@@ -40,7 +40,7 @@ public class PlaylistSelector extends ListView<String> {
         });
 
         ContextMenu cm = new ContextMenu();
-        MenuItem delete = new MenuItem("Delete");
+        MenuItem delete = new MenuItem("Löschen...");
         delete.setOnAction(event -> {
             String selected = getSelectionModel().getSelectedItem();
             PlaylistManager.deletePlaylist(selected);

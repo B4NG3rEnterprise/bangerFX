@@ -75,6 +75,7 @@ public class FileBrowser extends TreeView<TreeFile> {
 
     public void setPath(String path){
         this.path = path;
+        findFiles(new File(path), null);
     }
 
     private void findFiles(File dir, TreeItem<TreeFile> parent) {
