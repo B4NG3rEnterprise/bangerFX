@@ -232,33 +232,37 @@ public class MusicPlayer {
     }
 
     public void updateEQ() {
-        Bass.BASS_DX8_PARAMEQ eq = new Bass.BASS_DX8_PARAMEQ();
+        if(eqState.getValue()) {
+            Bass.BASS_DX8_PARAMEQ eq = new Bass.BASS_DX8_PARAMEQ();
 
-        for (int i = 0; i < fxEQ.length; i++) {
-            if (bass.BASS_FXGetParameters(fxEQ[i], eq.getPointer()))
-            {
-                eq.read();
-                eq.fGain = gain[i].getValue();
-                eq.write();
+            for (int i = 0; i < fxEQ.length; i++) {
+                if (bass.BASS_FXGetParameters(fxEQ[i], eq.getPointer())) {
+                    eq.read();
+                    eq.fGain = gain[i].getValue();
+                    eq.write();
 
-                bass.BASS_FXSetParameters(fxEQ[i], eq.getPointer());
-                if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println("ERROR: " + error + " at " + i);
+                    bass.BASS_FXSetParameters(fxEQ[i], eq.getPointer());
+                    if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK)
+                        System.err.println("ERROR: " + error + " at " + i);
+                }
             }
         }
     }
 
     public void updateEQ(int band, float gain) {
-        Bass.BASS_DX8_PARAMEQ eq = new Bass.BASS_DX8_PARAMEQ();
+        if (eqState.getValue()) {
+            Bass.BASS_DX8_PARAMEQ eq = new Bass.BASS_DX8_PARAMEQ();
 
-        if (bass.BASS_FXGetParameters(fxEQ[band], eq.getPointer()))
-        {
-            eq.read();
-            this.gain[band].setValue(gain);
-            eq.fGain = gain;
-            eq.write();
+            if (bass.BASS_FXGetParameters(fxEQ[band], eq.getPointer())) {
+                eq.read();
+                this.gain[band].setValue(gain);
+                eq.fGain = gain;
+                eq.write();
 
-            bass.BASS_FXSetParameters(fxEQ[band], eq.getPointer());
-            if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK) System.err.println("ERROR: " + error + " at " + band);
+                bass.BASS_FXSetParameters(fxEQ[band], eq.getPointer());
+                if ((error = bass.BASS_ErrorGetCode()) != Bass.BASS_OK)
+                    System.err.println("ERROR: " + error + " at " + band);
+            }
         }
     }
 
@@ -454,7 +458,7 @@ public class MusicPlayer {
         playPauseListeners.add(l);
     }
 
-    
+
     private void fireQueueListeners(ObservableList<Song> q, int queueIndex) {
         for(QueueListener listener : queueListeners)
             listener.queueUpdated(q, queueIndex);
@@ -465,4 +469,3 @@ public class MusicPlayer {
             listener.statusChanged(playing, now);
     }
 }
-

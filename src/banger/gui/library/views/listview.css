@@ -10,8 +10,8 @@
 .table-row-cell:filled:selected, .table-cell:selected, .table-row-cell:focused {
     -fx-background: -fx-control-inner-background ;
     -fx-background-color: #FA7D38;
-    -fx-background-insets: 0, 0 0 1 0 ;
-    -fx-table-cell-border-color: #FA7D38;;
+    -fx-background-insets: 0, 0 0 1 0;
+    -fx-table-cell-border-color: #FA7D38;
 }
 
 .table-row-cell:odd{

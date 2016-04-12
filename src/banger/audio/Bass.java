@@ -121,7 +121,7 @@ public interface Bass extends Library {
         public int freq;
 
         protected List getFieldOrder() {
-            return Arrays.asList(new String[] {"flags", "hwsize", "hwfree", "freesam", "free3d", "minrate", "maxrate", "eax", "minbuf", "dsver", "latency", "initflags", "speakers", "freq"});
+            return Arrays.asList(new String[] {"flags", "hwsize", "hwfree", "freesam", "free3d", "minrate", "maxrate", "eax", "minbuf", "dsver", "latency", "initflags", "speakers", "freqEQ"});
         }
     }
     //endregion
@@ -348,7 +348,7 @@ public interface Bass extends Library {
         public String filename;
 
         protected List getFieldOrder() {
-            return Arrays.asList(new String[] {"freq", "chans", "flags", "ctype", "origres", "plugin", "sample", "filename"});
+            return Arrays.asList(new String[] {"freqEQ", "chans", "flags", "ctype", "origres", "plugin", "sample", "filename"});
         }
     }
     class TAG_APE_BINARY extends Structure {

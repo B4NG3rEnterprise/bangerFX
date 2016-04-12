@@ -3,8 +3,8 @@ package banger.gui.library.views;
 import banger.audio.data.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
-import javafx.collections.FXCollections;
 import banger.util.PlaylistManager;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
@@ -24,7 +24,6 @@ public class ListView extends TableView<Song> implements View {
 
     public ListView(MainView m) {
         mainview = m;
-        songs = DBController.getAllSongs();
 
         getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         getStylesheets().add("banger/gui/library/views/listview.css");

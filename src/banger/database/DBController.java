@@ -375,8 +375,7 @@ public class DBController {
         try{
             initDBConnection();
 
-            List<Song> list = new ArrayList<>();
-            ObservableList<Song> result = FXCollections.observableList(list);
+            ObservableList<Song> result = FXCollections.observableArrayList();
 
             // Statement stmt = connection.createStatement();
             ResultSet rs;
