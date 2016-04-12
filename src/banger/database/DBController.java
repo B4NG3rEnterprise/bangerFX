@@ -378,14 +378,15 @@ public class DBController {
             List<Song> list = new ArrayList<>();
             ObservableList<Song> result = FXCollections.observableList(list);
 
-            Statement stmt = connection.createStatement();
+            // Statement stmt = connection.createStatement();
             ResultSet rs;
 
-            rs = stmt.executeQuery("SELECT *, album.album_name, artist.artist_name " +
+            PreparedStatement ps = connection.prepareStatement("SELECT *, album.album_name, artist.artist_name " +
                     "FROM song " +
                     "INNER JOIN album ON (song.album = album.id) " +
                     "INNER JOIN artist ON (song.artist = artist.id) " +
                     "ORDER BY artist_name");
+            rs = ps.executeQuery();
 
             int total = 0;
             while (rs.next()) {

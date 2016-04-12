@@ -81,6 +81,7 @@ public class BangerBar extends MenuBar {
             PlaylistManager.exportPlaylists(directory.toString());
         });
         file.getItems().add(exp);
+        file.getItems().add(changeDir);
         MenuItem close = new MenuItem("Schließen");
         close.setOnAction(event -> {
             mainview.getMusicPlayer().kill();
@@ -148,8 +149,6 @@ public class BangerBar extends MenuBar {
         help.getItems().add(new MenuItem("Hilfe..."));
         help.getItems().add(new MenuItem("Über"));
         help.getItems().add(new MenuItem("Get Premium"));
-
-        file.getItems().add(changeDir);
 
         getMenus().addAll(file, edit, view, help);
     }
