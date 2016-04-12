@@ -107,7 +107,7 @@ public class DBController {
                     " artist bigint(20) NOT NULL DEFAULT 1," +
                     " album bigint(20) NOT NULL DEFAULT 1," +
                     " genre varchar(32) DEFAULT NULL," +
-                    " rating tinyint(4) DEFAULT NULL," +
+                    " rating tinyint(4) DEFAULT 0," +
                     " fileLocation varchar(32) DEFAULT NULL," +
                     " length int(11) DEFAULT NULL," +
                     " FOREIGN KEY (artist) REFERENCES artist (id)," +
@@ -508,14 +508,14 @@ public class DBController {
 
             ObservableList<Song> songs = FXCollections.observableArrayList();
 
-            Statement s = connection.createStatement();
+            PreparedStatement ps = connection.prepareStatement("select * from song " +
+                    "inner join album on song.album = album.id " +
+                    "inner join artist on song.artist = artist.id " +
+                    "where album.id = " + album.getId() + " " +
+                    "order by artist_name");
             ResultSet rs;
 
-            rs = s.executeQuery("select * from song " +
-                                "inner join album on song.album = album.id " +
-                                "inner join artist on song.artist = artist.id " +
-                                "where album.id = " + album.getId() + " " +
-                                "order by artist_name");
+            rs = ps.executeQuery();
 
             while(rs.next()) {
                 songs.add(new Song(
@@ -754,6 +754,31 @@ public class DBController {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static Song getSongByID(int id){
+        Song s = null;
+        try {
+            initDBConnection();
+            PreparedStatement ps = connection.prepareStatement("select * from song " +
+                            "inner join album on song.album = album.id " +
+                            "inner join artist on song.artist = artist.id " +
+                            "where song.id = " + id);
+            ResultSet rs = ps.executeQuery();
+            int song_id = rs.getInt("id");
+            String name = rs.getString("song_name");
+            String artist = rs.getString("artist_name");
+            String album = rs.getString("album_name");
+            String genre = rs.getString("genre");
+            byte rating = rs.getByte("rating");
+            String fileLocation = rs.getString("fileLocation");
+            int length = rs.getInt("length");
+
+            s = new Song(song_id, name, artist, album, genre, rating, fileLocation, length);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return s;
     }
 
     private static void deleteFiles(Song[] songs){

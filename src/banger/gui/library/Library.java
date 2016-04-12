@@ -39,8 +39,8 @@ public class Library extends StackPane {
 
         titleView = new TitleView(mainview);
         listView = new ListView(mainview);
-        lyricsView = new LyricsView(mainview);
-        albumView = new AlbumView();
+        // lyricsView = new LyricsView(mainview);
+        // albumView = new AlbumView(mainview);
 
         currentView = listView;
 
@@ -85,12 +85,14 @@ public class Library extends StackPane {
         if (currentViewNumber != view) {
             this.getChildren().remove(currentView);
             if (view == this.VIEW_ALBUM) {
-//                currentView = albumView ;
+                albumView = new AlbumView(mainview);
+                currentView = albumView ;
             } else if (view == this.VIEW_LIST) {
                 currentView = listView;
             } else if (view == this.VIEW_TITLE) {
                 currentView = titleView;
             } else if (view == this.VIEW_LYRICS) {
+                lyricsView = new LyricsView(mainview);
                 currentView =  lyricsView;
                 lyricsView.initLyrics();
             }

@@ -1,14 +1,48 @@
 package banger.gui.library.views;
 
+import banger.audio.data.Album;
+import banger.audio.data.Artist;
 import banger.audio.data.Song;
+import banger.database.DBController;
+import banger.gui.MainView;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.TilePane;
 
-/**
- * Created by Nick on 01.04.2016.
- */
-public class AlbumView implements View {
 
-    public AlbumView() {
+public class AlbumView extends TilePane implements View {
 
+    private MainView mainview;
+    private ObservableList<Album> albums;
+
+    public AlbumView(MainView m) {
+        mainview = m;
+        albums = DBController.getAllAlbums();
+
+
+        for (Album a : albums){
+            ObservableList<Song> songs = a.getSongs();
+            if(songs.size() > 0) {
+                ImageView cover = new ImageView(a.getCover());
+                cover.setFitWidth(200);
+                cover.setPreserveRatio(true);
+                cover.setSmooth(true);
+                cover.setCache(true);
+                cover.setOnMousePressed(event -> {
+                    if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
+                        mainview.getMusicPlayer().play(songs.get(0));
+
+                        //update queue in musicplayer
+                        mainview.getMusicPlayer().updateQueue(songs);
+                    }
+                });
+                getChildren().add(cover);
+            } else
+                continue;
+        }
+
+        setPadding(new Insets(15, 15, 15, 15));
     }
 
     public void refreshData() {
@@ -19,12 +53,10 @@ public class AlbumView implements View {
 
     }
 
-    @Override
     public Song getSelectedItem() {
         return null;
     }
 
-    @Override
     public Song[] getSelectedItems() {
         return new Song[0];
     }
