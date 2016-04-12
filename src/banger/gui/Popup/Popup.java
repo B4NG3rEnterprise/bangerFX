@@ -5,6 +5,7 @@ import banger.util.Utility;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.paint.Color;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -13,13 +14,13 @@ public class Popup extends javafx.stage.Popup {
 
     public Popup(Stage owner, TextFlow message) {
         super();
-        String color = Options.backgroundColor;
+        Color color = Color.valueOf(Options.backgroundColor);
         TextFlow label = message;
         if (Utility.isDark(color)) label.getStylesheets().add("banger/gui/popup/darkpopup.css");
         else label.getStylesheets().add("banger/gui/popup/popup.css");
 
         label.getStyleClass().add("popup");
-        label.setStyle("-fx-background-color: " + color);
+        label.setStyle("-fx-background-color: rgb(" + color.getRed()*255 + "," + color.getGreen()*255 + "," + color.getBlue()*255 + ");");
         label.setMinWidth(200);
         getContent().add(label);
 
