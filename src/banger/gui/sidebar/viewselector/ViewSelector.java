@@ -3,6 +3,7 @@ package banger.gui.sidebar.viewselector;
 import banger.gui.MainView;
 import banger.gui.library.Library;
 import banger.gui.options.Options;
+import banger.util.Utility;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -12,6 +13,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 public class ViewSelector extends VBox {
 
@@ -82,6 +84,11 @@ public class ViewSelector extends VBox {
         album.setBackground(null);
         lyrics.setBackground(null);
         current.setBackground(new Background(new BackgroundFill(Color.valueOf(Options.backgroundColor), CornerRadii.EMPTY, Insets.EMPTY)));
+        if (Utility.isDark(Color.valueOf(Options.backgroundColor))){
+            current.setTextFill(Paint.valueOf(Color.WHITE.toString()));
+        } else {
+            current.setTextFill(Paint.valueOf(Color.BLACK.toString()));
+        }
     }
 
     public void resizeContainer() {

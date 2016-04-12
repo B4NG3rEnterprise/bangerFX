@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.Image?>
+
+<?import javafx.scene.layout.HBox?>
+
+<?import banger.util.RatingStar?>
+<fx:root maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="20.0" prefWidth="100.0" type="HBox" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <RatingStar fx:id="one" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#clickedView" onMouseEntered="#enteredView" onMouseExited="#exitedView" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="file:/C:/Users/Nick/IdeaProjects/bangerFX/res/png/star_empty.png" />
+         </image></RatingStar>
+      <RatingStar fx:id="two" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#clickedView" onMouseEntered="#enteredView" onMouseExited="#exitedView" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="file:/C:/Users/Nick/IdeaProjects/bangerFX/res/png/star_empty.png" />
+         </image></RatingStar>
+      <RatingStar fx:id="three" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#clickedView" onMouseEntered="#enteredView" onMouseExited="#exitedView" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="file:/C:/Users/Nick/IdeaProjects/bangerFX/res/png/star_empty.png" />
+         </image></RatingStar>
+      <RatingStar fx:id="four" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#clickedView" onMouseEntered="#enteredView" onMouseExited="#exitedView" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="file:/C:/Users/Nick/IdeaProjects/bangerFX/res/png/star_empty.png" />
+         </image></RatingStar>
+      <RatingStar fx:id="five" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#clickedView" onMouseEntered="#enteredView" onMouseExited="#exitedView" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="file:/C:/Users/Nick/IdeaProjects/bangerFX/res/png/star_empty.png" />
+         </image></RatingStar>
+       <RatingStar fx:id="empty" fitHeight="20.0" fitWidth="20.0" onMouseClicked="#clickedEmpty" onMouseEntered="#enteredEmpty" onMouseExited="#exitedEmpty" pickOnBounds="true" preserveRatio="true">
+           </RatingStar>
+   </children>
+</fx:root>
