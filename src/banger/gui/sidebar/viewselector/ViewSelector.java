@@ -40,6 +40,7 @@ public class ViewSelector extends VBox {
             e.printStackTrace();
         }
         current = list;
+        updateColor();
     }
 
 

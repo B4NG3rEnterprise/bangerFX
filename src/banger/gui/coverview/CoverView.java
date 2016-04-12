@@ -29,7 +29,7 @@ public class CoverView extends HBox {
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("coverView.fxml"));
         loader.setRoot(this);
-        loader.setController(this);
+        loader.setController(this);;
 
         try {
             loader.load();

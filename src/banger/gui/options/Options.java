@@ -1,6 +1,7 @@
 package banger.gui.options;
 
 import banger.gui.MainView;
+import banger.util.Device;
 import banger.util.DeviceItem;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -80,7 +81,7 @@ public class Options extends VBox {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        wini.put("Options", "AudioDevice", -1);
+        wini.put("Options", "AudioDevice", -1/*mv.getMusicPlayer().getDevices().get(0).toString()*/);
         wini.put("Options", "BackgroundColor", "0xffb366ff");
         wini.put("Options", "Crossfade", 0);
         wini.put("Options", "Notifications", true);

@@ -2,6 +2,7 @@ package banger.gui.options;
 
 import banger.util.Utility;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
@@ -15,7 +16,7 @@ public class KeySelectionPopup extends Pane {
         super();
         String color = Options.backgroundColor;
         TextFlow label = new TextFlow(new Text("Dr"+"\u00FC"+"cken sie die gew"+"\u00FC"+"nschte Tastenkombination.\nESC zum Abbrechen"));
-        if (Utility.isDark(color)) label.getStylesheets().add("banger/gui/popup/darkpopup.css");
+        if (Utility.isDark(Color.valueOf(color))) label.getStylesheets().add("banger/gui/popup/darkpopup.css");
         else label.getStylesheets().add("banger/gui/popup/popup.css");
 
         label.setTextAlignment(TextAlignment.CENTER);
