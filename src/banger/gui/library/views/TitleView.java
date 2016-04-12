@@ -6,6 +6,7 @@ import banger.audio.data.Artist;
 import banger.audio.data.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
+import banger.util.Rating;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -14,10 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -107,6 +105,21 @@ public class TitleView extends ScrollPane implements View {
                             TableColumn songNameCol = new TableColumn("Name");
                             songNameCol.setCellValueFactory(new PropertyValueFactory<Song, String>("name"));
 
+                            TableColumn ratingCol = new TableColumn("Rating");
+                            ratingCol.setCellValueFactory(new PropertyValueFactory<Song, Integer>("rating"));
+                            ratingCol.setCellFactory(new Callback<TableColumn<Song, Integer>, TableCell<Song, Integer>>() {
+                                public TableCell<Song, Integer> call(TableColumn<Song, Integer> param) {
+                                    return new TableCell<Song, Integer>() {
+                                      public void updateItem(Integer item, boolean empty) {
+                                          if (item != null) {
+                                              Rating r = new Rating(mainview, item);
+                                              setGraphic(r);
+                                          }
+                                      }
+                                    };
+                                }
+                            });
+
                             TableColumn lengthCol = new TableColumn("Length");
                             lengthCol.setCellValueFactory(new PropertyValueFactory<Song, Integer>("length"));
 
@@ -117,7 +130,7 @@ public class TitleView extends ScrollPane implements View {
                             lengthCol.prefWidthProperty().bind(table.widthProperty().multiply(0.15));
                             table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-                            table.getColumns().addAll(numberCol, songNameCol, lengthCol);
+                            table.getColumns().addAll(numberCol, songNameCol, ratingCol, lengthCol);
 
                             table.setOnMousePressed(event -> {
                                 if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
