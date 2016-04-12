@@ -88,6 +88,7 @@ public class MainView extends Application {
         long start = System.currentTimeMillis();
         mainStage = new Stage(StageStyle.DECORATED);
 
+        mainStage.getIcons().add(new Image(Main.class.getResourceAsStream("/png/BangerFX icon.png")));
         mainStage.setTitle("B4NG3rFX");
         mainStage.setMinWidth(MIN_WIDTH);
         mainStage.setMaxWidth(1700);
@@ -173,6 +174,7 @@ public class MainView extends Application {
         initStage.setScene(splashScene);
         initStage.setX(bounds.getMinX() + bounds.getWidth() / 2 - SPLASH_WIDTH / 2);
         initStage.setY(bounds.getMinY() + bounds.getHeight() / 2 - SPLASH_HEIGHT / 2);
+        initStage.getIcons().add(new Image(Main.class.getResourceAsStream("/png/BangerFX icon.png")));
         initStage.show();
     }
 

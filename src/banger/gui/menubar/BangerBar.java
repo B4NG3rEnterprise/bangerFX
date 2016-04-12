@@ -19,7 +19,7 @@ import java.util.Optional;
 public class BangerBar extends MenuBar {
 
     private MainView mainview;
-    private Menu file, edit, view, help, extra, playlistMenu;
+    private Menu file, edit, view, help, playlistMenu;
 
     public BangerBar(MainView mainview){
         super();
@@ -149,10 +149,9 @@ public class BangerBar extends MenuBar {
         help.getItems().add(new MenuItem("Über"));
         help.getItems().add(new MenuItem("Get Premium"));
 
-        extra = new Menu("Extra");
-        extra.getItems().add(changeDir);
+        file.getItems().add(changeDir);
 
-        getMenus().addAll(file, edit, view, help, extra);
+        getMenus().addAll(file, edit, view, help);
     }
 
     public Menu initPlaylistMenu(){
