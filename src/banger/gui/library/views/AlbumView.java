@@ -7,19 +7,21 @@ import banger.database.DBController;
 import banger.gui.MainView;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.TilePane;
 
 
-public class AlbumView extends TilePane implements View {
+public class AlbumView extends ScrollPane implements View {
 
     private MainView mainview;
     private ObservableList<Album> albums;
+    private TilePane tp;
 
     public AlbumView(MainView m) {
         mainview = m;
         albums = DBController.getAllAlbums();
-
+        tp = new TilePane(15, 15);
 
         for (Album a : albums){
             ObservableList<Song> songs = a.getSongs();
@@ -37,12 +39,16 @@ public class AlbumView extends TilePane implements View {
                         mainview.getMusicPlayer().updateQueue(songs);
                     }
                 });
-                getChildren().add(cover);
+                tp.getChildren().add(cover);
             } else
                 continue;
         }
-
-        setPadding(new Insets(15, 15, 15, 15));
+        setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        setFitToHeight(true);
+        setFitToWidth(true);
+        setPadding(new Insets(10));
+        setContent(tp);
     }
 
     public void refreshData() {

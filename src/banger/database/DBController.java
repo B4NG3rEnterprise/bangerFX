@@ -775,6 +775,7 @@ public class DBController {
             int length = rs.getInt("length");
 
             s = new Song(song_id, name, artist, album, genre, rating, fileLocation, length);
+            connection.close();
         } catch (Exception e){
             e.printStackTrace();
         }
