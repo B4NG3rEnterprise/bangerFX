@@ -102,6 +102,11 @@ public class MainView extends Application {
 
         Options.init();
 
+        // Sidebar links
+        viewSelector = new ViewSelector(this);
+        filebrowser = new FileBrowser(this);
+        filebrowser.setMinSize(0, 0);
+
         handler = new InputHandler(this);
 
         player = new MusicPlayer(this);
@@ -129,11 +134,6 @@ public class MainView extends Application {
         VBox right = new VBox();
         right.setVgrow(queue, Priority.ALWAYS);
         right.getChildren().addAll(searchBar, new Separator(Orientation.HORIZONTAL), queue, new Separator(Orientation.HORIZONTAL), coverview, new Separator(Orientation.HORIZONTAL));
-
-        // Sidebar links
-        viewSelector = new ViewSelector(this);
-        filebrowser = new FileBrowser(this);
-        filebrowser.setMinSize(0, 0);
 
         Label plLabel = new Label("Playlists");
         plLabel.setPadding(new Insets(5));

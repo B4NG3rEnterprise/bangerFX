@@ -1,12 +1,10 @@
 package banger.gui.sidebar.filebrowser;
 
-import banger.audio.MusicPlayer;
 import banger.audio.data.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
 import banger.gui.options.Options;
 import banger.util.BangerVars;
-
 import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.event.EventHandler;
@@ -18,7 +16,6 @@ import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.File;
@@ -67,7 +64,7 @@ public class FileBrowser extends TreeView<TreeFile> {
             DBController.createFromDirectory(directory.toString());
             Options.setDirectory(directory.getPath());
             setPath(directory.getPath());
-            mainview.getLibrary().refreshData();
+            //mainview.getLibrary().refreshData();
         }
         findFiles(new File(path), null);
         this.getRoot().setExpanded(true);
