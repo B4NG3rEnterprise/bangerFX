@@ -74,7 +74,7 @@ public class MainView extends Application {
     public void start(final Stage initStage) throws Exception {
         Thread t = new Thread(()->{
             try {
-                Thread.sleep(1500);
+                Thread.sleep(500);
                 Platform.runLater(() -> hideSplash(initStage, () -> showMainStage()));
             } catch (Exception e){
                 e.printStackTrace();

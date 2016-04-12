@@ -6,6 +6,7 @@
     -fx-background-color: #FA7D38;
 }
 
+
 .table-row-cell:filled:selected, .table-cell:selected, .table-row-cell:focused {
     -fx-background: -fx-control-inner-background ;
     -fx-background-color: #FA7D38;

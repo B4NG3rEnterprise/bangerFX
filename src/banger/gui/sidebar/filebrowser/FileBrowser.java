@@ -11,11 +11,15 @@ import de.jensd.fx.glyphs.GlyphsDude;
 import de.jensd.fx.glyphs.materialdesignicons.MaterialDesignIcon;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 
@@ -47,6 +51,24 @@ public class FileBrowser extends TreeView<TreeFile> {
 
         addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEventHandle);
 
+        // check if program is run the first time, if so let user choose a music directory
+        if (path.equals("null")) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText("");
+            alert.setGraphic(null);
+            alert.initStyle(StageStyle.UNDECORATED);
+            alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
+            alert.setTitle("Erstes Mal gestartet");
+            alert.setContentText("Sie haben das Programm zuvor noch nicht genutzt. Bitte wählen Sie eine Directory mit Musik aus!");
+            alert.showAndWait();
+
+            DirectoryChooser dc = new DirectoryChooser();
+            File directory = dc.showDialog(mainview.stage);
+            DBController.createFromDirectory(directory.toString());
+            Options.setDirectory(directory.getPath());
+            setPath(directory.getPath());
+            mainview.getLibrary().refreshData();
+        }
         findFiles(new File(path), null);
         this.getRoot().setExpanded(true);
     }

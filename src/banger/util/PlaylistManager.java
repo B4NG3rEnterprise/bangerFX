@@ -42,17 +42,19 @@ public class PlaylistManager {
             File playlistExt = new File(PLAYLIST_DIR + name + "(" + ext + ")" + ".m3u");
             while (playlistExt.exists()) {
                 playlistExt = new File(PLAYLIST_DIR + name + "(" + ext + ")" + ".m3u");
+                ext++;
             }
-            String nameExt = playlistExt.getName();
+            String nameExt = playlistExt.getName().replace(".m3u", "");
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Playlist existiert");
-            alert.setContentText("Playlist existiert bereits. Die aktuelle Playlist wird als " + nameExt + " gepeichert.");
+            alert.setContentText("Playlist existiert bereits. Die aktuelle Playlist wird als " + nameExt + " gespeichert.");
             alert.setHeaderText("");
             alert.setGraphic(null);
             alert.initStyle(StageStyle.UNDECORATED);
             alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
             alert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
+                    createFile(new File(PLAYLIST_DIR + nameExt + ".m3u"));
                     addToPlaylist(nameExt, songs);
                 }
             });

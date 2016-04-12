@@ -42,7 +42,6 @@ public class PlaylistSelector extends ListView<String> {
             String selected = getSelectionModel().getSelectedItem();
             PlaylistManager.deletePlaylist(selected);
             updatePlaylists();
-            mainview.getBangerBar().updatePlaylistMenu();
         });
         cm.getItems().add(delete);
 
@@ -58,7 +57,6 @@ public class PlaylistSelector extends ListView<String> {
             if (event.getCode() == KeyCode.DELETE && getItems().size() > 0) {
                 PlaylistManager.deletePlaylist(getSelectionModel().getSelectedItem());
                 updatePlaylists();
-                mainview.getBangerBar().updatePlaylistMenu();
             }
         });
     }
@@ -66,6 +64,9 @@ public class PlaylistSelector extends ListView<String> {
     public void updatePlaylists(){
         String[] playlists = PlaylistManager.getPlaylists();
         ObservableList<String> data = FXCollections.observableArrayList();
+
+        mainview.getBangerBar().updatePlaylistMenu();
+        mainview.getLibrary().refreshData();
 
         if (playlists != null) {
             for (int i = 0; i < playlists.length; i++) {

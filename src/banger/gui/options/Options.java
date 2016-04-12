@@ -63,6 +63,15 @@ public class Options extends VBox {
         crossfade = Float.parseFloat(wini.get("Options", "Crossfade"));
     }
 
+    public static void setDirectory(String dir){
+        wini.put("Options", "FilePath", dir);
+        try {
+            wini.store();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private static void createOptions() {
         File f = new File(PATH);
         try {
@@ -75,7 +84,7 @@ public class Options extends VBox {
         wini.put("Options", "BackgroundColor", "0xffb366ff");
         wini.put("Options", "Crossfade", 0);
         wini.put("Options", "Notifications", true);
-        wini.put("Options", "FilePath", "D:/Musik"); //TODO: Implement dialog to fill this on fist startup!
+        wini.put("Options", "FilePath", "null");
 
         wini.put("KeyBindings", "0", "SPACE");
         wini.put("KeyBindings", "1", "ENTER");

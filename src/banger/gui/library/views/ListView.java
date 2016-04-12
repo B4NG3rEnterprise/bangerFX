@@ -4,16 +4,23 @@ import banger.audio.data.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
 import javafx.collections.FXCollections;
+import banger.util.PlaylistManager;
 import javafx.collections.ObservableList;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.event.EventHandler;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.StageStyle;
+
+import java.util.Optional;
 
 public class ListView extends TableView<Song> implements View {
 
     private MainView mainview;
     private ObservableList<Song> songs;
+    private Menu playlistMenu;
+    private ContextMenu cm;
 
     public ListView(MainView m) {
         mainview = m;
@@ -49,6 +56,26 @@ public class ListView extends TableView<Song> implements View {
                 mainview.getMusicPlayer().updateQueue(FXCollections.observableArrayList(songs));
             }
         });
+
+        cm = new ContextMenu();
+        MenuItem delete = new MenuItem("Delete");
+        delete.setOnAction(event -> {
+            DBController.deleteSongs(getSelectedItems());
+            refreshData();
+        });
+        playlistMenu = initPlaylistMenu();
+        cm.getItems().addAll(delete, playlistMenu);
+
+        addEventHandler(MouseEvent.MOUSE_CLICKED,
+                new EventHandler<MouseEvent>() {
+                    @Override public void handle(MouseEvent e) {
+                        if (e.getButton() == MouseButton.SECONDARY)
+                            cm.show(mainview.stage, e.getScreenX(), e.getScreenY());
+                            playlistMenu = initPlaylistMenu();
+                            cm.getItems().remove(1); // remove menu
+                            cm.getItems().add(1, playlistMenu); // add menu again
+                    }
+                });
     }
 
     public void select(Song song) {
@@ -73,5 +100,63 @@ public class ListView extends TableView<Song> implements View {
             result[i] = songs.get(i);
         if (result.length == 0) result = null;
         return result;
+    }
+
+    public Menu initPlaylistMenu(){
+        playlistMenu = new Menu("Hinzufügen zu...");
+
+        // just examples, loop through playlists and add them to the menu
+        String[] playlists = PlaylistManager.getPlaylists();
+        if (playlists != null) {
+            for (int i = 0; i < playlists.length; i++) {
+                MenuItem item = new MenuItem(playlists[i]);
+                item.setOnAction(event -> {
+                    // TODO add songs to playlist
+                    Song[] songs = getSelectedItems();
+                    PlaylistManager.addToPlaylist(item.getText(), songs);
+                });
+                playlistMenu.getItems().add(item);
+                // System.out.println(item.toString());
+            }
+        }
+        MenuItem newpl = new MenuItem("Neue Playlist erstellen...");
+        newpl.setOnAction(event -> {
+            // TODO add songs so playlist
+            Song[] songs = getSelectedItems();
+
+            if (songs != null) { // show name input and create new playlist
+                String name = "New Playlist";
+                TextInputDialog dialog = new TextInputDialog(name);
+                dialog.setHeaderText("");
+                dialog.setGraphic(null);
+                dialog.setTitle("Playlist Name");
+                dialog.setContentText("Enter a playlist name:");
+                dialog.initStyle(StageStyle.UNDECORATED);
+                dialog.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
+                dialog.getEditor().getStyleClass().add("editor");
+
+                Optional<String> result = dialog.showAndWait();
+                if (result.isPresent()) {
+                    name = result.get();
+                }
+
+                PlaylistManager.createPlaylist(name, songs);
+            } else { // show alert
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Keine Dateien ausgewählt");
+                alert.setContentText("Bitte wählen Sie zuerst Dateien aus!");
+                alert.setHeaderText("");
+                alert.setGraphic(null);
+                alert.initStyle(StageStyle.UNDECORATED);
+                alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
+                alert.show();
+            }
+
+            // update PlaylistSelector
+            mainview.getPlaylistSelector().updatePlaylists();
+        });
+        playlistMenu.getItems().add(newpl);
+
+        return playlistMenu;
     }
 }

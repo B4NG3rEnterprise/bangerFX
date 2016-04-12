@@ -18,8 +18,8 @@ import java.util.Optional;
 
 public class BangerBar extends MenuBar {
 
-    MainView mainview;
-    Menu file, edit, view, help, extra, playlistMenu;
+    private MainView mainview;
+    private Menu file, edit, view, help, extra, playlistMenu;
 
     public BangerBar(MainView mainview){
         super();
@@ -32,11 +32,9 @@ public class BangerBar extends MenuBar {
         getStylesheets().add("banger/gui/menubar/bangerbar.css");
         MenuItem changeDir = new MenuItem("Choose Directory...");
         changeDir.setOnAction(e -> {
-            Stage stage = new Stage();
-            stage.centerOnScreen();
             DirectoryChooser dc = new DirectoryChooser();
             // dc.setInitialDirectory(new File("F:/Musik"));
-            File directory = dc.showDialog(stage);
+            File directory = dc.showDialog(mainview.stage);
             DBController.createFromDirectory(directory.toString());
             mainview.getLibrary().refreshData();
         });
@@ -44,20 +42,8 @@ public class BangerBar extends MenuBar {
         file = new Menu("Datei");
         MenuItem deleteSelected = new MenuItem("Songs löschen...");
         deleteSelected.setOnAction(event -> {
-            Song[] songs = mainview.getLibrary().getSelectedItems();
-            if (songs != null) {
-                DBController.deleteSongs(mainview.getLibrary().getSelectedItems());
-                mainview.getLibrary().refreshData();
-            } else {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Keine Dateien ausgewählt");
-                alert.setContentText("Bitte wählen Sie zuerst Dateien aus!");
-                alert.setHeaderText("");
-                alert.setGraphic(null);
-                alert.initStyle(StageStyle.UNDECORATED);
-                alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
-                alert.show();
-            }
+            DBController.deleteSongs(mainview.getLibrary().getSelectedItems());
+            mainview.getLibrary().refreshData();
         });
         file.getItems().add(deleteSelected);
         MenuItem imp = new MenuItem("Songs Importieren...");
@@ -169,8 +155,8 @@ public class BangerBar extends MenuBar {
         getMenus().addAll(file, edit, view, help, extra);
     }
 
-    private Menu initPlaylistMenu(){
-        Menu playlistMenu = new Menu("Hinzufügen zu...");
+    public Menu initPlaylistMenu(){
+        playlistMenu = new Menu("Hinzufügen zu...");
 
         // just examples, loop through playlists and add them to the menu
         String[] playlists = PlaylistManager.getPlaylists();

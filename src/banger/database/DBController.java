@@ -648,39 +648,50 @@ public class DBController {
 
     public static void deleteSongs(Song[] songs){
         try {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Wirklich löschen?");
-            alert.setContentText("Wollen Sie die ausgewählten Dateien nur aus dem MusicPlayer entfernen oder auch von der Festplatte?");
-            alert.setHeaderText("");
-            alert.setGraphic(null);
-            alert.initStyle(StageStyle.UNDECORATED);
-            alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
-            ButtonType library = new ButtonType("MusicPlayer");
-            ButtonType disc = new ButtonType("Festplatte");
-            ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+            if (songs != null) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Wirklich löschen?");
+                alert.setContentText("Wollen Sie die ausgewählten Dateien nur aus dem MusicPlayer entfernen oder auch von der Festplatte?");
+                alert.setHeaderText("");
+                alert.setGraphic(null);
+                alert.initStyle(StageStyle.UNDECORATED);
+                alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
+                ButtonType library = new ButtonType("MusicPlayer");
+                ButtonType disc = new ButtonType("Festplatte");
+                ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
-            alert.getButtonTypes().setAll(library, disc, buttonTypeCancel);
+                alert.getButtonTypes().setAll(library, disc, buttonTypeCancel);
 
-            Optional<ButtonType> result = alert.showAndWait();
-            alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText("");
-            alert.setGraphic(null);
-            alert.initStyle(StageStyle.UNDECORATED);
-            alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
-            if (result.get() == library){
-                int counter = deleteDatabaseEntries(songs);
-                alert.setTitle("Songs entfernt");
-                alert.setContentText(counter + " Song[s] aus dem MusicPlayer entfernt.");
-                alert.show();
-            } else if (result.get() == disc) {
-                int counter = deleteDatabaseEntries(songs);
-                deleteFiles(songs);
-                alert.setTitle("Songs gelöscht");
-                alert.setContentText(counter + " Song[s] von der Festplatte gelöscht.");
-                alert.show();
+                Optional<ButtonType> result = alert.showAndWait();
+                alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("");
+                alert.setGraphic(null);
+                alert.initStyle(StageStyle.UNDECORATED);
+                alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
+                if (result.get() == library) {
+                    int counter = deleteDatabaseEntries(songs);
+                    alert.setTitle("Songs entfernt");
+                    alert.setContentText(counter + " Song[s] aus dem MusicPlayer entfernt.");
+                    alert.show();
+                } else if (result.get() == disc) {
+                    int counter = deleteDatabaseEntries(songs);
+                    deleteFiles(songs);
+                    alert.setTitle("Songs gelöscht");
+                    alert.setContentText(counter + " Song[s] von der Festplatte gelöscht.");
+                    alert.show();
+                } else {
+                    alert.setTitle("Abgebrochen");
+                    alert.setContentText("Keine Dateien gelöscht.");
+                    alert.show();
+                }
             } else {
-                alert.setTitle("Abgebrochen");
-                alert.setContentText("Keine Dateien gelöscht.");
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Keine Dateien ausgewählt");
+                alert.setContentText("Bitte wählen Sie zuerst Dateien aus!");
+                alert.setHeaderText("");
+                alert.setGraphic(null);
+                alert.initStyle(StageStyle.UNDECORATED);
+                alert.getDialogPane().getStylesheets().add("banger/gui/menubar/dialog.css");
                 alert.show();
             }
         } catch (SQLException e){
