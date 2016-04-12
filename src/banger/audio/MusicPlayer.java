@@ -124,6 +124,7 @@ public class MusicPlayer {
     }
 
     public void crossfade() {
+        //SkipForward
         int i = queue.indexOf(getNowPlaying());
         Song next = null;
         switch (repeatState) {
@@ -143,6 +144,7 @@ public class MusicPlayer {
         }
         fireQueueListeners(queue, queue.indexOf(next));
 
+        //Init
         final int old = stream;
         nowPlaying = next;
 

@@ -1,16 +1,18 @@
 package banger.gui.sidebar;
 
+import banger.audio.data.Song;
 import banger.database.DBController;
 import banger.gui.MainView;
 import banger.util.PlaylistManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
-import javafx.scene.control.*;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.StageStyle;
 
 public class PlaylistSelector extends ListView<String> {
 
@@ -30,9 +32,10 @@ public class PlaylistSelector extends ListView<String> {
 
         setOnMousePressed(event -> {
             if (event.isPrimaryButtonDown() && event.getClickCount() == 2) {
-                // TODO add playlist songs to titleview and display it there instead of the queue
                 // System.out.println("Playlist selected: " + getSelectionModel().getSelectedItem());
-                mainview.getQueue().setItems(DBController.getSongsFromPlaylist(getSelectionModel().getSelectedItem()));
+                ObservableList<Song> q = DBController.getSongsFromPlaylist(getSelectionModel().getSelectedItem());
+                mainview.getMusicPlayer().play(q.get(0));
+                mainview.getMusicPlayer().updateQueue(q);
             }
         });
 
