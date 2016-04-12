@@ -272,7 +272,7 @@ public class DBController {
                             ps3.setInt(2, artistID);
                             ps3.setInt(3, albumID);
                             ps3.setString(4, genre);
-                            ps3.setInt(5, 5);
+                            ps3.setInt(5, 0);
                             ps3.setString(6, filePath);
                             ps3.setInt(7, length);
                             ps3.addBatch();
@@ -283,7 +283,7 @@ public class DBController {
                             ps3.setInt(2, 1);
                             ps3.setInt(3, 1);
                             ps3.setString(4, "Unknown");
-                            ps3.setInt(5, 5);
+                            ps3.setInt(5, 0);
                             ps3.setString(6, filePath);
                             ps3.setInt(7, 0);
                             ps3.addBatch();
@@ -293,7 +293,7 @@ public class DBController {
                         ps3.setInt(2, 1);
                         ps3.setInt(3, 1);
                         ps3.setString(4, "Unknown");
-                        ps3.setInt(5, 5);
+                        ps3.setInt(5, 0);
                         ps3.setString(6, filePath);
                         ps3.setInt(7, 0);
                         ps3.addBatch();
@@ -703,14 +703,14 @@ public class DBController {
         Song result = null;
         try {
             initDBConnection();
-            Statement s = connection.createStatement();
-            ResultSet rs;
-
-            rs = s.executeQuery("SELECT *, album.album_name, artist.artist_name " +
+            PreparedStatement ps = connection.prepareStatement("SELECT *, album.album_name, artist.artist_name " +
                     "FROM song " +
                     "INNER JOIN album ON (song.album = album.id) " +
                     "INNER JOIN artist ON (song.artist = artist.id) " +
                     "WHERE (song.fileLocation = '" + path.replace("'", "''") + "')");
+            ResultSet rs;
+
+            rs = ps.executeQuery();
 
             int id = rs.getInt("id");
             String name = rs.getString("song_name");
@@ -746,9 +746,9 @@ public class DBController {
     public static void rate(int id, int rating){
         try {
             initDBConnection();
-            Statement stmt = connection.createStatement();
+            PreparedStatement ps = connection.prepareStatement("UPDATE song SET rating=" + rating + " WHERE id=" + id);
 
-            stmt.execute("UPDATE song SET rating = " + rating + " WHERE id = " + id);
+            ps.execute();
 
             connection.close();
         } catch (Exception e){

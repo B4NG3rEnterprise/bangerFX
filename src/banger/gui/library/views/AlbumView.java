@@ -43,6 +43,7 @@ public class AlbumView extends ScrollPane implements View {
             } else
                 continue;
         }
+        getStylesheets().add("banger/gui/library/views/lyricsview.css");
         setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         setFitToHeight(true);

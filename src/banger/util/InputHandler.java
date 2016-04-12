@@ -31,7 +31,7 @@ public class InputHandler implements EventHandler<KeyEvent> {
 
     @Override
     public void handle(KeyEvent t) {
-        System.out.println(t.getText());
+        // System.out.println(t.getText());
         Iterator<KeyBinding> it = keyBindings.listIterator();
         KeyBinding kb;
         while (it.hasNext()) {

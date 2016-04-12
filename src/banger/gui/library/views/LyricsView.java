@@ -72,7 +72,7 @@ public class LyricsView extends VBox implements View {
         sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
         StackPane lyricsContainer = new StackPane();
-        lyricsContainer.setMinHeight(400); // TODO remove later
+        lyricsContainer.setMinHeight(600); // TODO remove later
         lyricsContainer.getChildren().addAll(sp, overlay);
 
         HBox hbox = new HBox(2);
